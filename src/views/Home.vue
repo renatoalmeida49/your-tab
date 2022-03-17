@@ -3,42 +3,20 @@
     <h1>Home page</h1>
 
     <div class="tab" :key="render">
-      <div class="tab__string">
-        <span>e</span>
-        <Draggable v-model="eString">
-          <span
-            v-for="(note, index) in eString"
-            @dblclick="changeContent('eString', index)"
-            :key="`${note}-${index}`"
-            >{{ note }}</span
-          >
-        </Draggable>
-      </div>
-      <div class="tab__string">
-        <span>B</span>
+      <template v-for="(string, indexString) in guitar">
+        <div class="tab__string" :key="indexString">
+          <span>{{ string.note }}|</span>
 
-        <span v-for="n in 40" :key="n" @click="changeContent">-</span>
-      </div>
-      <div class="tab__string">
-        <span>G</span>
-
-        <span v-for="n in 40" :key="n" @click="changeContent">-</span>
-      </div>
-      <div class="tab__string">
-        <span>D</span>
-
-        <span v-for="n in 40" :key="n" @click="changeContent">-</span>
-      </div>
-      <div class="tab__string">
-        <span>A</span>
-
-        <span v-for="n in 40" :key="n" @click="changeContent">-</span>
-      </div>
-      <div class="tab__string">
-        <span>E</span>
-
-        <span v-for="n in 40" :key="n" @click="changeContent">-</span>
-      </div>
+          <Draggable v-model="string.string" group="tablatura">
+            <span
+              v-for="(note, index) in string.string"
+              @dblclick="changeContent(indexString, index)"
+              :key="`${note}-${index}`"
+              >{{ note }}</span
+            >
+          </Draggable>
+        </div>
+      </template>
     </div>
   </div>
 </template>
@@ -54,16 +32,87 @@ export default {
   },
 
   data() {
+    const string = () => {
+      return [
+        "-",
+        "-",
+        "-",
+        "-",
+        "-",
+        "-",
+        "-",
+        "-",
+        "-",
+        "-",
+        "-",
+        "-",
+        "-",
+        "-",
+        "-",
+        "-",
+        "-",
+        "-",
+        "-",
+        "-",
+        "-",
+        "-",
+        "-",
+        "-",
+        "-",
+        "-",
+        "-",
+        "-",
+        "-",
+        "-",
+        "-",
+        "-",
+        "-",
+        "-",
+        "-",
+        "-",
+        "-",
+        "-",
+        "-",
+        "-",
+      ];
+    };
+
     return {
       render: 0,
-      eString: ["-", "-", "3", "-", "-", "-", "-", "-", "-", "-", "-"],
+      guitar: {
+        eString: {
+          note: "e",
+          string: string(),
+        },
+        BString: {
+          note: "B",
+          string: string(),
+        },
+        GString: {
+          note: "G",
+          string: string(),
+        },
+        DString: {
+          note: "D",
+          string: string(),
+        },
+        AString: {
+          note: "A",
+          string: string(),
+        },
+        EString: {
+          note: "E",
+          string: string(),
+        },
+      },
     };
   },
 
   methods: {
     changeContent(string, index) {
-      this[string][index] = prompt(this[string][index]);
-      // event.target.innerHTML = prompt(event.target.innerHTML) || "-";
+      this.guitar[string].string[index] = prompt(
+        this.guitar[string].string[index] || "-"
+      );
       this.forceRender();
     },
 
@@ -81,5 +130,10 @@ export default {
 <style lang="scss">
 .tab {
   font-family: monospace;
+  font-size: 20px;
+
+  .tab__string {
+    display: flex;
+  }
 }
 </style>
