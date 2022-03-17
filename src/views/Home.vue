@@ -2,11 +2,12 @@
   <div class="home">
     <h1>Home page</h1>
 
-    <div class="tab" :key="render">
+    <button @click="download('test.txt')">Click</button>
+
+    <div id="all-tabs" class="tab" :key="render">
       <template v-for="(string, indexString) in guitar">
         <div class="tab__string" :key="indexString">
           <span>{{ string.note }}|</span>
-
           <Draggable v-model="string.string" group="tablatura">
             <span
               v-for="(note, index) in string.string"
@@ -114,6 +115,23 @@ export default {
         this.guitar[string].string[index] || "-"
       );
       this.forceRender();
+    },
+
+    download(filename) {
+      // let element = document.createElement("a");
+      let content = document.getElementById("all-tabs");
+      const teste = content.innerText.replaceAll("|\n", "|");
+
+      const blob = new Blob([teste], { type: "text/txt" });
+
+      const elem = window.document.createElement("a");
+
+      elem.href = window.URL.createObjectURL(blob);
+
+      elem.download = filename;
+      document.body.appendChild(elem);
+      elem.click();
+      document.body.removeChild(elem);
     },
 
     forceRender() {
