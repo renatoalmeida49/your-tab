@@ -1,6 +1,6 @@
 <template>
   <div class="tab-index" :key="render">
-    <button @click="newTab">New tab</button>
+    <!-- <button @click="newTab">New tab</button> -->
 
     <template v-for="(tab, indexTab) in tabs">
       <div class="tab" :key="indexTab">
