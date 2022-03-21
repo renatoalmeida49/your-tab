@@ -2,33 +2,29 @@
   <div class="tab-index" :key="render">
     <!-- <button @click="newTab">New tab</button> -->
 
-    <template v-for="(tab, indexTab) in tabs">
-      <div class="tab" :key="indexTab">
-        <p>{{ indexTab }}</p>
-        <template v-for="(string, indexString) in tab">
-          <div class="tab__string" :key="indexString">
-            <span>{{ string.note }}|</span>
-            <Draggable
-              :list="string.string"
-              :move="handleMoveItem"
-              @end="handleDragEndItem"
-              group="tablatura"
+    <div class="tab">
+      <template v-for="(string, indexString) in tab">
+        <div class="tab__string" :key="indexString">
+          <span>{{ string.note }}|</span>
+          <Draggable
+            :list="string.string"
+            :move="handleMoveItem"
+            @end="handleDragEndItem"
+            group="tablatura"
+            :data-list="indexString"
+          >
+            <span
               :data-list="indexString"
-              :data-tab="indexTab"
+              class="note"
+              v-for="(note, index) in string.string"
+              @dblclick="changeContent(indexString, index)"
+              :key="`${note}-${index}`"
+              >{{ note }}</span
             >
-              <span
-                :data-list="indexString"
-                class="note"
-                v-for="(note, index) in string.string"
-                @dblclick="changeContent(indexTab, indexString, index)"
-                :key="`${note}-${index}`"
-                >{{ note }}</span
-              >
-            </Draggable>
-          </div>
-        </template>
-      </div>
-    </template>
+          </Draggable>
+        </div>
+      </template>
+    </div>
   </div>
 </template>
 
@@ -119,19 +115,14 @@ export default {
 
     return {
       render: 0,
-      blankTab: tab(),
-      tabs: [],
+      tab: tab(),
     };
   },
 
-  mounted() {
-    this.newTab();
-  },
-
   methods: {
-    changeContent(indexTab, indexString, index) {
-      this.tabs[indexTab][indexString].string[index] = prompt(
-        this.tabs[indexTab][indexString].string[index] || "-"
+    changeContent(indexString, index) {
+      this.tab[indexString].string[index] = prompt(
+        this.tab[indexString].string[index] || "-"
       );
       this.forceRender();
     },
@@ -140,53 +131,33 @@ export default {
       this.render++;
     },
 
-    newTab() {
-      this.tabs.push(JSON.parse(JSON.stringify(this.blankTab)));
-    },
-
     handleDragEndItem() {
       if (this.originalList === this.futureList) {
-        this.movingItem =
-          this.tabs[this.originalTab][this.futureList].string[
-            this.originalIndex
-          ];
-        this.futureItem =
-          this.tabs[this.futureTab][this.futureList].string[this.futureIndex];
+        this.movingItem = this.tab[this.futureList].string[this.originalIndex];
+        this.futureItem = this.tab[this.futureList].string[this.futureIndex];
 
         if (this.movingItem && this.futureItem) {
-          let _list = Object.assign(
-            [],
-            this.tabs[this.futureTab][this.futureList].string
-          );
+          let _list = Object.assign([], this.tab[this.futureList].string);
 
           _list[this.futureIndex] = this.movingItem;
           _list[this.originalIndex] = this.futureItem;
 
-          this.tabs[this.futureTab][this.futureList].string = _list;
+          this.tab[this.futureList].string = _list;
         }
       } else {
         this.movingItem =
-          this.tabs[this.originalTab][this.originalList].string[
-            this.originalIndex
-          ];
-        this.futureItem =
-          this.tabs[this.futureTab][this.futureList].string[this.futureIndex];
+          this.tab[this.originalList].string[this.originalIndex];
+        this.futureItem = this.tab[this.futureList].string[this.futureIndex];
 
         if (this.movingItem && this.futureItem) {
-          let _listFrom = Object.assign(
-            [],
-            this.tabs[this.originalTab][this.originalList].string
-          );
-          let _listTo = Object.assign(
-            [],
-            this.tabs[this.futureTab][this.futureList].string
-          );
+          let _listFrom = Object.assign([], this.tab[this.originalList].string);
+          let _listTo = Object.assign([], this.tab[this.futureList].string);
 
           _listTo[this.futureIndex] = this.movingItem;
           _listFrom[this.originalIndex] = this.futureItem;
 
-          this.tabs[this.originalTab][this.originalList].string = _listFrom;
-          this.tabs[this.futureTab][this.futureList].string = _listTo;
+          this.tab[this.originalList].string = _listFrom;
+          this.tab[this.futureList].string = _listTo;
         }
       }
     },
@@ -196,9 +167,6 @@ export default {
 
       this.originalIndex = index;
       this.futureIndex = futureIndex;
-
-      this.originalTab = event.from.getAttribute("data-tab");
-      this.futureTab = event.to.getAttribute("data-tab");
 
       this.originalList = event.from.getAttribute("data-list");
       this.futureList = event.to.getAttribute("data-list");
@@ -213,6 +181,10 @@ export default {
 .tab-index {
   font-family: monospace;
   font-size: 20px;
+
+  .tab {
+    padding: 12px;
+  }
 
   .tab__string {
     display: flex;
