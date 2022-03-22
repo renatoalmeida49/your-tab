@@ -1,19 +1,16 @@
 <template>
-  <div class="verse">
-    <!-- <button @click="newVerse">New verse</button> -->
-
-    <div v-for="(verse, index) in verse" :key="index">
-      <Draggable :list="verse.chords">
-        <span
-          v-for="(dash, index) in verse.chords"
-          :key="index"
-          @dblclick="changeContent(index)"
-          >{{ dash }}</span
-        >
-      </Draggable>
-      <p>{{ verse.verse }}</p>
-      <input type="text" v-model="verse.verse" />
-    </div>
+  <div class="verse" :key="render">
+    <Draggable :list="chords">
+      <span
+        v-for="(dash, index) in chords"
+        :key="index"
+        @dblclick="changeContent(index)"
+        :class="checkContent(dash)"
+        >{{ dash }}</span
+      >
+    </Draggable>
+    <pre>{{ verse }}</pre>
+    <input class="verse-input" type="text" v-model="verse" />
   </div>
 </template>
 
@@ -32,7 +29,7 @@ export default {
       return [
         "-",
         "-",
-        "5",
+        "-",
         "-",
         "-",
         "-",
@@ -73,36 +70,38 @@ export default {
       ];
     };
 
-    const line = () => {
-      return {
-        chords: chordsLine(),
-        verse: "",
-      };
-    };
-
     return {
+      render: 1,
       chords: chordsLine(),
-      blankLine: line(),
-      verse: [],
+      verse: "",
     };
-  },
-
-  mounted() {
-    this.newVerse();
-
-    console.log(this.verse);
   },
 
   methods: {
-    newVerse() {
-      this.verse.push(JSON.parse(JSON.stringify(this.blankLine)));
+    checkContent(content) {
+      return content != "-" ? "red" : "verse-dash";
     },
 
     changeContent(index) {
-      console.log(index, this.verse);
+      this.chords[index] = prompt(this.chords[index]);
+
+      this.forceRender();
+    },
+
+    forceRender() {
+      this.render++;
     },
   },
 };
 </script>
 
-<style lang="scss"></style>
+<style lang="scss">
+.verse {
+  width: 100%;
+  font-size: 20px;
+
+  .red {
+    color: red;
+  }
+}
+</style>
