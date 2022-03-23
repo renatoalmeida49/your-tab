@@ -1,8 +1,7 @@
 <template>
-  <div class="tab-index" :key="render">
+  <div class="tab" :key="render">
     <!-- <button @click="newTab">New tab</button> -->
-
-    <div class="tab">
+    <div class="tab__container">
       <template v-for="(string, indexString) in tab">
         <div class="tab__string" :key="indexString">
           <span>{{ string.note }}|</span>
@@ -178,15 +177,15 @@ export default {
 </script>
 
 <style lang="scss">
-.tab-index {
+.tab {
   font-family: monospace;
   font-size: 20px;
 
-  .tab {
-    padding: 12px;
+  &__container {
+    margin-bottom: $margin-bottom;
   }
 
-  .tab__string {
+  &__string {
     display: flex;
 
     span {

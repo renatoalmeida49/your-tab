@@ -1,14 +1,13 @@
 <template>
   <div class="home">
-    <button @click="download('tab.txt')">Download TXT</button>
-    <button @click="generateReport">Download PDF</button>
+    <div class="home__buttons">
+      <!-- <button @click="download('tab.txt')">Download TXT</button> -->
+      <button @click="generateReport">Download PDF</button>
+      <button @click="add('tab')">Tab</button>
+      <button @click="add('verse')">Verso</button>
+    </div>
 
-    <ul class="menu">
-      <li @click="add('tab')">Tab</li>
-      <li @click="add('strophe')">Estrofe</li>
-    </ul>
-
-    <div id="all-tabs" class="tabs">
+    <div id="song" class="home__song">
       <component
         :is="typeComponent(part)"
         v-for="(part, index) in songStructure"
@@ -24,9 +23,11 @@
       filename="tab-pdf"
       pdf-format="a4"
       pdf-orientation="portrait"
-      :paginate-elements-by-height="1400"
+      :pdf-content-width="widthPDF"
+      :paginate-elements-by-height="1100"
+      :pdf-quality="2"
     >
-      <section slot="pdf-content">
+      <section class="pdf-content" slot="pdf-content">
         <div id="pdf-content"></div>
       </section>
     </vue-html2pdf>
@@ -36,11 +37,11 @@
 <script>
 import VueHtml2pdf from "vue-html2pdf";
 import Tab from "@/components/tab";
-import Strophe from "@/components/strophe";
+import Verse from "@/components/verse";
 
 const componentList = {
   tab: Tab,
-  strophe: Strophe,
+  verse: Verse,
 };
 
 export default {
@@ -56,6 +57,12 @@ export default {
     };
   },
 
+  computed: {
+    widthPDF() {
+      return "800px";
+    },
+  },
+
   methods: {
     add(component) {
       console.log(component);
@@ -64,7 +71,7 @@ export default {
 
     download(filename) {
       // let element = document.createElement("a");
-      let content = document.getElementById("all-tabs");
+      let content = document.getElementById("song");
       const teste = content.innerText.replaceAll("|\n", "|");
 
       const blob = new Blob([teste], { type: "text/txt" });
@@ -80,7 +87,7 @@ export default {
     },
 
     generateReport() {
-      const cifra = document.getElementById("all-tabs");
+      const cifra = document.getElementById("song");
       const pdf = document.getElementById("pdf-content");
 
       pdf.innerHTML = cifra.innerHTML;
@@ -107,26 +114,19 @@ export default {
 </script>
 
 <style lang="scss">
-.menu {
-  background: $primary;
-  font-family: "title";
-  color: $secondary;
-  list-style: none;
-
-  position: fixed;
-  padding: 20px;
+#pdf-content {
+  margin: 40px;
 }
-.tabs {
-  padding: 0px 120px;
-  font-family: monospace;
-  font-size: 20px;
+.home {
+  background: $white;
+  min-height: 200vh;
+  padding: 40px 60px;
+  position: relative;
 
-  .tab__string {
-    display: flex;
-
-    span {
-      cursor: pointer;
-    }
+  &__buttons {
+    text-align: center;
+    position: sticky;
+    top: 0px;
   }
 }
 </style>
