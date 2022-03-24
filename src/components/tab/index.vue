@@ -80,6 +80,20 @@ export default {
         "-",
         "-",
         "-",
+        "-",
+        "-",
+        "-",
+        "-",
+        "-",
+        "-",
+        "-",
+        "-",
+        "-",
+        "-",
+        "-",
+        "-",
+        "-",
+        "-",
       ];
     };
 
@@ -179,7 +193,6 @@ export default {
 <style lang="scss">
 .tab {
   font-family: monospace;
-  font-size: 20px;
 
   &__container {
     margin-bottom: $margin-bottom;

@@ -1,10 +1,14 @@
 <template>
-  <div class="home">
+  <div class="home" :key="render">
     <div class="home__buttons">
-      <!-- <button @click="download('tab.txt')">Download TXT</button> -->
-      <button @click="generateReport">Download PDF</button>
-      <button @click="add('tab')">Tab</button>
-      <button @click="add('verse')">Verso</button>
+      <div class="home__buttons-song">
+        <button @click="add('tab')">Tab</button>
+        <button @click="add('verse')">Verso</button>
+      </div>
+      <div class="home__buttons-downloads">
+        <button @click="download('tab.txt')">Download TXT</button>
+        <button @click="generateReport">Download PDF</button>
+      </div>
     </div>
 
     <div id="song" class="home__song">
@@ -53,6 +57,7 @@ export default {
 
   data() {
     return {
+      render: 1,
       songStructure: [],
     };
   },
@@ -65,7 +70,6 @@ export default {
 
   methods: {
     add(component) {
-      console.log(component);
       this.songStructure.push(component);
     },
 
@@ -109,6 +113,10 @@ export default {
     typeComponent(component) {
       return componentList[component];
     },
+
+    forceRender() {
+      this.render++;
+    },
   },
 };
 </script>
@@ -119,14 +127,60 @@ export default {
 }
 .home {
   background: $white;
-  min-height: 200vh;
-  padding: 40px 60px;
+  min-height: calc(100vh - 77px);
+  padding: 0 60px;
   position: relative;
 
   &__buttons {
     text-align: center;
     position: sticky;
     top: 0px;
+
+    &-song {
+      button {
+        cursor: pointer;
+        font-size: 20px;
+        width: 100%;
+        max-width: 150px;
+        border: none;
+        background: $primary;
+        color: $secondary;
+        padding: 8px 20px;
+        font-family: "title";
+        box-shadow: 0px 1px 6px 0px rgb(0 0 0 / 50%);
+
+        &:first-child {
+          border-radius: 0 0 0 20px;
+        }
+
+        &:last-child {
+          border-radius: 0 0 20px 0;
+        }
+      }
+    }
+
+    &-downloads {
+      button {
+        cursor: pointer;
+        font-size: 14px;
+        width: 100%;
+        max-width: 100px;
+        border: none;
+        background: $secondary;
+        color: $primary;
+        padding: 8px 20px;
+        font-family: "title";
+        box-shadow: 0px 1px 6px 0px rgb(0 0 0 / 50%);
+
+        &:first-child {
+          border-radius: 0 0 0 20px;
+        }
+
+        &:last-child {
+          border-radius: 0 0 20px 0;
+        }
+      }
+    }
   }
 }
 </style>

@@ -98,10 +98,12 @@ export default {
 <style lang="scss">
 .verse {
   width: 100%;
-  font-size: 20px;
+  font-family: monospace;
+  margin-bottom: $margin-bottom;
 
   .red {
-    color: red;
+    color: $primary;
+    font-family: "title";
   }
 }
 </style>

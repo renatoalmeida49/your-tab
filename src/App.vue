@@ -1,6 +1,7 @@
 <template>
   <div id="app">
     <div class="container">
+      <h1>Cifra builder</h1>
       <router-view />
     </div>
   </div>
@@ -22,6 +23,12 @@
     max-width: 1240px;
     padding: 0 40px;
     margin: auto;
+
+    h1 {
+      text-align: center;
+      background: $white;
+      padding: 20px 0;
+    }
   }
 }
 </style>
