@@ -12,11 +12,16 @@
     </div>
 
     <div id="song" class="home__song">
-      <component
-        :is="typeComponent(part)"
-        v-for="(part, index) in songStructure"
-        :key="index"
-      ></component>
+      <Draggable :list="songStructure">
+        <component
+          v-for="(part, index) in songStructure"
+          :key="index"
+          :is="part.component"
+          :info="part.info"
+          :songIndex="index"
+          @changeContent="updateContent"
+        ></component>
+      </Draggable>
     </div>
 
     <vue-html2pdf
@@ -39,6 +44,7 @@
 </template>
 
 <script>
+import Draggable from "vuedraggable";
 import VueHtml2pdf from "vue-html2pdf";
 import Tab from "@/components/tab";
 import Verse from "@/components/verse";
@@ -48,11 +54,152 @@ const componentList = {
   verse: Verse,
 };
 
+const string = () => {
+  return [
+    "-",
+    "-",
+    "-",
+    "-",
+    "-",
+    "-",
+    "-",
+    "-",
+    "-",
+    "-",
+    "-",
+    "-",
+    "-",
+    "-",
+    "-",
+    "-",
+    "-",
+    "-",
+    "-",
+    "-",
+    "-",
+    "-",
+    "-",
+    "-",
+    "-",
+    "-",
+    "-",
+    "-",
+    "-",
+    "-",
+    "-",
+    "-",
+    "-",
+    "-",
+    "-",
+    "-",
+    "-",
+    "-",
+    "-",
+    "-",
+    "-",
+    "-",
+    "-",
+    "-",
+    "-",
+    "-",
+    "-",
+    "-",
+    "-",
+    "-",
+    "-",
+    "-",
+    "-",
+    "-",
+  ];
+};
+
+const defaultTab = () => {
+  return {
+    eString: {
+      note: "e",
+      string: string(),
+    },
+    BString: {
+      note: "B",
+      string: string(),
+    },
+    GString: {
+      note: "G",
+      string: string(),
+    },
+    DString: {
+      note: "D",
+      string: string(),
+    },
+    AString: {
+      note: "A",
+      string: string(),
+    },
+    EString: {
+      note: "E",
+      string: string(),
+    },
+  };
+};
+
+const chordsLine = () => {
+  return [
+    "-",
+    "-",
+    "-",
+    "-",
+    "-",
+    "-",
+    "-",
+    "-",
+    "-",
+    "-",
+    "-",
+    "-",
+    "-",
+    "-",
+    "-",
+    "-",
+    "-",
+    "-",
+    "-",
+    "-",
+    "-",
+    "-",
+    "-",
+    "-",
+    "-",
+    "-",
+    "-",
+    "-",
+    "-",
+    "-",
+    "-",
+    "-",
+    "-",
+    "-",
+    "-",
+    "-",
+    "-",
+    "-",
+    "-",
+    "-",
+  ];
+};
+
+const defaultVerse = () => {
+  return {
+    chords: chordsLine(),
+    verse: "",
+  };
+};
+
 export default {
   name: "Home",
 
   components: {
     VueHtml2pdf,
+    Draggable,
   },
 
   data() {
@@ -70,7 +217,10 @@ export default {
 
   methods: {
     add(component) {
-      this.songStructure.push(component);
+      this.songStructure.push({
+        component: componentList[component],
+        info: component == "tab" ? defaultTab() : defaultVerse(),
+      });
     },
 
     download(filename) {
@@ -110,12 +260,15 @@ export default {
       this.$refs.html2Pdf.generatePdf();
     },
 
-    typeComponent(component) {
-      return componentList[component];
-    },
-
     forceRender() {
       this.render++;
+    },
+
+    updateContent(payload) {
+      this.songStructure[payload.index].info = payload.content;
+      // console.log("Edit here: ", this.songStructure[payload.index]);
+      // console.log("Put this content: ", payload.content);
+      // console.log("---------");
     },
   },
 };

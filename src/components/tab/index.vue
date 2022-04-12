@@ -1,8 +1,7 @@
 <template>
   <div class="tab" :key="render">
-    <!-- <button @click="newTab">New tab</button> -->
     <div class="tab__container">
-      <template v-for="(string, indexString) in tab">
+      <template v-for="(string, indexString) in info">
         <div class="tab__string" :key="indexString">
           <span>{{ string.note }}|</span>
           <Draggable
@@ -37,106 +36,32 @@ export default {
     Draggable,
   },
 
+  props: {
+    info: { type: Object, required: true },
+    songIndex: { type: Number, required: true },
+  },
+
   data() {
-    const string = () => {
-      return [
-        "-",
-        "-",
-        "-",
-        "-",
-        "-",
-        "-",
-        "-",
-        "-",
-        "-",
-        "-",
-        "-",
-        "-",
-        "-",
-        "-",
-        "-",
-        "-",
-        "-",
-        "-",
-        "-",
-        "-",
-        "-",
-        "-",
-        "-",
-        "-",
-        "-",
-        "-",
-        "-",
-        "-",
-        "-",
-        "-",
-        "-",
-        "-",
-        "-",
-        "-",
-        "-",
-        "-",
-        "-",
-        "-",
-        "-",
-        "-",
-        "-",
-        "-",
-        "-",
-        "-",
-        "-",
-        "-",
-        "-",
-        "-",
-        "-",
-        "-",
-        "-",
-        "-",
-        "-",
-        "-",
-      ];
-    };
-
-    const tab = () => {
-      return {
-        eString: {
-          note: "e",
-          string: string(),
-        },
-        BString: {
-          note: "B",
-          string: string(),
-        },
-        GString: {
-          note: "G",
-          string: string(),
-        },
-        DString: {
-          note: "D",
-          string: string(),
-        },
-        AString: {
-          note: "A",
-          string: string(),
-        },
-        EString: {
-          note: "E",
-          string: string(),
-        },
-      };
-    };
-
     return {
       render: 0,
-      tab: tab(),
     };
+  },
+
+  watch: {
+    info: {
+      handler() {
+        this.emitChange();
+      },
+      deep: true,
+    },
   },
 
   methods: {
     changeContent(indexString, index) {
-      this.tab[indexString].string[index] = prompt(
-        this.tab[indexString].string[index] || "-"
+      this.info[indexString].string[index] = prompt(
+        this.info[indexString].string[index] || "-"
       );
+      this.emitChange();
       this.forceRender();
     },
 
@@ -146,33 +71,38 @@ export default {
 
     handleDragEndItem() {
       if (this.originalList === this.futureList) {
-        this.movingItem = this.tab[this.futureList].string[this.originalIndex];
-        this.futureItem = this.tab[this.futureList].string[this.futureIndex];
+        this.movingItem = this.info[this.futureList].string[this.originalIndex];
+        this.futureItem = this.info[this.futureList].string[this.futureIndex];
 
         if (this.movingItem && this.futureItem) {
-          let _list = Object.assign([], this.tab[this.futureList].string);
+          let _list = Object.assign([], this.info[this.futureList].string);
 
           _list[this.futureIndex] = this.movingItem;
           _list[this.originalIndex] = this.futureItem;
 
-          this.tab[this.futureList].string = _list;
+          this.info[this.futureList].string = _list;
         }
       } else {
         this.movingItem =
-          this.tab[this.originalList].string[this.originalIndex];
-        this.futureItem = this.tab[this.futureList].string[this.futureIndex];
+          this.info[this.originalList].string[this.originalIndex];
+        this.futureItem = this.info[this.futureList].string[this.futureIndex];
 
         if (this.movingItem && this.futureItem) {
-          let _listFrom = Object.assign([], this.tab[this.originalList].string);
-          let _listTo = Object.assign([], this.tab[this.futureList].string);
+          let _listFrom = Object.assign(
+            [],
+            this.info[this.originalList].string
+          );
+          let _listTo = Object.assign([], this.info[this.futureList].string);
 
           _listTo[this.futureIndex] = this.movingItem;
           _listFrom[this.originalIndex] = this.futureItem;
 
-          this.tab[this.originalList].string = _listFrom;
-          this.tab[this.futureList].string = _listTo;
+          this.info[this.originalList].string = _listFrom;
+          this.info[this.futureList].string = _listTo;
         }
       }
+
+      this.emitChange();
     },
 
     handleMoveItem(event) {
@@ -185,6 +115,13 @@ export default {
       this.futureList = event.to.getAttribute("data-list");
 
       return false;
+    },
+
+    emitChange() {
+      this.$emit("changeContent", {
+        content: this.info,
+        index: this.songIndex,
+      });
     },
   },
 };

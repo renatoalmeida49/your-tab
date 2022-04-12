@@ -1,16 +1,16 @@
 <template>
   <div class="verse" :key="render">
-    <Draggable :list="chords">
+    <Draggable :list="info.chords">
       <span
-        v-for="(dash, index) in chords"
+        v-for="(dash, index) in info.chords"
         :key="index"
         @dblclick="changeContent(index)"
         :class="checkContent(dash)"
         >{{ dash }}</span
       >
     </Draggable>
-    <pre>{{ verse }}</pre>
-    <input class="verse-input" type="text" v-model="verse" />
+    <pre>{{ info.verse }}</pre>
+    <input class="verse-input" type="text" v-model="info.verse" />
   </div>
 </template>
 
@@ -24,57 +24,24 @@ export default {
     Draggable,
   },
 
-  data() {
-    const chordsLine = () => {
-      return [
-        "-",
-        "-",
-        "-",
-        "-",
-        "-",
-        "-",
-        "-",
-        "-",
-        "-",
-        "-",
-        "-",
-        "-",
-        "-",
-        "-",
-        "-",
-        "-",
-        "-",
-        "-",
-        "-",
-        "-",
-        "-",
-        "-",
-        "-",
-        "-",
-        "-",
-        "-",
-        "-",
-        "-",
-        "-",
-        "-",
-        "-",
-        "-",
-        "-",
-        "-",
-        "-",
-        "-",
-        "-",
-        "-",
-        "-",
-        "-",
-      ];
-    };
+  props: {
+    info: { type: Object, required: true },
+    songIndex: { type: Number, required: true },
+  },
 
+  data() {
     return {
       render: 1,
-      chords: chordsLine(),
-      verse: "",
     };
+  },
+
+  watch: {
+    info: {
+      handler() {
+        this.emitChange();
+      },
+      deep: true,
+    },
   },
 
   methods: {
@@ -83,13 +50,22 @@ export default {
     },
 
     changeContent(index) {
-      this.chords[index] = prompt(this.chords[index]);
+      this.info.chords[index] = prompt(this.info.chords[index]);
+
+      this.emitChange();
 
       this.forceRender();
     },
 
     forceRender() {
       this.render++;
+    },
+
+    emitChange() {
+      this.$emit("changeContent", {
+        content: this.info,
+        index: this.songIndex,
+      });
     },
   },
 };
