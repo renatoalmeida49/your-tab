@@ -1,6 +1,6 @@
 <template>
-  <div class="verse">
-    <Draggable :list="info.chords" :key="render">
+  <div class="verse" :key="render">
+    <Draggable :list="info.chords">
       <span
         v-for="(dash, index) in info.chords"
         :key="index"

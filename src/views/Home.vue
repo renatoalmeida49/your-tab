@@ -3,6 +3,7 @@
     <div class="home__buttons">
       <div class="home__buttons-song">
         <button @click="add('tab')">Tab</button>
+        <button @click="add('text')">Texto</button>
         <button @click="add('verse')">Verso</button>
       </div>
       <div class="home__buttons-downloads">
@@ -48,10 +49,12 @@ import Draggable from "vuedraggable";
 import VueHtml2pdf from "vue-html2pdf";
 import Tab from "@/components/tab";
 import Verse from "@/components/verse";
+import Text from "@/components/text";
 
 const componentList = {
   tab: Tab,
   verse: Verse,
+  text: Text,
 };
 
 const string = () => {
@@ -194,6 +197,12 @@ const defaultVerse = () => {
   };
 };
 
+const defaultText = () => {
+  return {
+    text: "",
+  };
+};
+
 export default {
   name: "Home",
 
@@ -219,8 +228,19 @@ export default {
     add(component) {
       this.songStructure.push({
         component: componentList[component],
-        info: component == "tab" ? defaultTab() : defaultVerse(),
+        info: this.getComponent(component),
       });
+    },
+
+    getComponent(component) {
+      switch (component) {
+        case "tab":
+          return defaultTab();
+        case "verse":
+          return defaultVerse();
+        case "text":
+          return defaultText();
+      }
     },
 
     download(filename) {
@@ -266,9 +286,8 @@ export default {
 
     updateContent(payload) {
       this.songStructure[payload.index].info = payload.content;
-      // console.log("Edit here: ", this.songStructure[payload.index]);
-      // console.log("Put this content: ", payload.content);
-      // console.log("---------");
+
+      this.forceRender();
     },
   },
 };
