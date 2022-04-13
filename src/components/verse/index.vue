@@ -1,6 +1,6 @@
 <template>
-  <div class="verse" :key="render">
-    <Draggable :list="info.chords">
+  <div class="verse">
+    <Draggable :list="info.chords" :key="render">
       <span
         v-for="(dash, index) in info.chords"
         :key="index"
@@ -9,8 +9,14 @@
         >{{ dash }}</span
       >
     </Draggable>
-    <pre>{{ info.verse }}</pre>
-    <input class="verse-input" type="text" v-model="info.verse" />
+    <!-- <pre>{{ info.verse }}</pre> -->
+    <span
+      ref="input"
+      class="verse__input"
+      @blur="change"
+      role="textbox"
+      contenteditable
+    ></span>
   </div>
 </template>
 
@@ -35,6 +41,10 @@ export default {
     };
   },
 
+  mounted() {
+    this.$refs.input.innerHTML = this.info.verse;
+  },
+
   watch: {
     info: {
       handler() {
@@ -55,6 +65,10 @@ export default {
       this.emitChange();
 
       this.forceRender();
+    },
+
+    change(event) {
+      this.info.verse = event.target.innerHTML;
     },
 
     forceRender() {
@@ -80,6 +94,12 @@ export default {
   .red {
     color: $primary;
     font-family: "title";
+  }
+
+  &__input {
+    display: block;
+    width: 100%;
+    margin-left: 30px;
   }
 }
 </style>
