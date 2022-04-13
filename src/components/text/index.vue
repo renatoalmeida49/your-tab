@@ -53,6 +53,12 @@ export default {
     display: block;
     width: 100%;
     height: auto;
+    border: 1px solid $gray;
+    padding: 3px;
+
+    &:focus {
+      outline: none;
+    }
   }
 }
 </style>

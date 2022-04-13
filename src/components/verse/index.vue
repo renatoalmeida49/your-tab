@@ -100,7 +100,13 @@ export default {
 
   &__input {
     display: block;
+    border: 1px solid $gray;
+    padding: 3px;
     width: 100%;
+
+    &:focus {
+      outline: none;
+    }
   }
 }
 </style>
