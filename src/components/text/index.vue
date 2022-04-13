@@ -1,5 +1,5 @@
 <template>
-  <div class="text">
+  <SongContent class="text">
     <span
       ref="input"
       @blur="change"
@@ -7,7 +7,7 @@
       role="textbox"
       contenteditable
     ></span>
-  </div>
+  </SongContent>
 </template>
 
 <script>
@@ -51,7 +51,6 @@ export default {
 .text {
   &__area {
     display: block;
-    margin-left: 20px;
     width: 100%;
     height: auto;
   }

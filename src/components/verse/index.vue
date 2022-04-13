@@ -1,23 +1,25 @@
 <template>
-  <div class="verse" :key="render">
-    <Draggable :list="info.chords">
+  <SongContent class="verse" :key="render">
+    <div class="verse__container">
+      <Draggable :list="info.chords">
+        <span
+          v-for="(dash, index) in info.chords"
+          :key="index"
+          @dblclick="changeContent(index)"
+          :class="checkContent(dash)"
+          >{{ dash }}</span
+        >
+      </Draggable>
+      <!-- <pre>{{ info.verse }}</pre> -->
       <span
-        v-for="(dash, index) in info.chords"
-        :key="index"
-        @dblclick="changeContent(index)"
-        :class="checkContent(dash)"
-        >{{ dash }}</span
-      >
-    </Draggable>
-    <!-- <pre>{{ info.verse }}</pre> -->
-    <span
-      ref="input"
-      class="verse__input"
-      @blur="change"
-      role="textbox"
-      contenteditable
-    ></span>
-  </div>
+        ref="input"
+        class="verse__input"
+        @blur="change"
+        role="textbox"
+        contenteditable
+      ></span>
+    </div>
+  </SongContent>
 </template>
 
 <script>
@@ -99,7 +101,6 @@ export default {
   &__input {
     display: block;
     width: 100%;
-    margin-left: 30px;
   }
 }
 </style>
