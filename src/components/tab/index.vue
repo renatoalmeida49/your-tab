@@ -1,5 +1,5 @@
 <template>
-  <SongContent class="tab" :key="render">
+  <div class="tab" :key="render" :contentIndex="songIndex">
     <div class="tab__container">
       <template v-for="(string, indexString) in info">
         <div class="tab__string" :key="indexString">
@@ -23,7 +23,7 @@
         </div>
       </template>
     </div>
-  </SongContent>
+  </div>
 </template>
 
 <script>

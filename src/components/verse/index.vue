@@ -1,5 +1,5 @@
 <template>
-  <SongContent class="verse" :key="render">
+  <div class="verse" :key="render" :contentIndex="songIndex">
     <div class="verse__container">
       <Draggable :list="info.chords">
         <span
@@ -19,7 +19,7 @@
         contenteditable
       ></span>
     </div>
-  </SongContent>
+  </div>
 </template>
 
 <script>
@@ -91,11 +91,14 @@ export default {
 .verse {
   width: 100%;
   font-family: monospace;
-  margin-bottom: $margin-bottom;
 
   .red {
     color: $primary;
     font-family: "title";
+  }
+
+  &__container {
+    width: 100%;
   }
 
   &__input {

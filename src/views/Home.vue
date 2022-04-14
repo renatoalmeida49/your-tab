@@ -14,14 +14,20 @@
 
     <div id="song" class="home__song">
       <Draggable :list="songStructure">
-        <component
-          v-for="(part, index) in songStructure"
-          :key="index"
-          :is="part.component"
-          :info="part.info"
-          :songIndex="index"
-          @changeContent="updateContent"
-        ></component>
+        <template v-for="(part, index) in songStructure">
+          <SongContent
+            :key="index"
+            :contentIndex="index"
+            @removeContent="removeContent"
+          >
+            <component
+              :is="part.component"
+              :info="part.info"
+              :songIndex="index"
+              @changeContent="updateContent"
+            ></component>
+          </SongContent>
+        </template>
       </Draggable>
     </div>
 
@@ -243,6 +249,10 @@ export default {
       }
     },
 
+    removeContent(payload) {
+      this.songStructure.splice(payload, 1);
+    },
+
     download(filename) {
       // let element = document.createElement("a");
       let content = document.getElementById("song");
@@ -268,6 +278,8 @@ export default {
 
       const dashes = pdf.querySelectorAll(".verse-dash");
       const inputs = pdf.querySelectorAll(".verse-input");
+      const buttons = pdf.querySelectorAll("button");
+      const spans = pdf.querySelectorAll("span");
 
       dashes.forEach((item) => {
         item.style.visibility = "hidden";
@@ -275,6 +287,14 @@ export default {
 
       inputs.forEach((item) => {
         item.style.display = "none";
+      });
+
+      buttons.forEach((item) => {
+        item.style.display = "none";
+      });
+
+      spans.forEach((item) => {
+        item.style.border = "none";
       });
 
       this.$refs.html2Pdf.generatePdf();

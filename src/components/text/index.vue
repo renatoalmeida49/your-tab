@@ -1,5 +1,5 @@
 <template>
-  <SongContent class="text">
+  <div class="text" :contentIndex="songIndex">
     <span
       ref="input"
       @blur="change"
@@ -7,7 +7,7 @@
       role="textbox"
       contenteditable
     ></span>
-  </SongContent>
+  </div>
 </template>
 
 <script>
@@ -49,6 +49,8 @@ export default {
 
 <style lang="scss">
 .text {
+  width: 100%;
+
   &__area {
     display: block;
     width: 100%;
