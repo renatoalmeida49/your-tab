@@ -129,8 +129,6 @@ export default {
 
 <style lang="scss">
 .tab {
-  font-family: monospace;
-
   &__string {
     display: flex;
 

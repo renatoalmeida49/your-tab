@@ -17,6 +17,7 @@
 #app {
   background: $gray;
   min-height: 100vh;
+  font-family: monospace;
 
   .container {
     width: 100%;

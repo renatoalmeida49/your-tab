@@ -90,7 +90,6 @@ export default {
 <style lang="scss">
 .verse {
   width: 100%;
-  font-family: monospace;
 
   .red {
     color: $primary;
