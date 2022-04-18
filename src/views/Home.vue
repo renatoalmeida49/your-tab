@@ -1,6 +1,6 @@
 <template>
   <div class="home" :key="render">
-    <div class="home__buttons">
+    <!-- <div class="home__buttons">
       <div class="home__buttons-song">
         <button @click="add('tab')">Tab</button>
         <button @click="add('text')">Texto</button>
@@ -10,21 +10,16 @@
         <button @click="download('tab.txt')">Download TXT</button>
         <button @click="generateReport">Download PDF</button>
       </div>
-    </div>
+    </div> -->
 
     <div id="song" class="home__song">
-      <Draggable :list="songStructure">
-        <template v-for="(part, index) in songStructure">
-          <SongContent
-            :key="index"
-            :contentIndex="index"
-            @removeContent="removeContent"
-          >
+      <Draggable :list="song">
+        <template v-for="(part, index) in song">
+          <SongContent :key="index" :contentIndex="index">
             <component
               :is="part.component"
               :info="part.info"
               :songIndex="index"
-              @changeContent="updateContent"
             ></component>
           </SongContent>
         </template>
@@ -51,163 +46,9 @@
 </template>
 
 <script>
+import { mapGetters } from "vuex";
 import Draggable from "vuedraggable";
 import VueHtml2pdf from "vue-html2pdf";
-import Tab from "@/components/tab";
-import Verse from "@/components/verse";
-import Text from "@/components/text";
-
-const componentList = {
-  tab: Tab,
-  verse: Verse,
-  text: Text,
-};
-
-const string = () => {
-  return [
-    "-",
-    "-",
-    "-",
-    "-",
-    "-",
-    "-",
-    "-",
-    "-",
-    "-",
-    "-",
-    "-",
-    "-",
-    "-",
-    "-",
-    "-",
-    "-",
-    "-",
-    "-",
-    "-",
-    "-",
-    "-",
-    "-",
-    "-",
-    "-",
-    "-",
-    "-",
-    "-",
-    "-",
-    "-",
-    "-",
-    "-",
-    "-",
-    "-",
-    "-",
-    "-",
-    "-",
-    "-",
-    "-",
-    "-",
-    "-",
-    "-",
-    "-",
-    "-",
-    "-",
-    "-",
-    "-",
-    "-",
-    "-",
-    "-",
-    "-",
-    "-",
-    "-",
-    "-",
-    "-",
-  ];
-};
-
-const defaultTab = () => {
-  return {
-    eString: {
-      note: "e",
-      string: string(),
-    },
-    BString: {
-      note: "B",
-      string: string(),
-    },
-    GString: {
-      note: "G",
-      string: string(),
-    },
-    DString: {
-      note: "D",
-      string: string(),
-    },
-    AString: {
-      note: "A",
-      string: string(),
-    },
-    EString: {
-      note: "E",
-      string: string(),
-    },
-  };
-};
-
-const chordsLine = () => {
-  return [
-    "-",
-    "-",
-    "-",
-    "-",
-    "-",
-    "-",
-    "-",
-    "-",
-    "-",
-    "-",
-    "-",
-    "-",
-    "-",
-    "-",
-    "-",
-    "-",
-    "-",
-    "-",
-    "-",
-    "-",
-    "-",
-    "-",
-    "-",
-    "-",
-    "-",
-    "-",
-    "-",
-    "-",
-    "-",
-    "-",
-    "-",
-    "-",
-    "-",
-    "-",
-    "-",
-    "-",
-    "-",
-    "-",
-    "-",
-    "-",
-  ];
-};
-
-const defaultVerse = () => {
-  return {
-    chords: chordsLine(),
-    verse: "",
-  };
-};
-
-const defaultText = () => {
-  return {
-    text: "",
-  };
-};
 
 export default {
   name: "Home",
@@ -225,34 +66,14 @@ export default {
   },
 
   computed: {
+    ...mapGetters("songStructure", ["song"]),
+
     widthPDF() {
       return "800px";
     },
   },
 
   methods: {
-    add(component) {
-      this.songStructure.push({
-        component: componentList[component],
-        info: this.getComponent(component),
-      });
-    },
-
-    getComponent(component) {
-      switch (component) {
-        case "tab":
-          return defaultTab();
-        case "verse":
-          return defaultVerse();
-        case "text":
-          return defaultText();
-      }
-    },
-
-    removeContent(payload) {
-      this.songStructure.splice(payload, 1);
-    },
-
     download(filename) {
       // let element = document.createElement("a");
       let content = document.getElementById("song");
@@ -303,12 +124,6 @@ export default {
     forceRender() {
       this.render++;
     },
-
-    updateContent(payload) {
-      this.songStructure[payload.index].info = payload.content;
-
-      this.forceRender();
-    },
   },
 };
 </script>
@@ -318,7 +133,6 @@ export default {
   margin: 40px;
 }
 .home {
-  background: $white;
   min-height: calc(100vh - 77px);
   padding: 0 60px;
   position: relative;
