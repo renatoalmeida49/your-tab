@@ -2,7 +2,7 @@
   <div class="menu">
     <div class="menu__buttons-song">
       <button @click="add('tab')">Tab</button>
-      <button @click="add('text')">Texto</button>
+      <button @click="add('textField')">Texto</button>
       <button @click="add('verse')">Verso</button>
     </div>
     <div class="menu__buttons-downloads">
@@ -34,12 +34,12 @@ import { mapActions } from "vuex";
 import VueHtml2pdf from "vue-html2pdf";
 import Tab from "@/components/tab";
 import Verse from "@/components/verse";
-import Text from "@/components/text";
+import TextField from "@/components/text-field";
 
 const componentList = {
   tab: Tab,
   verse: Verse,
-  text: Text,
+  textField: TextField,
 };
 
 const string = () => {
@@ -211,7 +211,7 @@ export default {
           return defaultTab();
         case "verse":
           return defaultVerse();
-        case "text":
+        case "textField":
           return defaultText();
       }
     },
