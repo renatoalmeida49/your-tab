@@ -1,9 +1,9 @@
 <template>
-  <div class="text" :contentIndex="songIndex">
+  <div class="text-field" :contentIndex="songIndex">
     <span
       ref="input"
       @blur="change"
-      class="text__area"
+      class="text-field__area"
       role="textbox"
       contenteditable
     ></span>
@@ -12,7 +12,7 @@
 
 <script>
 export default {
-  name: "Text",
+  name: "TextField",
 
   props: {
     info: { type: Object, required: true },
@@ -48,7 +48,7 @@ export default {
 </script>
 
 <style lang="scss">
-.text {
+.text-field {
   width: 100%;
 
   &__area {

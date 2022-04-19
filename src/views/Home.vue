@@ -51,6 +51,7 @@ export default {
 <style lang="scss">
 #pdf-content {
   margin: 40px;
+  font-family: monospace;
 }
 .home {
   min-height: calc(100vh - 77px);
