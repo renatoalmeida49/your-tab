@@ -57,6 +57,7 @@ export default {
     height: auto;
     border: 1px solid $gray;
     padding: 3px;
+    min-height: 30px;
 
     &:focus {
       outline: none;
