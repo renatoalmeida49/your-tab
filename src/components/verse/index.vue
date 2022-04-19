@@ -1,7 +1,7 @@
 <template>
-  <div class="verse" :key="render" :contentIndex="songIndex">
+  <div class="verse" :contentIndex="songIndex">
     <div class="verse__container">
-      <Draggable :list="info.chords">
+      <Draggable :list="info.chords" :key="render">
         <span
           v-for="(dash, index) in info.chords"
           :key="index"
@@ -47,14 +47,14 @@ export default {
     this.$refs.input.innerHTML = this.info.verse;
   },
 
-  watch: {
-    info: {
-      handler() {
-        this.emitChange();
-      },
-      deep: true,
-    },
-  },
+  // watch: {
+  //   info: {
+  //     handler() {
+  //       this.emitChange();
+  //     },
+  //     deep: true,
+  //   },
+  // },
 
   methods: {
     checkContent(content) {
@@ -63,8 +63,6 @@ export default {
 
     changeContent(index) {
       this.info.chords[index] = prompt(this.info.chords[index]);
-
-      this.emitChange();
 
       this.forceRender();
     },

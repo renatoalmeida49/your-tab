@@ -9,6 +9,7 @@
       <!-- <button @click="download('tab.txt')">Download TXT</button> -->
       <button @click="generateReport">Download PDF</button>
     </div>
+
     <vue-html2pdf
       ref="html2Pdf"
       :show-layout="false"
@@ -254,6 +255,7 @@ export default {
 
   #pdf-content {
     margin: 40px;
+    font-family: monospace;
   }
 
   &__buttons {

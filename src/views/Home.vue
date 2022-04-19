@@ -1,17 +1,5 @@
 <template>
   <div class="home" :key="render">
-    <!-- <div class="home__buttons">
-      <div class="home__buttons-song">
-        <button @click="add('tab')">Tab</button>
-        <button @click="add('text')">Texto</button>
-        <button @click="add('verse')">Verso</button>
-      </div>
-      <div class="home__buttons-downloads">
-        <button @click="download('tab.txt')">Download TXT</button>
-        <button @click="generateReport">Download PDF</button>
-      </div>
-    </div> -->
-
     <div id="song" class="home__song">
       <Draggable :list="song">
         <template v-for="(part, index) in song">
@@ -25,36 +13,17 @@
         </template>
       </Draggable>
     </div>
-
-    <vue-html2pdf
-      ref="html2Pdf"
-      :show-layout="false"
-      :enable-download="true"
-      :preview-modal="false"
-      filename="tab-pdf"
-      pdf-format="a4"
-      pdf-orientation="portrait"
-      :pdf-content-width="widthPDF"
-      :paginate-elements-by-height="1100"
-      :pdf-quality="2"
-    >
-      <section class="pdf-content" slot="pdf-content">
-        <div id="pdf-content"></div>
-      </section>
-    </vue-html2pdf>
   </div>
 </template>
 
 <script>
 import { mapGetters } from "vuex";
 import Draggable from "vuedraggable";
-import VueHtml2pdf from "vue-html2pdf";
 
 export default {
   name: "Home",
 
   components: {
-    VueHtml2pdf,
     Draggable,
   },
 
