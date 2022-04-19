@@ -1,7 +1,7 @@
 <template>
-  <div class="verse" :contentIndex="songIndex">
+  <div class="verse">
     <div class="verse__container">
-      <Draggable :list="info.chords" :key="render">
+      <Draggable :list="info.chords">
         <span
           v-for="(dash, index) in info.chords"
           :key="index"
@@ -10,7 +10,7 @@
           >{{ dash }}</span
         >
       </Draggable>
-      <!-- <pre>{{ info.verse }}</pre> -->
+
       <span
         ref="input"
         class="verse__input"
@@ -34,7 +34,6 @@ export default {
 
   props: {
     info: { type: Object, required: true },
-    songIndex: { type: Number, required: true },
   },
 
   data() {
@@ -46,15 +45,6 @@ export default {
   mounted() {
     this.$refs.input.innerHTML = this.info.verse;
   },
-
-  // watch: {
-  //   info: {
-  //     handler() {
-  //       this.emitChange();
-  //     },
-  //     deep: true,
-  //   },
-  // },
 
   methods: {
     checkContent(content) {
@@ -73,13 +63,6 @@ export default {
 
     forceRender() {
       this.render++;
-    },
-
-    emitChange() {
-      this.$emit("changeContent", {
-        content: this.info,
-        index: this.songIndex,
-      });
     },
   },
 };
