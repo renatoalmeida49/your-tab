@@ -6,7 +6,7 @@
       <button @click="add('verse')">Verso</button>
     </div>
     <div class="menu__buttons-downloads">
-      <!-- <button @click="download('tab.txt')">Download TXT</button> -->
+      <button @click="download('tab.txt')">Download TXT</button>
       <button @click="generateReport">Download PDF</button>
     </div>
 
@@ -245,18 +245,35 @@ export default {
 
       this.$refs.html2Pdf.generatePdf();
     },
+
+    download(filename) {
+      // let element = document.createElement("a");
+      let content = document.getElementById("song");
+      const teste = content.innerText.replaceAll("|\n", "|");
+
+      const blob = new Blob([teste], { type: "text/txt" });
+
+      const elem = window.document.createElement("a");
+
+      elem.href = window.URL.createObjectURL(blob);
+
+      elem.download = filename;
+      document.body.appendChild(elem);
+      elem.click();
+      document.body.removeChild(elem);
+    },
   },
 };
 </script>
 
 <style lang="scss">
+#pdf-content {
+  margin: 40px;
+  font-family: monospace;
+}
+
 .menu {
   text-align: center;
-
-  #pdf-content {
-    margin: 40px;
-    font-family: monospace;
-  }
 
   &__buttons {
     text-align: center;
