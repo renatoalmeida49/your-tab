@@ -1,7 +1,7 @@
 <template>
   <div class="verse">
     <div class="verse__container">
-      <Draggable :list="info.chords">
+      <Draggable :list="info.chords" :key="render">
         <span
           v-for="(dash, index) in info.chords"
           :key="index"
