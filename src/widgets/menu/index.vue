@@ -274,11 +274,12 @@ export default {
 
 .menu {
   text-align: center;
+  position: sticky;
+  z-index: 100;
+  top: 0px;
 
   &__buttons {
     text-align: center;
-    position: sticky;
-    top: 0px;
 
     &-song {
       button {

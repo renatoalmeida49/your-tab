@@ -64,7 +64,7 @@ export default {
   font-family: monospace;
 }
 .home {
-  min-height: calc(100vh - 77px);
+  min-height: calc(100vh - 167px);
   padding: 0 60px;
   position: relative;
 }
