@@ -30,7 +30,7 @@
 </template>
 
 <script>
-import { mapActions } from "vuex";
+import { mapActions, mapGetters } from "vuex";
 import VueHtml2pdf from "vue-html2pdf";
 import Tab from "@/components/tab";
 import Verse from "@/components/verse";
@@ -101,35 +101,6 @@ const string = () => {
   ];
 };
 
-const defaultTab = () => {
-  return {
-    eString: {
-      note: "e",
-      string: string(),
-    },
-    BString: {
-      note: "B",
-      string: string(),
-    },
-    GString: {
-      note: "G",
-      string: string(),
-    },
-    DString: {
-      note: "D",
-      string: string(),
-    },
-    AString: {
-      note: "A",
-      string: string(),
-    },
-    EString: {
-      note: "E",
-      string: string(),
-    },
-  };
-};
-
 const chordsLine = () => {
   return [
     "-",
@@ -195,6 +166,14 @@ export default {
     VueHtml2pdf,
   },
 
+  mounted() {
+    console.log("Instrument tunning: ", this.instrument);
+  },
+
+  computed: {
+    ...mapGetters("instrument", ["instrument"]),
+  },
+
   methods: {
     ...mapActions("songStructure", ["addContent"]),
 
@@ -208,12 +187,53 @@ export default {
     getComponent(component) {
       switch (component) {
         case "tab":
-          return defaultTab();
+          return this.defaultTab();
         case "verse":
           return defaultVerse();
         case "textField":
           return defaultText();
       }
+    },
+
+    defaultTab() {
+      console.log("Default tab ");
+
+      let tab = {};
+
+      console.log(
+        this.instrument.map((item) => {
+          tab[item] = string();
+        })
+      );
+
+      console.log("Tab final: ", tab);
+
+      return {
+        eString: {
+          note: "e",
+          string: string(),
+        },
+        BString: {
+          note: "B",
+          string: string(),
+        },
+        GString: {
+          note: "G",
+          string: string(),
+        },
+        DString: {
+          note: "D",
+          string: string(),
+        },
+        AString: {
+          note: "A",
+          string: string(),
+        },
+        EString: {
+          note: "E",
+          string: string(),
+        },
+      };
     },
 
     generateReport() {
