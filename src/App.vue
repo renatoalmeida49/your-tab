@@ -2,6 +2,7 @@
   <div id="app">
     <div class="container">
       <h1>Cifra builder</h1>
+      <Menu />
       <router-view />
     </div>
   </div>
@@ -24,6 +25,7 @@
     max-width: 1240px;
     padding: 0 40px;
     margin: auto;
+    background: $white;
 
     h1 {
       text-align: center;

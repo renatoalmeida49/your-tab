@@ -1,7 +1,7 @@
 <template>
   <div class="song-content">
     <div class="song-content__buttons">
-      <button class="song-content__remove" @click="removeContent">X</button>
+      <button class="song-content__remove" @click="remove">X</button>
       <button class="song-content__move">
         <div class="song-content__line"></div>
         <div class="song-content__line"></div>
@@ -14,6 +14,8 @@
 </template>
 
 <script>
+import { mapActions } from "vuex";
+
 export default {
   name: "SongContent",
 
@@ -21,11 +23,11 @@ export default {
     contentIndex: { type: Number, required: true },
   },
 
-  emits: ["removeContent"],
-
   methods: {
-    removeContent() {
-      this.$emit("removeContent", this.contentIndex);
+    ...mapActions("songStructure", ["removeContent"]),
+
+    remove() {
+      this.removeContent(this.contentIndex);
     },
   },
 };

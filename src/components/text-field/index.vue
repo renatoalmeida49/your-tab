@@ -23,25 +23,9 @@ export default {
     this.$refs.input.innerHTML = this.info.text;
   },
 
-  watch: {
-    info: {
-      handler() {
-        this.emitChange();
-      },
-      deep: true,
-    },
-  },
-
   methods: {
     change(event) {
       this.info.text = event.target.innerHTML;
-    },
-
-    emitChange() {
-      this.$emit("changeContent", {
-        content: this.info,
-        index: this.songIndex,
-      });
     },
   },
 };

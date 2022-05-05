@@ -47,21 +47,21 @@ export default {
     };
   },
 
-  watch: {
-    info: {
-      handler() {
-        this.emitChange();
-      },
-      deep: true,
-    },
-  },
+  // watch: {
+  //   info: {
+  //     handler() {
+  //       this.emitChange();
+  //     },
+  //     deep: true,
+  //   },
+  // },
 
   methods: {
     changeContent(indexString, index) {
       this.info[indexString].string[index] = prompt(
         this.info[indexString].string[index] || "-"
       );
-      this.emitChange();
+      // this.emitChange();
       this.forceRender();
     },
 
@@ -102,7 +102,7 @@ export default {
         }
       }
 
-      this.emitChange();
+      // this.emitChange();
     },
 
     handleMoveItem(event) {
@@ -117,12 +117,12 @@ export default {
       return false;
     },
 
-    emitChange() {
-      this.$emit("changeContent", {
-        content: this.info,
-        index: this.songIndex,
-      });
-    },
+    // emitChange() {
+    //   this.$emit("changeContent", {
+    //     content: this.info,
+    //     index: this.songIndex,
+    //   });
+    // },
   },
 };
 </script>
