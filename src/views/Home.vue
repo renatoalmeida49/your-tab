@@ -1,7 +1,12 @@
 <template>
   <div class="home">
     <div id="song" class="home__song">
-      <Draggable :list="song" @change="forceRender" :key="render">
+      <Draggable
+        :list="song"
+        @change="forceRender"
+        @remove="forceRender"
+        :key="render"
+      >
         <SongContent
           v-for="(part, index) in song"
           :key="index"
@@ -31,9 +36,14 @@ export default {
 
   data() {
     return {
-      songStructure: [],
       render: 1,
     };
+  },
+
+  watch: {
+    song() {
+      this.forceRender();
+    },
   },
 
   computed: {
