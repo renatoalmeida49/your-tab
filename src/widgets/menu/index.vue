@@ -35,6 +35,7 @@ import VueHtml2pdf from "vue-html2pdf";
 import Tab from "@/components/tab";
 import Verse from "@/components/verse";
 import TextField from "@/components/text-field";
+import string from "@/config/string";
 
 const componentList = {
   tab: Tab,
@@ -42,132 +43,11 @@ const componentList = {
   textField: TextField,
 };
 
-const string = () => {
-  return [
-    "-",
-    "-",
-    "-",
-    "-",
-    "-",
-    "-",
-    "-",
-    "-",
-    "-",
-    "-",
-    "-",
-    "-",
-    "-",
-    "-",
-    "-",
-    "-",
-    "-",
-    "-",
-    "-",
-    "-",
-    "-",
-    "-",
-    "-",
-    "-",
-    "-",
-    "-",
-    "-",
-    "-",
-    "-",
-    "-",
-    "-",
-    "-",
-    "-",
-    "-",
-    "-",
-    "-",
-    "-",
-    "-",
-    "-",
-    "-",
-    "-",
-    "-",
-    "-",
-    "-",
-    "-",
-    "-",
-    "-",
-    "-",
-    "-",
-    "-",
-    "-",
-    "-",
-    "-",
-    "-",
-  ];
-};
-
-const chordsLine = () => {
-  return [
-    "-",
-    "-",
-    "-",
-    "-",
-    "-",
-    "-",
-    "-",
-    "-",
-    "-",
-    "-",
-    "-",
-    "-",
-    "-",
-    "-",
-    "-",
-    "-",
-    "-",
-    "-",
-    "-",
-    "-",
-    "-",
-    "-",
-    "-",
-    "-",
-    "-",
-    "-",
-    "-",
-    "-",
-    "-",
-    "-",
-    "-",
-    "-",
-    "-",
-    "-",
-    "-",
-    "-",
-    "-",
-    "-",
-    "-",
-    "-",
-  ];
-};
-
-const defaultVerse = () => {
-  return {
-    chords: chordsLine(),
-    verse: "",
-  };
-};
-
-const defaultText = () => {
-  return {
-    text: "",
-  };
-};
-
 export default {
   name: "Menu",
 
   components: {
     VueHtml2pdf,
-  },
-
-  mounted() {
-    console.log("Instrument tunning: ", this.instrument);
   },
 
   computed: {
@@ -189,50 +69,31 @@ export default {
         case "tab":
           return this.defaultTab();
         case "verse":
-          return defaultVerse();
+          return this.defaultVerse();
         case "textField":
-          return defaultText();
+          return this.defaultText();
       }
     },
 
     defaultTab() {
-      console.log("Default tab ");
+      return this.instrument.map((item) => {
+        return {
+          note: item,
+          string: string(),
+        };
+      });
+    },
 
-      let tab = {};
-
-      console.log(
-        this.instrument.map((item) => {
-          tab[item] = string();
-        })
-      );
-
-      console.log("Tab final: ", tab);
-
+    defaultVerse() {
       return {
-        eString: {
-          note: "e",
-          string: string(),
-        },
-        BString: {
-          note: "B",
-          string: string(),
-        },
-        GString: {
-          note: "G",
-          string: string(),
-        },
-        DString: {
-          note: "D",
-          string: string(),
-        },
-        AString: {
-          note: "A",
-          string: string(),
-        },
-        EString: {
-          note: "E",
-          string: string(),
-        },
+        chords: string(),
+        verse: "",
+      };
+    },
+
+    defaultText() {
+      return {
+        text: "",
       };
     },
 

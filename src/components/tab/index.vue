@@ -37,7 +37,7 @@ export default {
   },
 
   props: {
-    info: { type: Object, required: true },
+    info: { type: Array, required: true },
     songIndex: { type: Number, required: true },
   },
 
@@ -46,15 +46,6 @@ export default {
       render: 0,
     };
   },
-
-  // watch: {
-  //   info: {
-  //     handler() {
-  //       this.emitChange();
-  //     },
-  //     deep: true,
-  //   },
-  // },
 
   methods: {
     changeContent(indexString, index) {
