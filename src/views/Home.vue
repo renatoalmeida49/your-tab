@@ -11,6 +11,7 @@
           v-for="(part, index) in song"
           :key="index"
           :contentIndex="index"
+          :showOptions="isTabHeader(index)"
         >
           <component
             :is="part.component"
@@ -53,6 +54,12 @@ export default {
   methods: {
     forceRender() {
       this.render++;
+    },
+
+    isTabHeader(index) {
+      if (index == 0) return false;
+
+      return true;
     },
   },
 };

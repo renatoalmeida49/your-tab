@@ -1,6 +1,10 @@
 const getters = {
-  instrument(state) {
+  tuning(state) {
     return state.tuning;
+  },
+
+  instrument(state) {
+    return state.instrument;
   },
 };
 

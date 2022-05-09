@@ -1,9 +1,10 @@
 const getDefaultState = () => {
-  return ["e", "B", "G", "D", "A", "E"];
+  return {
+    tuning: ["e", "B", "G", "D", "A", "E"],
+    instrument: "guitar",
+  };
 };
 
-const state = {
-  tuning: getDefaultState(),
-};
+const state = getDefaultState();
 
 export default state;

@@ -32,12 +32,14 @@
 <script>
 import { mapActions, mapGetters } from "vuex";
 import VueHtml2pdf from "vue-html2pdf";
+import TabHeader from "@/components/tab-header";
 import Tab from "@/components/tab";
 import Verse from "@/components/verse";
 import TextField from "@/components/text-field";
 import string from "@/config/string";
 
 const componentList = {
+  tabHeader: TabHeader,
   tab: Tab,
   verse: Verse,
   textField: TextField,
@@ -48,6 +50,13 @@ export default {
 
   components: {
     VueHtml2pdf,
+  },
+
+  mounted() {
+    this.addContent({
+      component: componentList.tabHeader,
+      info: {},
+    });
   },
 
   computed: {
