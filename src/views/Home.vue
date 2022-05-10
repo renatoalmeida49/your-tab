@@ -1,6 +1,8 @@
 <template>
   <div class="home">
     <div id="song" class="home__song">
+      <TabHeader />
+
       <Draggable
         :list="song"
         @change="forceRender"
@@ -27,12 +29,14 @@
 <script>
 import { mapGetters } from "vuex";
 import Draggable from "vuedraggable";
+import TabHeader from "@/components/tab-header";
 
 export default {
   name: "Home",
 
   components: {
     Draggable,
+    TabHeader,
   },
 
   data() {

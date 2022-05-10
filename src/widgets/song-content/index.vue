@@ -1,6 +1,6 @@
 <template>
   <div class="song-content">
-    <div class="song-content__buttons" v-if="showOptions">
+    <div class="song-content__buttons">
       <button class="song-content__remove" @click="remove">X</button>
       <button class="song-content__move">
         <div class="song-content__line"></div>
@@ -21,7 +21,6 @@ export default {
 
   props: {
     contentIndex: { type: Number, required: true },
-    showOptions: { type: Boolean, default: true },
   },
 
   methods: {

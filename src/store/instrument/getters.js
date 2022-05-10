@@ -6,6 +6,10 @@ const getters = {
   instrument(state) {
     return state.instrument;
   },
+
+  tone(state) {
+    return state.tone;
+  },
 };
 
 export default getters;

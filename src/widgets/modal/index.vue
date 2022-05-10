@@ -3,6 +3,10 @@
     <div class="modal__wrapper" @click="close">
       <div class="modal__container">
         <slot />
+
+        <footer>
+          <button @click="close">Cancelar</button>
+        </footer>
       </div>
     </div>
   </div>
