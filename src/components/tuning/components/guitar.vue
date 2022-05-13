@@ -1,6 +1,6 @@
 <template>
   <div class="guitar">
-    <form @submit.prevent="submitTuning">
+    <form @submit.prevent="submitTunning">
       <input type="text" required v-model="tuningModel[0]" placeholder="e" />
       <input type="text" required v-model="tuningModel[1]" placeholder="B" />
       <input type="text" required v-model="tuningModel[2]" placeholder="G" />
@@ -16,6 +16,8 @@
 <script>
 import { mapGetters, mapActions } from "vuex";
 
+const defaultTuning = ["e", "B", "G", "D", "A", "E"];
+
 export default {
   name: "Guitar",
 
@@ -26,17 +28,22 @@ export default {
   },
 
   mounted() {
-    this.$set(this, "tuningModel", Object.assign([], this.tuning));
+    if (this.instrument == "guitar") {
+      this.$set(this, "tuningModel", Object.assign([], this.tuning));
+    } else {
+      this.tuningModel = defaultTuning;
+    }
   },
 
   computed: {
-    ...mapGetters("instrument", ["tuning"]),
+    ...mapGetters("instrument", ["tuning", "instrument"]),
   },
 
   methods: {
-    ...mapActions("instrument", ["newTuning"]),
+    ...mapActions("instrument", ["newTuning", "newInstrument"]),
 
-    submitTuning() {
+    submitTunning() {
+      this.newInstrument("guitar");
       this.newTuning(this.tuningModel);
 
       this.close();

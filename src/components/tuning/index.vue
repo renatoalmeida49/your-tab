@@ -2,14 +2,29 @@
   <div class="tuning">
     <header>
       <ul class="tuning__menu">
-        <li @click="newTab('Guitar')">Violão/Guitarra</li>
-        <li @click="newTab('Ukulele')">Ukelele</li>
-        <li @click="newTab('Bass')">Baixo</li>
+        <li
+          @click="newTab('Guitar')"
+          :class="{ active: selectedComponent == 'Guitar' }"
+        >
+          Violão/Guitarra
+        </li>
+        <li
+          @click="newTab('Ukulele')"
+          :class="{ active: selectedComponent == 'Ukulele' }"
+        >
+          Ukelele
+        </li>
+        <li
+          @click="newTab('Bass')"
+          :class="{ active: selectedComponent == 'Bass' }"
+        >
+          Baixo
+        </li>
       </ul>
     </header>
 
     <section>
-      <component :is="selectedComponent" />
+      <component :is="selectedComponent" @close="close" />
     </section>
   </div>
 </template>
@@ -38,19 +53,41 @@ export default {
     newTab(component) {
       this.selectedComponent = component;
     },
+
+    close() {
+      this.$parent.$emit("close");
+    },
   },
 };
 </script>
 
 <style lang="scss">
 .tuning {
+  > header {
+    padding-top: 20px;
+  }
+
+  > section {
+    padding: 20px;
+    border: 1px solid black;
+    border-top: none;
+  }
+
   &__menu {
     list-style: none;
     display: flex;
-    gap: 20px;
 
     li {
       cursor: pointer;
+      text-align: center;
+      padding: 10px;
+      border-bottom: 1px solid black;
+      flex: 1;
+
+      &.active {
+        border: 1px solid black;
+        border-bottom: none;
+      }
     }
   }
 }

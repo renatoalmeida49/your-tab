@@ -2,7 +2,7 @@
   <div class="modal">
     <div class="modal__wrapper" @click="close">
       <div class="modal__container">
-        <slot @close="close" />
+        <slot />
 
         <footer>
           <button @click="close">Cancelar</button>
@@ -42,7 +42,7 @@ export default {
   }
 
   &__container {
-    width: 300px;
+    max-width: 450px;
     margin: 0px auto;
     padding: 20px 30px;
     background-color: #fff;
