@@ -1,40 +1,30 @@
 <template>
   <div class="tab-header">
-    <span class="tab-header__title" role="textbox" contenteditable>
-      Título da música
+    <span class="tab-header__title" ref="title" role="textbox" contenteditable>
+      (Título)
     </span>
     <span class="tab-header__artist" role="textbox" contenteditable>
-      Artista
+      (Artista)
     </span>
     <div>
       <span>Tom: </span>
-      <span class="tab-header__tone">
+      <span class="tab-header__tone" role="textbox" contenteditable>
         {{ tone }}
       </span>
-      <button @click="toggleModal('showModalTone')">Mudar Tom</button>
     </div>
     <div>
       <div>
         <span>Instrumento: </span>
-        <span class="tab-header__tone">{{ instrument }}</span>
+        <span class="tab-header__instrument">{{ instrument }}</span>
       </div>
       <div>
         <span>Afinação: </span>
-        <span class="tab-header__tone">
+        <span class="tab-header__tuning">
           {{ getTuning }}
         </span>
         <button @click="toggleModal('showModalTuning')">Mudar afinação</button>
       </div>
     </div>
-
-    <Modal v-if="showModalTone" @close="toggleModal('showModalTone')">
-      <div class="tab-header__modalTone">
-        <header>
-          <h3>Mudar Tom</h3>
-        </header>
-        <p>Content</p>
-      </div>
-    </Modal>
 
     <Modal v-if="showModalTuning" @close="toggleModal('showModalTuning')">
       <div class="tab-header__modalTuning">
@@ -50,7 +40,7 @@
 
 <script>
 import { mapActions, mapGetters } from "vuex";
-import Tuning from "@/components/modals/tuning";
+import Tuning from "@/components/tuning";
 
 export default {
   name: "TabHeader",
@@ -105,6 +95,20 @@ export default {
   }
 
   &__tone {
+    display: inline-block;
+    width: 100px;
+    color: $primary;
+    font-family: "title";
+    margin-right: 10px;
+  }
+
+  &__instrument {
+    color: $primary;
+    font-family: "title";
+    margin-right: 10px;
+  }
+
+  &__tuning {
     color: $primary;
     font-family: "title";
     margin-right: 10px;

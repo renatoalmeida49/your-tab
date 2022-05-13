@@ -21,6 +21,7 @@ export default {
 
   mounted() {
     this.$refs.input.innerHTML = this.info.text;
+    this.$refs.input.focus();
   },
 
   methods: {

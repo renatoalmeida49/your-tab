@@ -44,6 +44,7 @@ export default {
 
   mounted() {
     this.$refs.input.innerHTML = this.info.verse;
+    this.$refs.input.focus();
   },
 
   methods: {

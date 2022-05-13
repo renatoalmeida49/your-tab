@@ -59,6 +59,7 @@ export default {
 
     add(component) {
       this.addContent({
+        type: component,
         component: componentList[component],
         info: this.getComponent(component),
       });

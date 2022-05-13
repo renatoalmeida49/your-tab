@@ -1,5 +1,5 @@
 <template>
-  <div class="home">
+  <div class="home" @click="newContent">
     <div id="song" class="home__song">
       <TabHeader />
 
@@ -27,9 +27,10 @@
 </template>
 
 <script>
-import { mapGetters } from "vuex";
+import { mapGetters, mapActions } from "vuex";
 import Draggable from "vuedraggable";
 import TabHeader from "@/components/tab-header";
+import TextField from "@/components/text-field";
 
 export default {
   name: "Home",
@@ -37,6 +38,7 @@ export default {
   components: {
     Draggable,
     TabHeader,
+    TextField,
   },
 
   data() {
@@ -56,6 +58,8 @@ export default {
   },
 
   methods: {
+    ...mapActions("songStructure", ["addContent"]),
+
     forceRender() {
       this.render++;
     },
@@ -64,6 +68,22 @@ export default {
       if (index == 0) return false;
 
       return true;
+    },
+
+    newContent(event) {
+      if (event.target === event.currentTarget) {
+        if (this.song.length > 0) {
+          if (this.song[this.song.length - 1].type == "textField") {
+            return;
+          }
+        }
+
+        this.addContent({
+          type: "textField",
+          component: TextField,
+          info: { text: "", type: "text" },
+        });
+      }
     },
   },
 };
