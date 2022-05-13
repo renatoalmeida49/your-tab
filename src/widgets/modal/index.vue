@@ -2,7 +2,7 @@
   <div class="modal">
     <div class="modal__wrapper" @click="close">
       <div class="modal__container">
-        <slot />
+        <slot @close="close" />
 
         <footer>
           <button @click="close">Cancelar</button>
