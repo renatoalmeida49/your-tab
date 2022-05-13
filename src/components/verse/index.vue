@@ -5,7 +5,7 @@
         <span
           v-for="(dash, index) in info.chords"
           :key="index"
-          @dblclick="changeContent(index)"
+          @click="changeContent(index)"
           :class="checkContent(dash)"
           >{{ dash }}</span
         >
@@ -53,7 +53,8 @@ export default {
     },
 
     changeContent(index) {
-      this.info.chords[index] = prompt(this.info.chords[index]);
+      this.info.chords[index] =
+        prompt("Novo valor", this.info.chords[index]) || "-";
 
       this.forceRender();
     },

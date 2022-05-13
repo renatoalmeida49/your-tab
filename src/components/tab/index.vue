@@ -50,7 +50,7 @@ export default {
   methods: {
     changeContent(indexString, index) {
       this.info[indexString].string[index] =
-        prompt(this.info[indexString].string[index] || "-") || "-";
+        prompt("Novo valor", this.info[indexString].string[index]) || "-";
       // this.emitChange();
       this.forceRender();
     },
