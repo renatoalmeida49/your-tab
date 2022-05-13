@@ -74,7 +74,7 @@ export default {
       if (event.target === event.currentTarget) {
         if (this.song.length > 0) {
           if (this.song[this.song.length - 1].type == "textField") {
-            return;
+            if (this.song[this.song.length - 1].info.text == "") return;
           }
         }
 
