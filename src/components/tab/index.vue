@@ -15,7 +15,7 @@
               :data-list="indexString"
               class="note"
               v-for="(note, index) in string.string"
-              @dblclick="changeContent(indexString, index)"
+              @click="changeContent(indexString, index)"
               :key="`${note}-${index}`"
               >{{ note }}</span
             >
@@ -49,9 +49,8 @@ export default {
 
   methods: {
     changeContent(indexString, index) {
-      this.info[indexString].string[index] = prompt(
-        this.info[indexString].string[index] || "-"
-      );
+      this.info[indexString].string[index] =
+        prompt(this.info[indexString].string[index] || "-") || "-";
       // this.emitChange();
       this.forceRender();
     },
