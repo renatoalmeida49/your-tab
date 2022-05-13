@@ -71,6 +71,7 @@ export default {
     padding: 20px;
     border: 1px solid black;
     border-top: none;
+    padding-top: 30px;
   }
 
   &__menu {

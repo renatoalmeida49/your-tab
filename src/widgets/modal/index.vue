@@ -51,5 +51,10 @@ export default {
     transition: all 0.3s ease;
     font-family: Helvetica, Arial, sans-serif;
   }
+
+  footer {
+    padding-top: 20px;
+    text-align: center;
+  }
 }
 </style>

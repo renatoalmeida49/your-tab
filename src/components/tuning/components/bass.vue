@@ -1,6 +1,6 @@
 <template>
-  <div class="bass">
-    <form @submit.prevent="submitTunning">
+  <form @submit.prevent="submitTunning" class="bass">
+    <div class="bass__form-group">
       <input
         type="text"
         required
@@ -29,10 +29,10 @@
         placeholder="E"
         value="E"
       />
+    </div>
 
-      <button type="submit">Confirmar</button>
-    </form>
-  </div>
+    <button type="submit">Confirmar</button>
+  </form>
 </template>
 
 <script>
@@ -80,12 +80,16 @@ export default {
 
 <style lang="scss">
 .bass {
-  display: flex;
-  justify-content: space-between;
+  text-align: center;
 
   input {
     width: 5ch;
     text-align: center;
+    margin: 0 5px;
+  }
+
+  &__form-group {
+    margin-bottom: 20px;
   }
 }
 </style>

@@ -1,14 +1,14 @@
 <template>
-  <div class="ukulele">
-    <form @submit.prevent="submitTunning">
+  <form @submit.prevent="submitTunning" class="ukulele">
+    <div class="guitar__form-group">
       <input type="text" required placeholder="A" value="A" />
       <input type="text" required placeholder="E" value="E" />
       <input type="text" required placeholder="C" value="C" />
       <input type="text" required placeholder="G" value="G" />
+    </div>
 
-      <button type="submit">Confirmar</button>
-    </form>
-  </div>
+    <button type="submit">Confirmar</button>
+  </form>
 </template>
 
 <script>
@@ -56,12 +56,16 @@ export default {
 
 <style lang="scss">
 .ukulele {
-  display: flex;
-  justify-content: space-between;
+  text-align: center;
 
   input {
     width: 5ch;
     text-align: center;
+    margin: 0 5px;
+  }
+
+  &__form-group {
+    margin-bottom: 20px;
   }
 }
 </style>
