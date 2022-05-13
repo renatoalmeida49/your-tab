@@ -13,7 +13,7 @@
           v-for="(part, index) in song"
           :key="index"
           :contentIndex="index"
-          :showOptions="isTabHeader(index)"
+          :showCloseButton="checkPart(part)"
         >
           <component
             :is="part.component"
@@ -64,8 +64,8 @@ export default {
       this.render++;
     },
 
-    isTabHeader(index) {
-      if (index == 0) return false;
+    checkPart(part) {
+      if (part.type == "textField") return false;
 
       return true;
     },
@@ -74,7 +74,10 @@ export default {
       if (event.target === event.currentTarget) {
         if (this.song.length > 0) {
           if (this.song[this.song.length - 1].type == "textField") {
-            if (this.song[this.song.length - 1].info.text == "") return;
+            if (this.song[this.song.length - 1].info.text == "") {
+              this.song.pop();
+              return;
+            }
           }
         }
 
