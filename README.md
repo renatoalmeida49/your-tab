@@ -102,6 +102,6 @@ yarn serve
 
 ## :clap: Agradecimentos  
   
-* **Rafael Rodrigues** - Mestre na arte de ensino. Sempre aprendo algo novo com ele.
-* **Wesley Alves** - Tirou muitas dúvidas e caminhos para o desenvolvimento de funcionalidades
-* **Thiago Vilasboas** - O cara que mais entende de CSS que eu conheço
+* **Rafael Rodrigues** - [Linkedin](https://www.linkedin.com/in/r-a-f-a-e-l-rodrigues/) - Mestre na arte de ensino. Sempre aprendo algo novo com ele.
+* **Wesley Alves** - [Linkedin](https://www.linkedin.com/in/wesley-alves-f/) - Tirou muitas dúvidas e caminhos para o desenvolvimento de funcionalidades
+* **Thiago Vilasboas** - [Linkedin](https://www.linkedin.com/in/thiago-vilasboas/) - O cara que mais entende de CSS que eu conheço
