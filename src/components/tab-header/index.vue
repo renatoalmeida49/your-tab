@@ -13,10 +13,10 @@
       </span>
     </div>
     <div>
-      <div>
+      <!-- <div>
         <span>Instrumento: </span>
         <span class="tab-header__instrument">{{ instrument }}</span>
-      </div>
+      </div> -->
       <div>
         <span>Afinação: </span>
         <span class="tab-header__tuning">

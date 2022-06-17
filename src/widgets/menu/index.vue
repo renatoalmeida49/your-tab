@@ -13,8 +13,8 @@
     <vue-html2pdf
       ref="html2Pdf"
       :show-layout="false"
-      :enable-download="true"
-      :preview-modal="false"
+      :enable-download="false"
+      :preview-modal="true"
       filename="tab-pdf"
       pdf-format="a4"
       pdf-orientation="portrait"
