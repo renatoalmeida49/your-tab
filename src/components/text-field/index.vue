@@ -3,7 +3,7 @@
     class="text-field"
     :contentIndex="songIndex"
     ref="input"
-    @keypress="change"
+    @keydown="change"
     @blur="validate"
     role="textbox"
     contenteditable
@@ -11,6 +11,8 @@
 </template>
 
 <script>
+import { mapActions } from "vuex";
+
 export default {
   name: "TextField",
 
@@ -20,20 +22,35 @@ export default {
   },
 
   mounted() {
-    this.$refs.input.innerHTML = this.info.text;
+    this.$refs.input.innerText = this.info.text;
     this.$refs.input.focus();
   },
 
   methods: {
+    ...mapActions("songStructure", ["removeContent"]),
+
+    remove() {
+      this.removeContent(this.songIndex);
+    },
+
     change(event) {
-      if (event.keyCode != 13) {
-        this.info.text = event.target.innerText;
-        return;
+      if (event.keyCode == 13) {
+        this.$emit("addTextField");
+
+        event.preventDefault();
       }
 
-      this.$emit("addTextField");
+      this.info.text = event.target.innerText;
 
-      event.preventDefault();
+      if (event.keyCode == 8 || event.keyCode == 46) {
+        this.checkRemove();
+      }
+    },
+
+    checkRemove() {
+      if (this.info.text.length <= 1) {
+        this.remove();
+      }
     },
 
     validate(event) {
