@@ -1,13 +1,13 @@
 <template>
-  <div class="text-field" :contentIndex="songIndex">
-    <span
-      ref="input"
-      @blur="change"
-      class="text-field__area"
-      role="textbox"
-      contenteditable
-    ></span>
-  </div>
+  <div
+    class="text-field"
+    :contentIndex="songIndex"
+    ref="input"
+    @keypress="change"
+    @blur="validate"
+    role="textbox"
+    contenteditable
+  ></div>
 </template>
 
 <script>
@@ -26,7 +26,18 @@ export default {
 
   methods: {
     change(event) {
-      this.info.text = event.target.innerHTML;
+      if (event.keyCode != 13) {
+        this.info.text = event.target.innerText;
+        return;
+      }
+
+      this.$emit("addTextField");
+
+      event.preventDefault();
+    },
+
+    validate(event) {
+      this.info.text = event.target.innerText;
     },
   },
 };
@@ -34,19 +45,16 @@ export default {
 
 <style lang="scss">
 .text-field {
+  display: flex;
+  align-items: center;
   width: 100%;
+  height: auto;
+  border: 1px solid $gray;
+  padding: 3px;
+  min-height: 30px;
 
-  &__area {
-    display: block;
-    width: 100%;
-    height: auto;
-    border: 1px solid $gray;
-    padding: 3px;
-    min-height: 30px;
-
-    &:focus {
-      outline: none;
-    }
+  &:focus {
+    outline: none;
   }
 }
 </style>

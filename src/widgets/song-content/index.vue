@@ -1,6 +1,6 @@
 <template>
-  <div class="song-content">
-    <div class="song-content__buttons">
+  <div class="song-content" @mouseenter="mouseOver" @mouseleave="mouseOver">
+    <div class="song-content__buttons" :class="{ hidden: showMoveCursor }">
       <button
         class="song-content__remove"
         @click="remove"
@@ -30,11 +30,23 @@ export default {
     showCloseButton: { type: Boolean, default: true },
   },
 
+  data() {
+    return {
+      showMoveCursor: true,
+    };
+  },
+
+  computed: {},
+
   methods: {
     ...mapActions("songStructure", ["removeContent"]),
 
     remove() {
       this.removeContent(this.contentIndex);
+    },
+
+    mouseOver() {
+      this.showMoveCursor = !this.showMoveCursor;
     },
   },
 };
@@ -50,6 +62,14 @@ export default {
     display: flex;
     flex-direction: column;
     width: 10px;
+
+    &.hidden {
+      visibility: hidden;
+    }
+
+    &.default {
+      visibility: inherit;
+    }
   }
 
   &__line {

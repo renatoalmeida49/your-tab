@@ -13,11 +13,13 @@
           v-for="(part, index) in song"
           :key="index"
           :contentIndex="index"
+          :showCloseButton="checkPart(part)"
         >
           <component
             :is="part.component"
             :info="part.info"
             :songIndex="index"
+            @addTextField="addTextField"
           ></component>
         </SongContent>
       </Draggable>
@@ -67,6 +69,14 @@ export default {
       if (part.type == "textField") return false;
 
       return true;
+    },
+
+    addTextField() {
+      this.addContent({
+        type: "textField",
+        component: TextField,
+        info: { text: "", type: "text" },
+      });
     },
 
     newContent(event) {
