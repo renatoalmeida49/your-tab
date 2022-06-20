@@ -6,6 +6,10 @@ const actions = {
   removeContent(context, payload) {
     context.commit("removeContent", payload);
   },
+
+  addTextFiled(context, payload) {
+    context.commit("addTextField", payload);
+  },
 };
 
 export default actions;

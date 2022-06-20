@@ -35,7 +35,7 @@ export default {
 
     change(event) {
       if (event.keyCode == 13) {
-        this.$emit("addTextField");
+        this.$emit("newTextField", { index: this.songIndex });
 
         event.preventDefault();
       }

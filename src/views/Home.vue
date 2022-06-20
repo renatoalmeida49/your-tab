@@ -20,7 +20,7 @@
             :is="part.component"
             :info="part.info"
             :songIndex="index"
-            @addTextField="addTextField"
+            @newTextField="newTextField"
           ></component>
         </SongContent>
       </Draggable>
@@ -60,7 +60,7 @@ export default {
   },
 
   methods: {
-    ...mapActions("songStructure", ["addContent"]),
+    ...mapActions("songStructure", ["addContent", "addTextFiled"]),
 
     forceRender() {
       this.render++;
@@ -72,11 +72,14 @@ export default {
       return true;
     },
 
-    addTextField() {
-      this.addContent({
-        type: "textField",
-        component: TextField,
-        info: { text: "", type: "text" },
+    newTextField(payload) {
+      this.addTextFiled({
+        index: payload.index + 1,
+        component: {
+          type: "textField",
+          component: TextField,
+          info: { text: "", type: "text" },
+        },
       });
     },
 
