@@ -13,6 +13,7 @@
           v-for="(part, index) in song"
           :key="index"
           :contentIndex="index"
+          :type="part.type"
           :showCloseButton="checkPart(part)"
         >
           <component

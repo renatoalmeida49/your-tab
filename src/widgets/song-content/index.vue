@@ -1,5 +1,10 @@
 <template>
-  <div class="song-content" @mouseenter="mouseOver" @mouseleave="mouseOver">
+  <div
+    class="song-content"
+    :style="propStyle"
+    @mouseenter="mouseOver"
+    @mouseleave="mouseOver"
+  >
     <div class="song-content__buttons" :class="{ hidden: showMoveCursor }">
       <button
         class="song-content__remove"
@@ -28,6 +33,7 @@ export default {
   props: {
     contentIndex: { type: Number, required: true },
     showCloseButton: { type: Boolean, default: true },
+    type: { type: String, required: true },
   },
 
   data() {
@@ -36,7 +42,14 @@ export default {
     };
   },
 
-  computed: {},
+  computed: {
+    propStyle() {
+      return {
+        marginBottom: this.type == "textField" ? "" : "15px",
+        marginTop: this.type == "textField" ? "" : "15px",
+      };
+    },
+  },
 
   methods: {
     ...mapActions("songStructure", ["removeContent"]),
@@ -56,7 +69,6 @@ export default {
 .song-content {
   display: flex;
   gap: 10px;
-  margin-bottom: $margin-bottom;
 
   &__buttons {
     display: flex;
