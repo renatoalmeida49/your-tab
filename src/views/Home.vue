@@ -81,6 +81,13 @@ export default {
           info: { text: "", type: "text" },
         },
       });
+
+      this.forceRender();
+      // this.addContent({
+      //   type: "textField",
+      //   component: TextField,
+      //   info: { text: "", type: "text" },
+      // });
     },
 
     newContent(event) {
