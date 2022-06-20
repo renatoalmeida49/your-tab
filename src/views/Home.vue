@@ -56,11 +56,15 @@ export default {
   },
 
   computed: {
-    ...mapGetters("songStructure", ["song"]),
+    ...mapGetters("songStructure", ["song", "focusTextField"]),
   },
 
   methods: {
-    ...mapActions("songStructure", ["addContent", "addTextFiled"]),
+    ...mapActions("songStructure", [
+      "addContent",
+      "addTextFiled",
+      "focusTextFieldIndex",
+    ]),
 
     forceRender() {
       this.render++;
@@ -73,6 +77,8 @@ export default {
     },
 
     newTextField(payload) {
+      this.focusTextFieldIndex(payload.index);
+
       this.addTextFiled({
         index: payload.index + 1,
         component: {
@@ -82,12 +88,29 @@ export default {
         },
       });
 
-      this.forceRender();
       // this.addContent({
       //   type: "textField",
       //   component: TextField,
       //   info: { text: "", type: "text" },
       // });
+
+      // VERIFICA NO VUEX SE HÁ INDICE SALVO.
+      // SE HOUVER SETA O FOCUS PRA ELE
+      // SE NAO HOUVER, SETA ALEATORIO MESMO
+      if (this.focusTextField >= 0) {
+        const indexToFocus = this.focusTextField + 1;
+
+        this.$nextTick(() => {
+          document.getElementById(`input-${indexToFocus}`).focus();
+          // setTimeout(() => {
+          //   console.log(document.querySelector(`#input-${indexToFocus}`));
+          // }, 200);
+        });
+
+        this.focusTextFieldIndex(null);
+      }
+
+      this.forceRender();
     },
 
     newContent(event) {

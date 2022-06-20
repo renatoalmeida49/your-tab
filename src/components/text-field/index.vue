@@ -3,6 +3,7 @@
     class="text-field"
     :contentIndex="songIndex"
     ref="input"
+    :id="idTag"
     @keydown="change"
     @blur="validate"
     role="textbox"
@@ -26,8 +27,14 @@ export default {
     this.$refs.input.focus();
   },
 
+  computed: {
+    idTag() {
+      return `input-${this.songIndex}`;
+    },
+  },
+
   methods: {
-    ...mapActions("songStructure", ["removeContent"]),
+    ...mapActions("songStructure", ["removeContent", "focusTextFieldIndex"]),
 
     remove() {
       this.removeContent(this.songIndex);
