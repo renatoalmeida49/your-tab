@@ -21,6 +21,7 @@
             :info="part.info"
             :songIndex="index"
             @newTextField="newTextField"
+            @moveCursor="moveCursor"
           ></component>
         </SongContent>
       </Draggable>
@@ -76,6 +77,38 @@ export default {
       return true;
     },
 
+    moveCursor(payload) {
+      console.log("Event payload: ", payload);
+
+      let id = payload.id.split("-")[1];
+
+      this.focusTextFieldIndex(id);
+
+      if (id == 0 && payload.direction == "up") {
+        return;
+      }
+
+      if (payload.direction == "up") {
+        id = id - 1;
+      }
+
+      if (payload.direction == "down") {
+        id = parseInt(id) + 1;
+      }
+
+      if (!document.getElementById(`input-${id}`)) return;
+
+      this.$nextTick(() => {
+        console.log(id);
+        document.getElementById(`input-${id}`).focus();
+        // setTimeout(() => {
+        //   console.log(document.querySelector(`#input-${indexToFocus}`));
+        // }, 200);
+      });
+
+      this.focusTextFieldIndex(null);
+    },
+
     newTextField(payload) {
       this.focusTextFieldIndex(payload.index);
 
@@ -87,12 +120,6 @@ export default {
           info: { text: "", type: "text" },
         },
       });
-
-      // this.addContent({
-      //   type: "textField",
-      //   component: TextField,
-      //   info: { text: "", type: "text" },
-      // });
 
       // VERIFICA NO VUEX SE HÁ INDICE SALVO.
       // SE HOUVER SETA O FOCUS PRA ELE

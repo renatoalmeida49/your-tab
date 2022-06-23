@@ -41,6 +41,15 @@ export default {
     },
 
     change(event) {
+      // CHECA O ID DO EVENT E MOVE ELE PRA CIMA OU BAIXO
+      if (event.keyCode == 38) {
+        this.moveCursor("up", event.target.id);
+      }
+
+      if (event.keyCode == 40) {
+        this.moveCursor("down", event.target.id);
+      }
+
       if (event.keyCode == 13) {
         this.$emit("newTextField", { index: this.songIndex });
 
@@ -52,6 +61,10 @@ export default {
       if (event.keyCode == 8 || event.keyCode == 46) {
         this.checkRemove();
       }
+    },
+
+    moveCursor(direction, id) {
+      this.$emit("moveCursor", { direction: direction, id: id });
     },
 
     checkRemove() {
@@ -73,12 +86,12 @@ export default {
   align-items: center;
   width: 100%;
   height: auto;
-  border: 1px solid $gray;
   padding: 3px;
   min-height: 30px;
 
   &:focus {
     outline: none;
+    border: 1px solid $gray;
   }
 }
 </style>
