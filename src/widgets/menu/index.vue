@@ -88,7 +88,6 @@ export default {
     defaultVerse() {
       return {
         chords: string(),
-        verse: "",
       };
     },
 

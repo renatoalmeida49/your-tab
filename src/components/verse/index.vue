@@ -1,24 +1,14 @@
 <template>
   <div class="verse">
-    <div class="verse__container">
-      <Draggable :list="info.chords" :key="render">
-        <span
-          v-for="(dash, index) in info.chords"
-          :key="index"
-          @click="changeContent(index)"
-          :class="checkContent(dash)"
-          >{{ dash }}</span
-        >
-      </Draggable>
-
+    <Draggable :list="info.chords" :key="render">
       <span
-        ref="input"
-        class="verse__input"
-        @blur="change"
-        role="textbox"
-        contenteditable
-      ></span>
-    </div>
+        v-for="(dash, index) in info.chords"
+        :key="index"
+        @click="changeContent(index)"
+        :class="checkContent(dash)"
+        >{{ dash }}</span
+      >
+    </Draggable>
   </div>
 </template>
 
@@ -42,11 +32,6 @@ export default {
     };
   },
 
-  mounted() {
-    this.$refs.input.innerHTML = this.info.verse;
-    this.$refs.input.focus();
-  },
-
   methods: {
     checkContent(content) {
       return content != "-" ? "red" : "verse-dash";
@@ -59,10 +44,6 @@ export default {
       this.forceRender();
     },
 
-    change(event) {
-      this.info.verse = event.target.innerHTML;
-    },
-
     forceRender() {
       this.render++;
     },
@@ -73,25 +54,12 @@ export default {
 <style lang="scss">
 .verse {
   width: 100%;
+  display: flex;
+  align-items: center;
 
   .red {
     color: $primary;
     font-family: "title";
-  }
-
-  &__container {
-    width: 100%;
-  }
-
-  &__input {
-    display: block;
-    border: 1px solid $gray;
-    padding: 3px;
-    width: 100%;
-
-    &:focus {
-      outline: none;
-    }
   }
 }
 </style>
