@@ -45,8 +45,8 @@ export default {
   computed: {
     propStyle() {
       return {
-        marginBottom: this.type == "textField" ? "" : "15px",
-        marginTop: this.type == "textField" ? "" : "15px",
+        marginBottom: this.type == "tab" ? "15px" : "",
+        marginTop: this.type == "tab" ? "15px" : "",
       };
     },
   },
@@ -69,11 +69,17 @@ export default {
 .song-content {
   display: flex;
   gap: 10px;
+  position: relative;
 
   &__buttons {
+    position: absolute;
     display: flex;
-    flex-direction: column;
-    width: 10px;
+    justify-content: flex-end;
+    gap: 7px;
+    top: calc(50% - 11px);
+    left: -25px;
+    width: 32px;
+    padding-right: 7px;
 
     &.hidden {
       visibility: hidden;
@@ -93,8 +99,8 @@ export default {
   }
 
   &__move {
-    width: 100%;
     height: 100%;
+    width: 10px;
     cursor: move;
     border: 1px solid rgba(0, 0, 0, 0.5);
     border-radius: 6px;
