@@ -1,10 +1,19 @@
 <template>
   <div class="tab-header">
-    <span class="tab-header__title" ref="title" role="textbox" contenteditable>
-      (Título)
+    <span
+      class="tab-header__title"
+      ref="title"
+      role="textbox"
+      contenteditable
+      placeholder="(Título)"
+    >
     </span>
-    <span class="tab-header__artist" role="textbox" contenteditable>
-      (Artista)
+    <span
+      class="tab-header__artist"
+      role="textbox"
+      contenteditable
+      placeholder="(Artista)"
+    >
     </span>
     <div>
       <span>Tom: </span>
@@ -85,6 +94,12 @@ export default {
     font-size: 2rem;
     font-family: "title";
     cursor: text;
+
+    &[placeholder]:empty:before {
+      content: attr(placeholder);
+      color: $primary;
+      opacity: 0.5;
+    }
   }
 
   &__artist {
@@ -92,6 +107,12 @@ export default {
     color: $terciary;
     font-size: 1.5rem;
     cursor: text;
+
+    &[placeholder]:empty:before {
+      content: attr(placeholder);
+      color: $terciary;
+      opacity: 0.5;
+    }
   }
 
   &__tone {
