@@ -68,7 +68,7 @@ export default {
     },
 
     checkRemove() {
-      if (this.info.text.length <= 1) {
+      if (this.info.text.length == 0) {
         this.remove();
       }
     },
