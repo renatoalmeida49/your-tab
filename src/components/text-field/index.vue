@@ -1,14 +1,21 @@
 <template>
-  <div
-    class="text-field"
-    :contentIndex="songIndex"
-    ref="input"
-    :id="idTag"
-    @keydown="change"
-    @blur="validate"
-    role="textbox"
-    contenteditable
-  ></div>
+  <div class="text-field">
+    <div
+      class="text-field__input"
+      :contentIndex="songIndex"
+      ref="input"
+      :id="idTag"
+      @keydown="change"
+      @blur="validate"
+      role="textbox"
+      contenteditable
+    ></div>
+
+    <div class="text-field__select" :class="{ show: showSelect }">
+      <div class="text-field__option">Tab</div>
+      <div class="text-field__option">Verso</div>
+    </div>
+  </div>
 </template>
 
 <script>
@@ -20,6 +27,12 @@ export default {
   props: {
     info: { type: Object, required: true },
     songIndex: { type: Number, required: true },
+  },
+
+  data() {
+    return {
+      showSelect: false,
+    };
   },
 
   mounted() {
@@ -41,6 +54,15 @@ export default {
     },
 
     change(event) {
+      // MOSTRAR SELECT PARA ADICIONAR PARTE
+      if (event.keyCode == 191) {
+        this.showSelect = !this.showSelect;
+
+        console.log("Show Select", this.showSelect);
+
+        event.preventDefault();
+      }
+
       // CHECA O ID DO EVENT E MOVE ELE PRA CIMA OU BAIXO
       if (event.keyCode == 38) {
         this.moveCursor("up", event.target.id);
@@ -50,6 +72,7 @@ export default {
         this.moveCursor("down", event.target.id);
       }
 
+      // ADICIONA NOVO TEXT FIELD
       if (event.keyCode == 13) {
         this.$emit("newTextField", { index: this.songIndex });
 
@@ -58,6 +81,7 @@ export default {
 
       this.info.text = event.target.innerText;
 
+      // BACKSPACE OU DELETE
       if (event.keyCode == 8 || event.keyCode == 46) {
         this.checkRemove();
       }
@@ -82,16 +106,42 @@ export default {
 
 <style lang="scss">
 .text-field {
-  display: flex;
-  align-items: center;
   width: 100%;
-  height: auto;
-  padding: 3px;
-  min-height: 30px;
+  position: relative;
+  z-index: 1;
 
-  &:focus {
-    outline: none;
-    border: 1px solid $gray;
+  &__input {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    height: auto;
+    padding: 3px;
+    min-height: 30px;
+    position: relative;
+    z-index: 2;
+
+    &:focus {
+      outline: none;
+      border: 1px solid $gray;
+    }
+  }
+
+  &__select {
+    background: red;
+    display: inline-flex;
+    flex-direction: column;
+    position: absolute;
+    z-index: 3;
+    visibility: hidden;
+
+    &.show {
+      visibility: inherit;
+    }
+  }
+
+  &__option {
+    background: #cacaca;
+    padding: 5px 10px;
   }
 }
 </style>

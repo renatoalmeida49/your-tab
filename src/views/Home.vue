@@ -78,8 +78,6 @@ export default {
     },
 
     moveCursor(payload) {
-      console.log("Event payload: ", payload);
-
       let id = payload.id.split("-")[1];
 
       this.focusTextFieldIndex(id);
