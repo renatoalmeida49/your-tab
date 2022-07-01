@@ -97,7 +97,6 @@ export default {
       if (!document.getElementById(`input-${id}`)) return;
 
       this.$nextTick(() => {
-        console.log(id);
         document.getElementById(`input-${id}`).focus();
         // setTimeout(() => {
         //   console.log(document.querySelector(`#input-${indexToFocus}`));

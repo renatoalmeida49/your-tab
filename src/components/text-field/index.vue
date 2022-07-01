@@ -4,22 +4,34 @@
       class="text-field__input"
       :contentIndex="songIndex"
       ref="input"
-      :id="idTag"
+      :id="idInputTag"
       @keydown="change"
       @blur="validate"
       role="textbox"
       contenteditable
     ></div>
 
-    <div class="text-field__select" :class="{ show: showSelect }">
-      <div class="text-field__option">Tab</div>
-      <div class="text-field__option">Verso</div>
+    <div
+      class="text-field__select"
+      :id="idSelecTag"
+      :class="{ show: showSelect }"
+    >
+      <div class="text-field__option" data-key="tab">Tab</div>
+      <div class="text-field__option" data-key="verse">Verso</div>
     </div>
   </div>
 </template>
 
 <script>
-import { mapActions } from "vuex";
+import { mapActions, mapGetters } from "vuex";
+import Tab from "@/components/tab";
+import Verse from "@/components/verse";
+import string from "@/config/string";
+
+const componentList = {
+  tab: Tab,
+  verse: Verse,
+};
 
 export default {
   name: "TextField",
@@ -41,40 +53,129 @@ export default {
   },
 
   computed: {
-    idTag() {
+    ...mapGetters("instrument", ["tuning"]),
+
+    idInputTag() {
       return `input-${this.songIndex}`;
+    },
+
+    idSelecTag() {
+      return `select-${this.songIndex}`;
     },
   },
 
   methods: {
-    ...mapActions("songStructure", ["removeContent", "focusTextFieldIndex"]),
+    ...mapActions("songStructure", [
+      "removeContent",
+      "focusTextFieldIndex",
+      "addContent",
+    ]),
+
+    getComponent(component) {
+      switch (component) {
+        case "tab":
+          return this.defaultTab();
+        case "verse":
+          return this.defaultVerse();
+        case "textField":
+          return this.defaultText();
+      }
+    },
+
+    defaultTab() {
+      return this.tuning.map((item) => {
+        return {
+          note: item,
+          string: string(),
+        };
+      });
+    },
+
+    defaultVerse() {
+      return {
+        chords: string(),
+      };
+    },
+
+    defaultText() {
+      return {
+        text: "",
+      };
+    },
 
     remove() {
       this.removeContent(this.songIndex);
     },
 
+    addPart(part) {
+      console.log(part);
+    },
+
     change(event) {
       // MOSTRAR SELECT PARA ADICIONAR PARTE
       if (event.keyCode == 191) {
-        this.showSelect = !this.showSelect;
+        this.showSelect = true;
 
-        console.log("Show Select", this.showSelect);
+        let i = 0; // iterate over children elements inside dropdown
+        const dropdown = document.querySelector(`#${this.idSelecTag}`);
+        dropdown.classList.toggle("show");
+        const childs = dropdown.children; // get all dropdown elements
+
+        // attach keyboard events
+        window.addEventListener("keydown", (event) => {
+          switch (event.code) {
+            case "ArrowDown":
+              for (let c of childs) c.classList.remove("show");
+              childs[Math.abs(i) % childs.length].classList.add("show");
+              i++;
+              break;
+            case "ArrowUp":
+              for (let c of childs) c.classList.remove("show");
+              childs[Math.abs(i) % childs.length].classList.add("show");
+              i--;
+              break;
+          }
+          if (event.isComposing || event.keyCode === 229) {
+            return;
+          }
+        });
 
         event.preventDefault();
       }
 
       // CHECA O ID DO EVENT E MOVE ELE PRA CIMA OU BAIXO
       if (event.keyCode == 38) {
-        this.moveCursor("up", event.target.id);
+        if (!this.showSelect) {
+          this.moveCursor("up", event.target.id);
+        }
+
+        event.preventDefault();
       }
 
       if (event.keyCode == 40) {
-        this.moveCursor("down", event.target.id);
+        if (!this.showSelect) {
+          this.moveCursor("down", event.target.id);
+        }
+
+        event.preventDefault();
       }
 
       // ADICIONA NOVO TEXT FIELD
       if (event.keyCode == 13) {
-        this.$emit("newTextField", { index: this.songIndex });
+        if (!this.showSelect) {
+          this.$emit("newTextField", { index: this.songIndex });
+        } else {
+          const partToAdd = document.querySelector(".text-field__option.show")
+            .dataset.key;
+
+          this.addContent({
+            type: partToAdd,
+            component: componentList[partToAdd],
+            info: this.getComponent(partToAdd),
+          });
+
+          this.showSelect = false;
+        }
 
         event.preventDefault();
       }
@@ -138,6 +239,10 @@ export default {
   &__option {
     background: #cacaca;
     padding: 5px 10px;
+
+    &.show {
+      background: #cf4c4c;
+    }
   }
 }
 </style>
