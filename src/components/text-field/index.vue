@@ -107,8 +107,6 @@ export default {
 <style lang="scss">
 .text-field {
   width: 100%;
-  position: relative;
-  z-index: 1;
 
   &__input {
     display: flex;
@@ -117,8 +115,6 @@ export default {
     height: auto;
     padding: 3px;
     min-height: 30px;
-    position: relative;
-    z-index: 2;
 
     &:focus {
       outline: none;
