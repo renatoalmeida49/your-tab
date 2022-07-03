@@ -32,16 +32,6 @@
 <script>
 import { mapActions, mapGetters } from "vuex";
 import VueHtml2pdf from "vue-html2pdf";
-import Tab from "@/components/tab";
-import Verse from "@/components/verse";
-import TextField from "@/components/text-field";
-import string from "@/config/string";
-
-const componentList = {
-  tab: Tab,
-  verse: Verse,
-  textField: TextField,
-};
 
 export default {
   name: "Menu",
@@ -59,42 +49,8 @@ export default {
 
     add(component) {
       this.addContent({
-        type: component,
-        component: componentList[component],
-        info: this.getComponent(component),
+        component,
       });
-    },
-
-    getComponent(component) {
-      switch (component) {
-        case "tab":
-          return this.defaultTab();
-        case "verse":
-          return this.defaultVerse();
-        case "textField":
-          return this.defaultText();
-      }
-    },
-
-    defaultTab() {
-      return this.tuning.map((item) => {
-        return {
-          note: item,
-          string: string(),
-        };
-      });
-    },
-
-    defaultVerse() {
-      return {
-        chords: string(),
-      };
-    },
-
-    defaultText() {
-      return {
-        text: "",
-      };
     },
 
     generateReport() {

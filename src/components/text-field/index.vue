@@ -24,14 +24,6 @@
 
 <script>
 import { mapActions, mapGetters } from "vuex";
-import Tab from "@/components/tab";
-import Verse from "@/components/verse";
-import string from "@/config/string";
-
-const componentList = {
-  tab: Tab,
-  verse: Verse,
-};
 
 export default {
   name: "TextField",
@@ -70,38 +62,6 @@ export default {
       "focusTextFieldIndex",
       "addContent",
     ]),
-
-    getComponent(component) {
-      switch (component) {
-        case "tab":
-          return this.defaultTab();
-        case "verse":
-          return this.defaultVerse();
-        case "textField":
-          return this.defaultText();
-      }
-    },
-
-    defaultTab() {
-      return this.tuning.map((item) => {
-        return {
-          note: item,
-          string: string(),
-        };
-      });
-    },
-
-    defaultVerse() {
-      return {
-        chords: string(),
-      };
-    },
-
-    defaultText() {
-      return {
-        text: "",
-      };
-    },
 
     remove() {
       this.removeContent(this.songIndex);
@@ -169,9 +129,7 @@ export default {
             .dataset.key;
 
           this.addContent({
-            type: partToAdd,
-            component: componentList[partToAdd],
-            info: this.getComponent(partToAdd),
+            component: partToAdd,
           });
 
           this.showSelect = false;

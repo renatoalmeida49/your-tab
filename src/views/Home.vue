@@ -149,9 +149,7 @@ export default {
         }
 
         this.addContent({
-          type: "textField",
-          component: TextField,
-          info: { text: "", type: "text" },
+          component: "textField",
         });
       }
     },
