@@ -61,6 +61,7 @@ export default {
       "removeContent",
       "focusTextFieldIndex",
       "addContent",
+      "addContentBetweenParts",
     ]),
 
     remove() {
@@ -128,8 +129,12 @@ export default {
           const partToAdd = document.querySelector(".text-field__option.show")
             .dataset.key;
 
-          this.addContent({
+          const index =
+            partToAdd == "verse" ? this.songIndex : this.songIndex + 1;
+
+          this.addContentBetweenParts({
             component: partToAdd,
+            index: index,
           });
 
           this.showSelect = false;

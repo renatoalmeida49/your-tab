@@ -63,6 +63,17 @@ const actions = {
   focusTextFieldIndex(context, payload) {
     context.commit("focusTextFieldIndex", payload);
   },
+
+  addContentBetweenParts(context, payload) {
+    context.commit("addContentBetweenParts", {
+      component: {
+        type: payload.component,
+        component: componentList[payload.component],
+        info: getComponent(payload.component),
+      },
+      index: payload.index,
+    });
+  },
 };
 
 export default actions;

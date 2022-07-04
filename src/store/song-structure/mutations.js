@@ -14,6 +14,10 @@ const mutations = {
   focusTextFieldIndex(state, payload) {
     state.focusTextFieldIndex = payload;
   },
+
+  addContentBetweenParts(state, payload) {
+    state.songStructure.splice(payload.index, 0, payload.component);
+  },
 };
 
 export default mutations;
