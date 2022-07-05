@@ -68,18 +68,14 @@ export default {
 <style lang="scss">
 .song-content {
   display: flex;
-  gap: 10px;
   position: relative;
 
   &__buttons {
-    position: absolute;
     display: flex;
     justify-content: flex-end;
-    gap: 7px;
-    top: calc(50% - 11px);
-    left: -25px;
-    width: 32px;
-    padding-right: 7px;
+    gap: 2px;
+    width: 20px;
+    margin-right: 7px;
 
     &.hidden {
       visibility: hidden;

@@ -86,7 +86,7 @@ export default {
 <style lang="scss">
 .tab-header {
   width: 100%;
-  padding: 20px 0;
+  padding: 20px 27px;
 
   &__title {
     display: block;
