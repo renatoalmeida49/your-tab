@@ -4,6 +4,7 @@
       class="tab-header__title"
       ref="title"
       role="textbox"
+      @keydown="validate"
       contenteditable
       placeholder="(Título)"
     >
@@ -11,6 +12,7 @@
     <span
       class="tab-header__artist"
       role="textbox"
+      @keydown="validate"
       contenteditable
       placeholder="(Artista)"
     >
@@ -78,6 +80,10 @@ export default {
 
     toggleModal(modal) {
       this[modal] = !this[modal];
+    },
+
+    validate(event) {
+      if (event.keyCode == 13) event.preventDefault();
     },
   },
 };
