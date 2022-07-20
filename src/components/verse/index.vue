@@ -1,6 +1,14 @@
 <template>
-  <div class="verse">
-    <Draggable :list="info.chords" :key="render">
+  <div class="verse" contenteditable @blur="validate">
+    <span
+      v-for="(dash, index) in info.chords.length"
+      :key="index"
+      :class="checkContent(info.chords.charAt(index))"
+    >
+      {{ info.chords.charAt(index) }}
+    </span>
+
+    <!-- <Draggable :list="info.chords" :key="render">
       <span
         v-for="(dash, index) in info.chords"
         :key="index"
@@ -8,18 +16,18 @@
         :class="checkContent(dash)"
         >{{ dash }}</span
       >
-    </Draggable>
+    </Draggable> -->
   </div>
 </template>
 
 <script>
-import Draggable from "vuedraggable";
+// import Draggable from "vuedraggable";
 
 export default {
   name: "Verse",
 
   components: {
-    Draggable,
+    // Draggable,s
   },
 
   props: {
@@ -46,6 +54,12 @@ export default {
 
     forceRender() {
       this.render++;
+    },
+
+    validate(event) {
+      // console.log(event.target.innerText);
+      console.log(event.target.innerText);
+      this.info.chords = event.target.innerText;
     },
   },
 };

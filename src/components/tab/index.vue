@@ -1,6 +1,12 @@
 <template>
-  <div class="tab" :key="render" :contentIndex="songIndex">
-    <div class="tab__container">
+  <div
+    class="tab"
+    :key="render"
+    :contentIndex="songIndex"
+    contenteditable
+    @blur="validate"
+  >
+    <!-- <div class="tab__container">
       <template v-for="(string, indexString) in info">
         <div class="tab__string" :key="indexString">
           <span>{{ string.note }}|</span>
@@ -20,24 +26,26 @@
               >{{ note }}</span
             >
           </Draggable>
+          {{ string.string }}
         </div>
       </template>
-    </div>
+    </div> -->
+    <pre>  {{ info.text.trim() }}</pre>
   </div>
 </template>
 
 <script>
-import Draggable from "vuedraggable";
+// import Draggable from "vuedraggable";
 
 export default {
   name: "Tab",
 
   components: {
-    Draggable,
+    // Draggable,
   },
 
   props: {
-    info: { type: Array, required: true },
+    info: { type: Object, required: true },
     songIndex: { type: Number, required: true },
   },
 
@@ -105,6 +113,12 @@ export default {
       this.futureList = event.to.getAttribute("data-list");
 
       return false;
+    },
+
+    validate(event) {
+      // console.log(event.target.innerText);
+      console.log(event);
+      this.info.text = event.target.innerText;
     },
 
     // emitChange() {

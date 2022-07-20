@@ -3,7 +3,7 @@ import Verse from "@/components/verse";
 import TextField from "@/components/text-field";
 import string from "@/config/string";
 
-import store from "@/store";
+// import store from "@/store";
 
 const componentList = {
   tab: Tab,
@@ -23,12 +23,26 @@ function getComponent(component) {
 }
 
 function defaultTab() {
-  return store.getters["instrument/tuning"].map((item) => {
-    return {
-      note: item,
-      string: string(),
-    };
-  });
+  let tab = "";
+
+  tab = `
+  e|${string()}
+  B|${string()}
+  G|${string()}
+  D|${string()}
+  A|${string()}
+  E|${string()}`;
+
+  // return store.getters["instrument/tuning"].map((item) => {
+  //   return {
+  //     note: item,
+  //     string: string(),
+  //   };
+  // });
+
+  return {
+    text: tab,
+  };
 }
 
 function defaultVerse() {
