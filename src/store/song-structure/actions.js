@@ -3,8 +3,6 @@ import Verse from "@/components/verse";
 import TextField from "@/components/text-field";
 import string from "@/config/string";
 
-// import store from "@/store";
-
 const componentList = {
   tab: Tab,
   verse: Verse,
@@ -32,13 +30,6 @@ function defaultTab() {
   D|${string()}
   A|${string()}
   E|${string()}`;
-
-  // return store.getters["instrument/tuning"].map((item) => {
-  //   return {
-  //     note: item,
-  //     string: string(),
-  //   };
-  // });
 
   return {
     text: tab,
