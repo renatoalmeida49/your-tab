@@ -2,6 +2,8 @@
   <div id="app">
     <div class="container">
       <h1>Cifra builder</h1>
+
+      <p>Um construtor de cifras tablaturas e anotações.</p>
       <Menu />
       <router-view />
     </div>
