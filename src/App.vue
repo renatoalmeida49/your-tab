@@ -3,7 +3,17 @@
     <div class="container">
       <h1>Cifra builder</h1>
 
-      <p>Um construtor de cifras tablaturas e anotações.</p>
+      <section>
+        <p>Um construtor de cifras, tablaturas e anotações.</p>
+
+        <p>Clique em qualquer parte abaixo para iniciar suas anotações.</p>
+
+        <p>
+          Em qualquer momento pressione '/' para ter acesso ao atalho da
+          aplicação e adicionar rapidamente uma tablatura ou verso.
+        </p>
+      </section>
+
       <Menu />
       <router-view />
     </div>
@@ -33,6 +43,16 @@
       text-align: center;
       background: $white;
       padding: 20px 0;
+      padding-bottom: 0;
+    }
+
+    section {
+      text-align: center;
+      margin: 20px 0;
+
+      p {
+        margin-bottom: 15px;
+      }
     }
   }
 }
