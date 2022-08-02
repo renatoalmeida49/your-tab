@@ -7,7 +7,7 @@
       <input type="text" required placeholder="G" value="G" />
     </div>
 
-    <button type="submit">Confirmar</button>
+    <TheButton type="submit">Confirmar</TheButton>
   </form>
 </template>
 

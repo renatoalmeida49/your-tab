@@ -5,7 +5,7 @@
         <slot />
 
         <footer>
-          <button @click="close">Cancelar</button>
+          <TheButton @click="closeClick">Cancelar</TheButton>
         </footer>
       </div>
     </div>
@@ -19,6 +19,10 @@ export default {
   methods: {
     close(event) {
       if (event.target === event.currentTarget) this.$emit("close");
+    },
+
+    closeClick() {
+      this.$emit("close");
     },
   },
 };

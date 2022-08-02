@@ -3,13 +3,13 @@
     <div class="guitar__form-group">
       <p>Afinação rápida:</p>
 
-      <Badge
+      <TheButton
         v-for="(tunning, index) in tunnings"
         :key="index"
         @click="setTuning(index)"
       >
         {{ tunning.label }}
-      </Badge>
+      </TheButton>
     </div>
 
     <div class="bass__form-group">
@@ -43,7 +43,7 @@
       />
     </div>
 
-    <button type="submit">Confirmar</button>
+    <TheButton type="submit">Confirmar</TheButton>
   </form>
 </template>
 

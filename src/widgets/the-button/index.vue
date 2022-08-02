@@ -1,12 +1,12 @@
 <template>
-  <div class="badge" @click="emitClick">
+  <div class="the-button" @click="emitClick">
     <slot />
   </div>
 </template>
 
 <script>
 export default {
-  name: "Badge",
+  name: "TheButton",
 
   methods: {
     emitClick() {
@@ -17,7 +17,7 @@ export default {
 </script>
 
 <style lang="scss">
-.badge {
+.the-button {
   background: $primary;
   display: inline-flex;
   padding: 5px 10px;
