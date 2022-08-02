@@ -7,8 +7,10 @@
       :id="idInputTag"
       @keydown="change"
       @blur="validate"
+      @focus="changePlaceholder"
       role="textbox"
       contenteditable
+      :placeholder="placeholder"
     ></div>
 
     <div
@@ -36,6 +38,7 @@ export default {
   data() {
     return {
       showSelect: false,
+      placeholder: "",
     };
   },
 
@@ -161,7 +164,12 @@ export default {
       }
     },
 
+    changePlaceholder() {
+      this.placeholder = "Pressione '/' para inserir uma tablatura ou verso";
+    },
+
     validate(event) {
+      this.placeholder = "";
       this.info.text = event.target.innerText;
     },
   },
@@ -183,6 +191,12 @@ export default {
     &:focus {
       outline: none;
       border: 1px solid $gray;
+    }
+
+    &[placeholder]:empty:before {
+      content: attr(placeholder);
+      color: $terciary;
+      opacity: 0.5;
     }
   }
 
