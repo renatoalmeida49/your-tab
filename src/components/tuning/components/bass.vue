@@ -43,7 +43,7 @@
       />
     </div>
 
-    <TheButton type="submit">Confirmar</TheButton>
+    <TheButton type="submit" @click="submitTunning">Confirmar</TheButton>
   </form>
 </template>
 
