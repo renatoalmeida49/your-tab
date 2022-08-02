@@ -3,11 +3,13 @@
     <div class="guitar__form-group">
       <p>Afinação rápida:</p>
 
-      <button type="button" @click="setTuning('defaultTuning')">Padrão</button>
-      <button type="button" @click="setTuning('halfTuning')">Meio tom</button>
-      <button type="button" @click="setTuning('oneTune')">1 tom</button>
-      <button type="button" @click="setTuning('dropDTuning')">Drop D</button>
-      <button type="button" @click="setTuning('dropCTuning')">Drop C</button>
+      <Badge
+        v-for="(tunning, index) in tunnings"
+        :key="index"
+        @click="setTuning(index)"
+      >
+        {{ tunning.label }}
+      </Badge>
     </div>
 
     <div class="guitar__form-group">
@@ -26,20 +28,34 @@
 <script>
 import { mapGetters, mapActions } from "vuex";
 
-const tunnings = {
-  defaultTuning: ["e", "B", "G", "D", "A", "E"],
-  halfTuning: ["eb", "Bb", "Gb", "Db", "Ab", "Eb"],
-  oneTune: ["d", "A", "F", "C", "G", "D"],
-  dropDTuning: ["e", "B", "G", "D", "A", "D"],
-  dropCTuning: ["d", "A", "F", "C", "G", "C"],
-};
-
 export default {
   name: "Guitar",
 
   data() {
     return {
       tuningModel: [],
+      tunnings: {
+        defaultTuning: {
+          label: "Padrão",
+          tunning: ["e", "B", "G", "D", "A", "E"],
+        },
+        halfTuning: {
+          label: "Meio tom",
+          tunning: ["eb", "Bb", "Gb", "Db", "Ab", "Eb"],
+        },
+        oneTune: {
+          label: "1 tom",
+          tunning: ["d", "A", "F", "C", "G", "D"],
+        },
+        dropDTuning: {
+          label: "Drop D",
+          tunning: ["e", "B", "G", "D", "A", "D"],
+        },
+        dropCTuning: {
+          label: "Drop C",
+          tunning: ["d", "A", "F", "C", "G", "C"],
+        },
+      },
     };
   },
 
@@ -47,7 +63,7 @@ export default {
     if (this.instrument == "guitar") {
       this.$set(this, "tuningModel", Object.assign([], this.tuning));
     } else {
-      this.tuningModel = tunnings.defaultTuning;
+      this.tuningModel = this.tunnings.defaultTuning.tunning;
     }
   },
 
@@ -66,7 +82,7 @@ export default {
     },
 
     setTuning(tunning) {
-      this.tuningModel = tunnings[tunning];
+      this.tuningModel = this.tunnings[tunning].tunning;
     },
 
     close() {

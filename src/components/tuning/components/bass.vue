@@ -1,5 +1,17 @@
 <template>
   <form @submit.prevent="submitTunning" class="bass">
+    <div class="guitar__form-group">
+      <p>Afinação rápida:</p>
+
+      <Badge
+        v-for="(tunning, index) in tunnings"
+        :key="index"
+        @click="setTuning(index)"
+      >
+        {{ tunning.label }}
+      </Badge>
+    </div>
+
     <div class="bass__form-group">
       <input
         type="text"
@@ -38,14 +50,34 @@
 <script>
 import { mapGetters, mapActions } from "vuex";
 
-const defaultTuning = ["G", "D", "A", "E"];
-
 export default {
   name: "Bass",
 
   data() {
     return {
       tuningModel: [],
+      tunnings: {
+        defaultTuning: {
+          label: "Padrão",
+          tunning: ["G", "D", "A", "E"],
+        },
+        halfTuning: {
+          label: "Meio tom",
+          tunning: ["Gb", "Db", "Ab", "Eb"],
+        },
+        oneTune: {
+          label: "1 tom",
+          tunning: ["F", "E", "G", "D"],
+        },
+        // dropDTuning: {
+        //   label: "Drop D",
+        //   tunning: ["G", "D", "A", "E"],
+        // },
+        // dropCTuning: {
+        //   label: "Drop C",
+        //   tunning: ["G", "D", "A", "E"],
+        // },
+      },
     };
   },
 
@@ -53,7 +85,7 @@ export default {
     if (this.instrument == "bass") {
       this.$set(this, "tuningModel", Object.assign([], this.tuning));
     } else {
-      this.tuningModel = defaultTuning;
+      this.tuningModel = this.tunnings.defaultTuning.tunning;
     }
   },
 
@@ -69,6 +101,10 @@ export default {
       this.newTuning(this.tuningModel);
 
       this.close();
+    },
+
+    setTuning(tunning) {
+      this.tuningModel = this.tunnings[tunning].tunning;
     },
 
     close() {

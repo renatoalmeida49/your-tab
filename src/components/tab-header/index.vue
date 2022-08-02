@@ -148,11 +148,5 @@ export default {
       gap: 20px;
     }
   }
-
-  &__modalTuning {
-    > header {
-      margin-bottom: 30px;
-    }
-  }
 }
 </style>

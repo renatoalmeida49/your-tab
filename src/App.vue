@@ -48,7 +48,7 @@
       padding-bottom: 0;
     }
 
-    section {
+    > section {
       text-align: center;
       margin: 20px 0;
 
