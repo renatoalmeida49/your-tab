@@ -6,7 +6,7 @@
     contenteditable
     @blur="validate"
   >
-    <pre>  {{ info.text.trim() }}</pre>
+    <pre>{{ info.text.trim() }}</pre>
   </div>
 </template>
 

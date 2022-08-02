@@ -2,6 +2,7 @@ import Tab from "@/components/tab";
 import Verse from "@/components/verse";
 import TextField from "@/components/text-field";
 import string from "@/config/string";
+import store from "@/store";
 
 const componentList = {
   tab: Tab,
@@ -23,13 +24,9 @@ function getComponent(component) {
 function defaultTab() {
   let tab = "";
 
-  tab = `
-  e|${string()}
-  B|${string()}
-  G|${string()}
-  D|${string()}
-  A|${string()}
-  E|${string()}`;
+  store.state.instrument.tuning.map((tune) => {
+    tab += `${tune}|${string()}\n`;
+  });
 
   return {
     text: tab,
@@ -51,9 +48,9 @@ function defaultText() {
 const actions = {
   addContent(context, payload) {
     context.commit("addContent", {
-      type: payload.component,
-      component: componentList[payload.component],
-      info: getComponent(payload.component),
+      type: payload,
+      component: componentList[payload],
+      info: getComponent(payload),
     });
   },
 

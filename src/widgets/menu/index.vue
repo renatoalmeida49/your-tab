@@ -30,7 +30,7 @@
 </template>
 
 <script>
-import { mapActions, mapGetters } from "vuex";
+import { mapActions } from "vuex";
 import VueHtml2pdf from "vue-html2pdf";
 
 export default {
@@ -40,17 +40,11 @@ export default {
     VueHtml2pdf,
   },
 
-  computed: {
-    ...mapGetters("instrument", ["tuning"]),
-  },
-
   methods: {
     ...mapActions("songStructure", ["addContent"]),
 
     add(component) {
-      this.addContent({
-        component,
-      });
+      this.addContent(component);
     },
 
     generateReport() {
