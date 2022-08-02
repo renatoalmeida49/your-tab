@@ -8,11 +8,6 @@
 
         <p>Clique em qualquer parte abaixo para iniciar suas anotações.</p>
 
-        <p>
-          Em qualquer momento pressione '/' para ter acesso ao atalho da
-          aplicação e adicionar rapidamente uma tablatura ou verso.
-        </p>
-
         <p>Ao término da construção, faça o download em PDF da sua cifra.</p>
       </section>
 
