@@ -33,7 +33,7 @@
         <span class="tab-header__tuning">
           {{ getTuning }}
         </span>
-        <TheButton @click="toggleModal('showModalTuning')">
+        <TheButton id="changeTuningBtn" @click="toggleModal('showModalTuning')">
           Mudar afinação
         </TheButton>
       </div>

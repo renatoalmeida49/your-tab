@@ -57,6 +57,7 @@ export default {
       const inputs = pdf.querySelectorAll(".verse-input");
       const buttons = pdf.querySelectorAll("button");
       const spans = pdf.querySelectorAll("span");
+      const tunningBtn = pdf.querySelector("#changeTuningBtn");
 
       dashes.forEach((item) => {
         item.style.visibility = "hidden";
@@ -73,6 +74,8 @@ export default {
       spans.forEach((item) => {
         item.style.border = "none";
       });
+
+      tunningBtn.style.display = "none";
 
       this.$refs.html2Pdf.generatePdf();
     },
