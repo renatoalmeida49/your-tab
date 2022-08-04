@@ -78,6 +78,8 @@ export default {
     change(event) {
       // MOSTRAR SELECT PARA ADICIONAR PARTE
       if (event.keyCode == 191) {
+        if (event.shiftKey) return;
+
         this.showSelect = true;
 
         let i = 0; // iterate over children elements inside dropdown
