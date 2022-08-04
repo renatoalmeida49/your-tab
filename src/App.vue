@@ -14,21 +14,31 @@
         <h2>Feito para iniciantes e avançados</h2>
         <p>
           O Cifra Builder pode ser utilizado por todos os níveis de
-          guitarristas, baixas ou qualquer outro instumento de corda que você
-          toque!
+          guitarristas, baixistas ou qualquer outro instumento de corda que você
+          toque.
         </p>
 
         <h2>Exporte em PDF</h2>
         <p>
-          Com a exportação em PDF você pode salva o arquivo e pode levá-lo para
+          Com a exportação em PDF você pode salvar sua cifra e levá-la para
           qualquer lugar.
         </p>
 
         <h2>Futuras implementações</h2>
-        <p>
-          Em breve implementaremos a funcionalidade de login, onde você poderá
-          deixar suas tabs salvas e concluí-las em outra ocasião.
-        </p>
+        <ul>
+          <li>
+            Funcionalidade de login, onde você poderá deixar suas tabs salvas e
+            concluí-las em outra ocasião.
+          </li>
+
+          <li>Multiplos idiomas</li>
+
+          <li>Baixos de guitarras com mais cordas</li>
+
+          <li>Outros instrumentos de corda</li>
+
+          <li>Melhoria do uso de atalhos</li>
+        </ul>
 
         <h2>Fácil de usar</h2>
         <p>
@@ -92,7 +102,11 @@
       margin: 20px 0;
 
       p {
-        margin-bottom: 15px;
+        margin: 15px 0;
+      }
+
+      ul {
+        margin: 15px 0;
       }
     }
   }
