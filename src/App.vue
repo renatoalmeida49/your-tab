@@ -7,7 +7,18 @@
 
       <!-- <p>{{ $t("message") }}</p> -->
 
-      <a href="#help">Saiba mais</a>
+      <div class="links">
+        <img
+          v-for="(language, index) in languages"
+          :key="index"
+          :src="language.icon"
+          height="24px"
+          :alt="language.alt"
+          @click="changeLanguage(language.key)"
+        />
+
+        <a href="#help">Saiba mais</a>
+      </div>
 
       <Menu />
       <router-view />
@@ -56,6 +67,37 @@
   </div>
 </template>
 
+<script>
+export default {
+  name: "App",
+
+  data() {
+    return {
+      languages: [
+        {
+          icon: require("@/assets/flags/brazil.png"),
+          alt: "Idioma em português",
+          key: "ptBR",
+        },
+        {
+          icon: require("@/assets/flags/united-states.png"),
+          alt: "Idioma em inglês",
+          key: "enUS",
+        },
+      ],
+    };
+  },
+
+  methods: {
+    changeLanguage(language) {
+      localStorage.setItem("lang", language);
+
+      document.location.reload();
+    },
+  },
+};
+</script>
+
 <style lang="scss">
 * {
   margin: 0;
@@ -93,19 +135,27 @@
       margin: 20px 0;
     }
 
-    > a {
-      display: block;
-      text-align: center;
-      margin: 20px 0;
+    > .links {
       position: absolute;
+      display: flex;
+      align-items: center;
+      gap: 10px;
       z-index: 100;
-      top: 0px;
+      top: 20px;
       right: 68px;
 
       @include tablet {
         margin: 0;
-        top: 20px;
-        right: 16px;
+        right: 5px;
+      }
+
+      img {
+        cursor: pointer;
+      }
+
+      a {
+        display: block;
+        text-align: center;
       }
     }
 

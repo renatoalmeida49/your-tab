@@ -6,7 +6,7 @@ import { locale as ptBR } from "@/core/config/i18n/ptBR";
 
 Vue.use(VueI18n);
 
-const lang = localStorage.getItem("language") || "ptBR";
+const lang = localStorage.getItem("lang") || "ptBR";
 
 const i18n = new VueI18n({
   locale: lang,
