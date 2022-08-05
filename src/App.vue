@@ -99,6 +99,12 @@
       z-index: 100;
       top: 0px;
       right: 68px;
+
+      @include tablet {
+        margin: 0;
+        top: 20px;
+        right: 16px;
+      }
     }
 
     #help {
