@@ -6,8 +6,10 @@
       <button @click="add('verse')">Verso</button>
     </div>
     <div class="menu__buttons-downloads">
-      <button @click="download('tab.txt')">Download TXT</button>
-      <button @click="generateReport">Download PDF</button>
+      <!-- <button @click="download('tab.txt')">Download TXT</button> -->
+      <button @click="generateReport">
+        <img src="@/assets/icons/download.png" alt="Mudar afinação" />
+      </button>
     </div>
 
     <vue-html2pdf
@@ -113,9 +115,10 @@ export default {
   top: 0px;
 
   &__buttons {
-    text-align: center;
-
     &-song {
+      display: flex;
+      justify-content: center;
+
       button {
         cursor: pointer;
         font-size: 20px;
@@ -143,21 +146,22 @@ export default {
         cursor: pointer;
         font-size: 14px;
         width: 100%;
-        max-width: 100px;
+        max-width: 130px;
         border: none;
         background: $secondary;
         color: $primary;
         padding: 8px 20px;
         font-family: "title";
         box-shadow: 0px 1px 6px 0px rgb(0 0 0 / 50%);
+        border-radius: 0 0 20px 20px;
 
-        &:first-child {
-          border-radius: 0 0 0 20px;
-        }
+        // &:first-child {
+        //   border-radius: 0 0 0 20px;
+        // }
 
-        &:last-child {
-          border-radius: 0 0 20px 0;
-        }
+        // &:last-child {
+        //   border-radius: 0 0 20px 0;
+        // }
       }
     }
   }

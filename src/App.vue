@@ -74,6 +74,10 @@
     background: $white;
     position: relative;
 
+    @include tablet {
+      padding: 0;
+    }
+
     > h1 {
       text-align: center;
       background: $white;
@@ -107,6 +111,10 @@
 
       ul {
         margin: 15px 0;
+      }
+
+      @include tablet {
+        padding: 0 30px;
       }
     }
   }

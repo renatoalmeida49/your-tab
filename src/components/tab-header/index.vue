@@ -34,7 +34,11 @@
           {{ getTuning }}
         </span>
         <TheButton id="changeTuningBtn" @click="toggleModal('showModalTuning')">
-          Mudar afinação
+          <img
+            src="@/assets/icons/edit.png"
+            alt="Mudar afinação"
+            height="14px"
+          />
         </TheButton>
       </div>
     </div>

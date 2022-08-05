@@ -164,5 +164,9 @@ export default {
   min-height: calc(100vh - 167px);
   padding: 0 60px;
   position: relative;
+
+  @include tablet {
+    padding: 0;
+  }
 }
 </style>
