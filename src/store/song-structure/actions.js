@@ -1,7 +1,7 @@
 import Tab from "@/components/tab";
 import Verse from "@/components/verse";
 import TextField from "@/components/text-field";
-import string from "@/config/string";
+import string from "@/core/config/string";
 import store from "@/store";
 
 const componentList = {

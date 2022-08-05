@@ -5,6 +5,8 @@
 
       <p>Um construtor de cifras, tablaturas e anotações.</p>
 
+      <!-- <p>{{ $t("message") }}</p> -->
+
       <a href="#help">Saiba mais</a>
 
       <Menu />
