@@ -1,9 +1,11 @@
 <template>
   <div class="menu">
     <div class="menu__buttons-song">
-      <button @click="add('tab')">Tab</button>
-      <button @click="add('textField')">Texto</button>
-      <button @click="add('verse')">Verso</button>
+      <button @click="add('tab')">{{ $t("components.menu.tab") }}</button>
+      <button @click="add('textField')">
+        {{ $t("components.menu.text") }}
+      </button>
+      <button @click="add('verse')">{{ $t("components.menu.verse") }}</button>
     </div>
     <div class="menu__buttons-downloads">
       <!-- <button @click="download('tab.txt')">Download TXT</button> -->

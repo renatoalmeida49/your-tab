@@ -6,7 +6,7 @@
       role="textbox"
       @keydown="validate"
       contenteditable
-      placeholder="(Título)"
+      :placeholder="$t('components.tabHeader.songName')"
     >
     </span>
     <span
@@ -14,11 +14,11 @@
       role="textbox"
       @keydown="validate"
       contenteditable
-      placeholder="(Artista)"
+      :placeholder="$t('components.tabHeader.artistName')"
     >
     </span>
     <div>
-      <span>Tom: </span>
+      <span>{{ $t("components.tabHeader.tone") }}: </span>
       <span class="tab-header__tone" role="textbox" contenteditable>
         {{ tone }}
       </span>
@@ -29,14 +29,14 @@
         <span class="tab-header__instrument">{{ instrument }}</span>
       </div> -->
       <div>
-        <span>Afinação: </span>
+        <span>{{ $t("components.tabHeader.tunning") }}: </span>
         <span class="tab-header__tuning">
           {{ getTuning }}
         </span>
         <TheButton id="changeTuningBtn" @click="toggleModal('showModalTuning')">
           <img
             src="@/assets/icons/edit.png"
-            alt="Mudar afinação"
+            :alt="$t('components.tabHeader.tunningButton')"
             height="14px"
           />
         </TheButton>
@@ -46,7 +46,7 @@
     <Modal v-if="showModalTuning" @close="toggleModal('showModalTuning')">
       <div class="tab-header__modalTuning">
         <header>
-          <h3>Mudar afinação</h3>
+          <h3>{{ $t("components.tabHeader.tunningButton") }}</h3>
         </header>
 
         <Tuning />

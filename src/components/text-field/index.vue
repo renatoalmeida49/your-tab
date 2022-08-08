@@ -10,7 +10,7 @@
       @focus="changePlaceholder"
       role="textbox"
       contenteditable
-      :placeholder="placeholder"
+      :placeholder="$t(placeholder)"
     ></div>
 
     <div
@@ -18,8 +18,12 @@
       :id="idSelecTag"
       :class="{ show: showSelect }"
     >
-      <div class="text-field__option" data-key="tab">Tab</div>
-      <div class="text-field__option" data-key="verse">Verso</div>
+      <div class="text-field__option" data-key="tab">
+        {{ $t("components.textField.selectTab") }}
+      </div>
+      <div class="text-field__option" data-key="verse">
+        {{ $t("components.textField.selectVerse") }}
+      </div>
     </div>
   </div>
 </template>
@@ -167,7 +171,7 @@ export default {
     },
 
     changePlaceholder() {
-      this.placeholder = "Pressione '/' para inserir uma tablatura ou verso";
+      this.placeholder = "components.textField.placeholder";
     },
 
     validate(event) {

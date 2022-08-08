@@ -3,7 +3,7 @@
     <div class="container">
       <h1>Cifra builder</h1>
 
-      <p>Um construtor de cifras, tablaturas e anotações.</p>
+      <p>{{ $t("subtitle") }}</p>
 
       <!-- <p>{{ $t("message") }}</p> -->
 
@@ -17,51 +17,27 @@
           @click="changeLanguage(language.key)"
         />
 
-        <a href="#help">Saiba mais</a>
+        <a href="#help">{{ $t("help") }}</a>
       </div>
 
       <Menu />
       <router-view />
 
       <section id="help">
-        <h2>Feito para iniciantes e avançados</h2>
-        <p>
-          O Cifra Builder pode ser utilizado por todos os níveis de
-          guitarristas, baixistas ou qualquer outro instumento de corda que você
-          toque.
-        </p>
+        <template v-for="(item, indexItem) in $t('details')">
+          <h2 :key="keyGenerator(indexItem)">{{ item.title }}</h2>
 
-        <h2>Exporte em PDF</h2>
-        <p>
-          Com a exportação em PDF você pode salvar sua cifra e levá-la para
-          qualquer lugar.
-        </p>
-
-        <h2>Futuras implementações</h2>
-        <ul>
-          <li>
-            Funcionalidade de login, onde você poderá deixar suas tabs salvas e
-            concluí-las em outra ocasião.
-          </li>
-
-          <li>Multiplos idiomas</li>
-
-          <li>Baixos de guitarras com mais cordas</li>
-
-          <li>Outros instrumentos de corda</li>
-
-          <li>Melhoria do uso de atalhos</li>
-        </ul>
-
-        <h2>Fácil de usar</h2>
-        <p>
-          Com os alhos e a navegação, rapidamente é possível construir uma cifra
-          completa.
-        </p>
-        <p>Clique em qualquer parte abaixo para iniciar suas anotações.</p>
-
-        <h2>Fale conosco!</h2>
-        <p>Viu algum bug? Tem alguma sugestão?</p>
+          <template v-if="Array.isArray(item.description)">
+            <ul :key="keyGenerator(indexItem)">
+              <template v-for="(subitem, indexSubitem) in item.description">
+                <li :key="keyGenerator(indexSubitem)">{{ subitem }}</li>
+              </template>
+            </ul>
+          </template>
+          <template v-else>
+            <p :key="keyGenerator(indexItem)">{{ item.description }}</p>
+          </template>
+        </template>
       </section>
     </div>
   </div>
@@ -93,6 +69,10 @@ export default {
       localStorage.setItem("lang", language);
 
       document.location.reload();
+    },
+
+    keyGenerator(index) {
+      return index + 1 + (Math.random() * 100).toFixed(0);
     },
   },
 };
