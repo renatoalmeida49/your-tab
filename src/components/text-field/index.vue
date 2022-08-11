@@ -49,6 +49,28 @@ export default {
   mounted() {
     this.$refs.input.innerText = this.info.text;
     this.$refs.input.focus();
+
+    const target = document.querySelector(`#${this.idInputTag}`);
+
+    target.addEventListener("paste", (event) => {
+      event.preventDefault();
+      let paste = event.clipboardData.getData("text");
+
+      let array = paste.split("\n");
+
+      array.map((line, index) => {
+        if (index == 0) {
+          document.querySelector(`#${this.idInputTag}`).innerText = array[0];
+          return;
+        }
+
+        this.addContentBetweenParts({
+          component: "textField",
+          content: line,
+          index: this.songIndex + index + 1,
+        });
+      });
+    });
   },
 
   computed: {

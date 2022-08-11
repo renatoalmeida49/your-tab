@@ -10,14 +10,14 @@ const componentList = {
   textField: TextField,
 };
 
-function getComponent(component) {
+function getComponent(component, content = "") {
   switch (component) {
     case "tab":
-      return defaultTab();
+      return defaultTab(content);
     case "verse":
-      return defaultVerse();
+      return defaultVerse(content);
     case "textField":
-      return defaultText();
+      return defaultText(content);
   }
 }
 
@@ -39,9 +39,9 @@ function defaultVerse() {
   };
 }
 
-function defaultText() {
+function defaultText(content) {
   return {
-    text: "",
+    text: content,
   };
 }
 
@@ -71,7 +71,7 @@ const actions = {
       component: {
         type: payload.component,
         component: componentList[payload.component],
-        info: getComponent(payload.component),
+        info: getComponent(payload.component, payload.content),
       },
       index: payload.index,
     });
