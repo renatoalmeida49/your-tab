@@ -46,6 +46,10 @@ export const locale = {
       selectTab: "Tab",
       selectVerse: "Verso",
     },
+    verse: {
+      placeholder:
+        "Insira aqui os acordes. Pressione 'enter' para novo campo de texto",
+    },
     menu: {
       tab: "Tab",
       text: "Texto",

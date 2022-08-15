@@ -33,9 +33,9 @@ function defaultTab() {
   };
 }
 
-function defaultVerse() {
+function defaultVerse(content) {
   return {
-    chords: string(),
+    chords: content,
   };
 }
 

@@ -46,6 +46,9 @@ export const locale = {
       selectTab: "Tab",
       selectVerse: "Verse",
     },
+    verse: {
+      placeholder: "Enter the chords here. Press 'enter' for new text field",
+    },
     menu: {
       tab: "Tab",
       text: "Text",
