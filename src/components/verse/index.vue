@@ -51,7 +51,7 @@ export default {
     },
 
     change(event) {
-      if (event.keyCode == 13) {
+      if (event.key == "Enter") {
         this.addContentBetweenParts({
           component: "textField",
           index: this.songIndex + 1,

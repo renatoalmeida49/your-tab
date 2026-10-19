@@ -122,7 +122,7 @@ export default {
     },
 
     validate(event) {
-      if (event.keyCode == 13) event.preventDefault();
+      if (event.key == "Enter") event.preventDefault();
     },
   },
 };

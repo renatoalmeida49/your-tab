@@ -101,7 +101,6 @@ export default {
 
     change(event) {
       // MOSTRAR SELECT PARA ADICIONAR PARTE
-      // event.key: keyCode MUDA COM O LAYOUT (ABNT2, TECLADO NUMÉRICO)
       if (event.key == "/") {
         this.showSelect = true;
         this.selectedOption = 0;
@@ -110,14 +109,14 @@ export default {
       }
 
       // ESC FECHA O SELECT
-      if (event.keyCode == 27 && this.showSelect) {
+      if (event.key == "Escape" && this.showSelect) {
         this.showSelect = false;
 
         event.preventDefault();
       }
 
       // NAVEGA NO SELECT OU MOVE O CURSOR PRA CIMA/BAIXO
-      if (event.keyCode == 38) {
+      if (event.key == "ArrowUp") {
         if (this.showSelect) {
           this.moveSelection(-1);
         } else {
@@ -127,7 +126,7 @@ export default {
         event.preventDefault();
       }
 
-      if (event.keyCode == 40) {
+      if (event.key == "ArrowDown") {
         if (this.showSelect) {
           this.moveSelection(1);
         } else {
@@ -138,7 +137,7 @@ export default {
       }
 
       // ADICIONA NOVO TEXT FIELD
-      if (event.keyCode == 13) {
+      if (event.key == "Enter") {
         if (!this.showSelect) {
           this.$emit("newTextField", { index: this.songIndex });
         } else {
@@ -161,7 +160,7 @@ export default {
       this.setText(event.target.innerText);
 
       // BACKSPACE OU DELETE
-      if (event.keyCode == 8 || event.keyCode == 46) {
+      if (event.key == "Backspace" || event.key == "Delete") {
         this.checkRemove();
       }
     },

@@ -29,6 +29,16 @@ test.describe("campos de texto", () => {
     await expect(textFields(page).nth(1)).toBeFocused();
   });
 
+  test("Backspace em campo vazio remove o campo", async ({ page }) => {
+    await addFromMenu(page, "textField");
+    await page.keyboard.type("fica");
+    await page.keyboard.press("Enter");
+
+    await page.keyboard.press("Backspace");
+
+    expect(await songParts(page)).toEqual(["text:fica"]);
+  });
+
   test("setas navegam entre os campos", async ({ page }) => {
     await addFromMenu(page, "textField");
     await page.keyboard.press("Enter");

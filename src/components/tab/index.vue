@@ -27,7 +27,7 @@ export default {
     },
 
     change(event) {
-      if (event.keyCode == 13) {
+      if (event.key == "Enter") {
         this.$emit("newTextField", { index: this.songIndex });
 
         event.preventDefault();
