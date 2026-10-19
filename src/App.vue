@@ -18,26 +18,24 @@
         <a href="#help">{{ $t("help") }}</a>
       </div>
 
-      <Menu />
+      <TheMenu />
       <router-view />
 
       <section id="help">
-        <template v-for="(item, indexItem) in $t('details')">
-          <h2 :key="`title-${indexItem}`">{{ item.title }}</h2>
+        <!-- $t NÃO DEVOLVE ARRAYS NO VUE-I18N 9+: $tm PEGA A ESTRUTURA, $rt RENDERIZA -->
+        <template v-for="(item, indexItem) in $tm('details')" :key="indexItem">
+          <h2>{{ $rt(item.title) }}</h2>
 
-          <ul
-            v-if="Array.isArray(item.description)"
-            :key="`description-${indexItem}`"
-          >
+          <ul v-if="Array.isArray(item.description)">
             <li
               v-for="(subitem, indexSubitem) in item.description"
               :key="indexSubitem"
             >
-              {{ subitem }}
+              {{ $rt(subitem) }}
             </li>
           </ul>
-          <p v-else :key="`description-${indexItem}`">
-            {{ item.description }}
+          <p v-else>
+            {{ $rt(item.description) }}
           </p>
         </template>
       </section>
@@ -47,6 +45,8 @@
 
 <script>
 import { setLanguage } from "@/core/plugins/i18n";
+import brazilFlag from "@/assets/flags/brazil.png";
+import unitedStatesFlag from "@/assets/flags/united-states.png";
 
 export default {
   name: "App",
@@ -55,12 +55,12 @@ export default {
     return {
       languages: [
         {
-          icon: require("@/assets/flags/brazil.png"),
+          icon: brazilFlag,
           alt: "Português (Brasil)",
           key: "ptBR",
         },
         {
-          icon: require("@/assets/flags/united-states.png"),
+          icon: unitedStatesFlag,
           alt: "English",
           key: "enUS",
         },

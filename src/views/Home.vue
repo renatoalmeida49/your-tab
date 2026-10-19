@@ -3,7 +3,11 @@
     <div id="song" class="home__song">
       <TabHeader />
 
-      <Draggable :value="song" @input="setSong" handle=".song-content__move">
+      <VueDraggable
+        :model-value="song"
+        @update:model-value="setSong"
+        handle=".song-content__move"
+      >
         <SongContent
           v-for="(part, index) in song"
           :key="part.id"
@@ -12,7 +16,7 @@
           :showCloseButton="checkPart(part)"
         >
           <component
-            :is="componentList[part.type]"
+            :is="componentFor(part.type)"
             :partId="part.id"
             :info="part.info"
             :songIndex="index"
@@ -20,35 +24,32 @@
             @moveCursor="moveCursor"
           ></component>
         </SongContent>
-      </Draggable>
+      </VueDraggable>
     </div>
   </div>
 </template>
 
 <script>
 import { mapGetters, mapActions } from "vuex";
-import Draggable from "vuedraggable";
-import TabHeader from "@/components/tab-header";
-import Tab from "@/components/tab";
-import Verse from "@/components/verse";
-import TextField from "@/components/text-field";
+import { VueDraggable } from "vue-draggable-plus";
+import TabHeader from "@/components/tab-header/index.vue";
+import Tab from "@/components/tab/index.vue";
+import Verse from "@/components/verse/index.vue";
+import TextField from "@/components/text-field/index.vue";
+
+// FORA DO data(): COMPONENTES NÃO DEVEM VIRAR OBJETOS REATIVOS NO VUE 3
+const componentList = {
+  tab: Tab,
+  verse: Verse,
+  textField: TextField,
+};
 
 export default {
   name: "Home",
 
   components: {
-    Draggable,
+    VueDraggable,
     TabHeader,
-  },
-
-  data() {
-    return {
-      componentList: {
-        tab: Tab,
-        verse: Verse,
-        textField: TextField,
-      },
-    };
   },
 
   computed: {
@@ -62,6 +63,10 @@ export default {
       "removeContent",
       "setSong",
     ]),
+
+    componentFor(type) {
+      return componentList[type];
+    },
 
     checkPart(part) {
       if (part.type == "textField") return false;

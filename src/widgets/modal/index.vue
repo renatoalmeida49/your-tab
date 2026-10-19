@@ -16,6 +16,8 @@
 export default {
   name: "Modal",
 
+  emits: ["close"],
+
   methods: {
     close(event) {
       if (event.target === event.currentTarget) this.$emit("close");

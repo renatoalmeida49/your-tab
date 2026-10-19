@@ -17,11 +17,8 @@ module.exports = defineConfig({
   projects: [{ name: "chromium", use: { ...devices["Desktop Chrome"] } }],
 
   webServer: {
-    command: `vue-cli-service serve --port ${PORT}`,
+    command: `vite --port ${PORT} --strictPort`,
     url: `http://localhost:${PORT}`,
     reuseExistingServer: !process.env.CI,
-    timeout: 120 * 1000,
-    // WEBPACK 4 (VUE CLI 4) NÃO RODA NO NODE 17+ SEM O PROVIDER LEGADO
-    env: { NODE_OPTIONS: "--openssl-legacy-provider" },
   },
 });

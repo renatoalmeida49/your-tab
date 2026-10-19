@@ -19,34 +19,44 @@
       </button>
     </div>
 
-    <vue-html2pdf
-      ref="html2Pdf"
-      :show-layout="false"
-      :enable-download="false"
-      :preview-modal="true"
-      filename="tab-pdf"
-      pdf-format="a4"
-      pdf-orientation="portrait"
-      pdf-content-width="800px"
-      :paginate-elements-by-height="1100"
-      :pdf-quality="2"
-    >
-      <section class="pdf-content" slot="pdf-content">
+    <!-- LAYOUT FORA DA TELA, COM A LARGURA FIXA USADA PARA GERAR O PDF -->
+    <section class="menu__pdf-layout">
+      <div class="menu__pdf-page" ref="pdfContent">
         <div id="pdf-content"></div>
+      </div>
+    </section>
+
+    <transition name="menu__fade">
+      <section class="menu__pdf-preview" v-if="pdfFile">
+        <button @click="closePreview">&times;</button>
+
+        <iframe :src="pdfFile" width="100%" height="100%" />
       </section>
-    </vue-html2pdf>
+    </transition>
   </div>
 </template>
 
 <script>
 import { mapActions } from "vuex";
-import VueHtml2pdf from "vue-html2pdf";
+
+const pdfOptions = {
+  margin: 0,
+  filename: "tab-pdf.pdf",
+  image: { type: "jpeg", quality: 0.98 },
+  enableLinks: false,
+  html2canvas: { scale: 2, useCORS: true },
+  jsPDF: { unit: "in", format: "a4", orientation: "portrait" },
+  // NÃO CORTA UMA PARTE DA MÚSICA ENTRE DUAS PÁGINAS
+  pagebreak: { mode: ["avoid-all"] },
+};
 
 export default {
-  name: "Menu",
+  name: "TheMenu",
 
-  components: {
-    VueHtml2pdf,
+  data() {
+    return {
+      pdfFile: null,
+    };
   },
 
   methods: {
@@ -62,7 +72,7 @@ export default {
       this.addContent(component);
     },
 
-    generateReport() {
+    async generateReport() {
       const cifra = document.getElementById("song");
       const pdf = document.getElementById("pdf-content");
 
@@ -82,7 +92,18 @@ export default {
 
       tuningBtn.style.display = "none";
 
-      this.$refs.html2Pdf.generatePdf();
+      // CARREGA SÓ NO CLIQUE: html2pdf.js (html2canvas + jsPDF) É PESADO
+      const { default: html2pdf } = await import("html2pdf.js");
+
+      this.pdfFile = await html2pdf()
+        .set(pdfOptions)
+        .from(this.$refs.pdfContent)
+        .output("bloburl");
+    },
+
+    closePreview() {
+      URL.revokeObjectURL(this.pdfFile);
+      this.pdfFile = null;
     },
   },
 };
@@ -92,6 +113,68 @@ export default {
 #pdf-content {
   margin: 40px;
   font-family: monospace;
+}
+
+.menu__pdf-layout {
+  position: fixed;
+  top: 0;
+  left: -100vw;
+  z-index: -9999;
+}
+
+.menu__pdf-page {
+  width: 800px;
+  background: $white;
+}
+
+.menu__pdf-preview {
+  position: fixed;
+  width: 65%;
+  min-width: 600px;
+  height: 80vh;
+  top: 100px;
+  left: 50%;
+  z-index: 9999;
+  transform: translateX(-50%);
+  border-radius: 5px;
+  box-shadow: 0px 0px 10px #00000048;
+
+  @include tablet {
+    width: 95%;
+    min-width: 0;
+  }
+
+  button {
+    position: absolute;
+    top: -20px;
+    left: -15px;
+    width: 35px;
+    height: 35px;
+    background: #555;
+    border: 0;
+    box-shadow: 0px 0px 10px #00000048;
+    border-radius: 50%;
+    color: $white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    cursor: pointer;
+  }
+
+  iframe {
+    border: 0;
+  }
+}
+
+.menu__fade-enter-active,
+.menu__fade-leave-active {
+  transition: opacity 0.3s ease-in;
+}
+
+.menu__fade-enter-from,
+.menu__fade-leave-to {
+  opacity: 0;
 }
 
 .menu {

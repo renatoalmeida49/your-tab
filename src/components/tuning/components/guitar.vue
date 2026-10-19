@@ -31,6 +31,8 @@ import { mapGetters, mapActions } from "vuex";
 export default {
   name: "Guitar",
 
+  emits: ["close"],
+
   data() {
     return {
       tuningModel: [],
@@ -56,7 +58,7 @@ export default {
 
   mounted() {
     if (this.instrument == "guitar") {
-      this.$set(this, "tuningModel", Object.assign([], this.tuning));
+      this.tuningModel = [...this.tuning];
     } else {
       this.tuningModel = [...this.presets.defaultTuning.notes];
     }

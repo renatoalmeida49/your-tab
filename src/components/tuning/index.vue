@@ -37,6 +37,8 @@ import Ukulele from "./components/ukulele.vue";
 export default {
   name: "Tuning",
 
+  emits: ["close"],
+
   components: {
     Bass,
     Guitar,
@@ -55,7 +57,7 @@ export default {
     },
 
     close() {
-      this.$parent.$emit("close");
+      this.$emit("close");
     },
   },
 };

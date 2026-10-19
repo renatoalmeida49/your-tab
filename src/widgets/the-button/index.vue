@@ -8,6 +8,9 @@
 export default {
   name: "TheButton",
 
+  // SEM DECLARAR, O VUE 3 TAMBÉM REPASSA O @click NATIVO E DISPARA DUAS VEZES
+  emits: ["click"],
+
   props: {
     type: { type: String, default: "button" },
   },

@@ -9,7 +9,7 @@
       @focus="changePlaceholder"
       role="textbox"
       contenteditable
-      :placeholder="$t(placeholder)"
+      :placeholder="placeholder && $t(placeholder)"
     ></div>
 
     <div class="text-field__select" :class="{ show: showSelect }">
@@ -30,6 +30,8 @@ import { mapActions, mapGetters } from "vuex";
 
 export default {
   name: "TextField",
+
+  emits: ["newTextField", "moveCursor"],
 
   props: {
     partId: { type: String, required: true },

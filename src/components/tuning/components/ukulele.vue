@@ -19,6 +19,8 @@ const defaultTuning = ["A", "E", "C", "G"];
 export default {
   name: "Ukulele",
 
+  emits: ["close"],
+
   data() {
     return {
       tuningModel: [],
@@ -27,7 +29,7 @@ export default {
 
   mounted() {
     if (this.instrument == "ukulele") {
-      this.$set(this, "tuningModel", Object.assign([], this.tuning));
+      this.tuningModel = [...this.tuning];
     } else {
       this.tuningModel = [...defaultTuning];
     }

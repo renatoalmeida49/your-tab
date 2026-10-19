@@ -10,6 +10,8 @@ import { mapActions } from "vuex";
 export default {
   name: "Tab",
 
+  emits: ["newTextField"],
+
   props: {
     partId: { type: String, required: true },
     info: { type: Object, required: true },

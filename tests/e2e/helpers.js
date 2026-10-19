@@ -1,14 +1,20 @@
 import { test as base, expect } from "@playwright/test";
 
-// FALHA O TESTE SE HOUVER ERRO NO CONSOLE: PEGA WARNINGS DO VUE E
-// MUTAÇÕES FORA DE MUTATION (STORE EM STRICT MODE NO DEV)
+// FALHA O TESTE SE HOUVER ERRO NO CONSOLE OU WARNING DO VUE/VUE-I18N,
+// INCLUINDO MUTAÇÕES FORA DE MUTATION (STORE EM STRICT MODE NO DEV)
+const frameworkWarning = /^\[(Vue warn|intlify)\]/;
+
 export const test = base.extend({
   page: async ({ page }, use) => {
     const errors = [];
 
     page.on("pageerror", (error) => errors.push(error.message));
     page.on("console", (message) => {
-      if (message.type() == "error") errors.push(message.text());
+      const isError = message.type() == "error";
+      const isWarning =
+        message.type() == "warning" && frameworkWarning.test(message.text());
+
+      if (isError || isWarning) errors.push(message.text());
     });
 
     await use(page);

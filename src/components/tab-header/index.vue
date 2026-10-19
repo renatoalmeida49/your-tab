@@ -51,7 +51,7 @@
           <h3>{{ $t("components.tabHeader.tuningButton") }}</h3>
         </header>
 
-        <Tuning />
+        <Tuning @close="toggleModal('showModalTuning')" />
       </div>
     </Modal>
   </div>
@@ -59,7 +59,7 @@
 
 <script>
 import { mapActions, mapGetters } from "vuex";
-import Tuning from "@/components/tuning";
+import Tuning from "@/components/tuning/index.vue";
 
 export default {
   name: "TabHeader",

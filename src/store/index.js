@@ -1,17 +1,14 @@
-import Vue from "vue";
-import Vuex from "vuex";
+import { createStore } from "vuex";
 
 import songStructure from "./song-structure";
 import instrument from "./instrument";
 import persistence from "./plugins/persistence";
 
-Vue.use(Vuex);
-
-export default new Vuex.Store({
+export default createStore({
   modules: {
     songStructure,
     instrument,
   },
   plugins: [persistence],
-  strict: process.env.NODE_ENV !== "production",
+  strict: import.meta.env.DEV,
 });

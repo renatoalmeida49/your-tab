@@ -1,16 +1,10 @@
-import Vue from "vue";
+import { createApp } from "vue";
 import App from "./App.vue";
 import router from "./router";
 import store from "./store";
 import i18n from "./core/plugins/i18n";
+import widgets from "./widgets";
 
-import "./widgets";
+import "./assets/scss/_fonts.scss";
 
-Vue.config.productionTip = false;
-
-new Vue({
-  router,
-  store,
-  i18n,
-  render: (h) => h(App),
-}).$mount("#app");
+createApp(App).use(router).use(store).use(i18n).use(widgets).mount("#app");

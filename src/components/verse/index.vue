@@ -8,7 +8,7 @@
       @blur="validate"
       @keydown="change"
       @focus="changePlaceholder"
-      :placeholder="$t(placeholder)"
+      :placeholder="placeholder && $t(placeholder)"
     ></div>
   </div>
 </template>

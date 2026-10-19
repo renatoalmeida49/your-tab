@@ -3,7 +3,7 @@ const STORAGE_KEY = "tab-builder:song";
 function load() {
   try {
     return JSON.parse(localStorage.getItem(STORAGE_KEY));
-  } catch (e) {
+  } catch {
     return null;
   }
 }
@@ -19,7 +19,7 @@ function save(state) {
         instrument: state.instrument,
       })
     );
-  } catch (e) {
+  } catch {
     // STORAGE CHEIO OU BLOQUEADO (EX: ABA ANÔNIMA). SEGUE SEM SALVAR
   }
 }
