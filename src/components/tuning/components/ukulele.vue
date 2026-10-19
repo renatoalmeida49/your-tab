@@ -7,7 +7,7 @@
       <input type="text" required placeholder="G" value="G" />
     </div>
 
-    <TheButton type="submit" @click="submitTunning">Confirmar</TheButton>
+    <TheButton type="submit">Confirmar</TheButton>
   </form>
 </template>
 

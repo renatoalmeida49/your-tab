@@ -21,7 +21,7 @@
       <input type="text" required v-model="tuningModel[5]" placeholder="E" />
     </div>
 
-    <TheButton type="submit" @click="submitTunning">Confirmar</TheButton>
+    <TheButton type="submit">Confirmar</TheButton>
   </form>
 </template>
 
