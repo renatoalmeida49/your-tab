@@ -1,12 +1,5 @@
 <template>
-  <div
-    class="tab"
-    :key="render"
-    :contentIndex="songIndex"
-    contenteditable
-    @keydown="change"
-    @blur="validate"
-  >
+  <div class="tab" contenteditable @keydown="change" @blur="validate">
     <pre>{{ info.text.trim() }}</pre>
   </div>
 </template>
@@ -21,12 +14,6 @@ export default {
     partId: { type: String, required: true },
     info: { type: Object, required: true },
     songIndex: { type: Number, required: true },
-  },
-
-  data() {
-    return {
-      render: 0,
-    };
   },
 
   methods: {
@@ -49,15 +36,3 @@ export default {
   },
 };
 </script>
-
-<style lang="scss">
-.tab {
-  &__string {
-    display: flex;
-
-    span {
-      cursor: pointer;
-    }
-  }
-}
-</style>

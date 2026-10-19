@@ -80,10 +80,6 @@ export default {
     &.hidden {
       visibility: hidden;
     }
-
-    &.default {
-      visibility: inherit;
-    }
   }
 
   &__line {

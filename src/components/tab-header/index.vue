@@ -30,10 +30,6 @@
       ></span>
     </div>
     <div>
-      <!-- <div>
-        <span>Instrumento: </span>
-        <span class="tab-header__instrument">{{ instrument }}</span>
-      </div> -->
       <div>
         <span>{{ $t("components.tabHeader.tunning") }}: </span>
         <span class="tab-header__tuning">
@@ -75,7 +71,6 @@ export default {
   data() {
     return {
       showModalTuning: false,
-      showModalTone: false,
     };
   },
 
@@ -102,7 +97,7 @@ export default {
   },
 
   computed: {
-    ...mapGetters("instrument", ["tuning", "instrument", "tone"]),
+    ...mapGetters("instrument", ["tuning", "tone"]),
     ...mapGetters("songStructure", ["title", "artist"]),
 
     getTuning() {
@@ -111,7 +106,7 @@ export default {
   },
 
   methods: {
-    ...mapActions("instrument", ["newTuning", "newTone"]),
+    ...mapActions("instrument", ["newTone"]),
     ...mapActions("songStructure", ["setSongInfo"]),
 
     syncField(ref, value) {
@@ -173,24 +168,10 @@ export default {
     margin-right: 10px;
   }
 
-  &__instrument {
-    color: $primary;
-    font-family: "title";
-    margin-right: 10px;
-  }
-
   &__tuning {
     color: $primary;
     font-family: "title";
     margin-right: 10px;
-  }
-
-  &__modal {
-    footer {
-      display: flex;
-      justify-content: center;
-      gap: 20px;
-    }
   }
 }
 </style>

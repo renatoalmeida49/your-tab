@@ -82,10 +82,5 @@ export default {
       font-family: monospace;
     }
   }
-
-  .red {
-    color: $primary;
-    font-family: "title";
-  }
 }
 </style>

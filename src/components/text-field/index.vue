@@ -2,7 +2,6 @@
   <div class="text-field">
     <div
       class="text-field__input"
-      :contentIndex="songIndex"
       ref="input"
       :id="idInputTag"
       @keydown="change"
@@ -88,7 +87,6 @@ export default {
   methods: {
     ...mapActions("songStructure", [
       "removeContent",
-      "addContent",
       "addContentBetweenParts",
       "updatePart",
     ]),
@@ -99,10 +97,6 @@ export default {
 
     remove() {
       this.removeContent(this.songIndex);
-    },
-
-    addPart(part) {
-      console.log(part);
     },
 
     change(event) {
@@ -226,7 +220,6 @@ export default {
   }
 
   &__select {
-    background: red;
     display: inline-flex;
     flex-direction: column;
     position: absolute;

@@ -11,7 +11,6 @@
       <button class="menu__new-song" @click="startNewSong">
         {{ $t("components.menu.newSong") }}
       </button>
-      <!-- <button @click="download('tab.txt')">Download TXT</button> -->
       <button @click="generateReport">
         <img src="@/assets/icons/download.png" alt="Mudar afinação" />
       </button>
@@ -66,19 +65,9 @@ export default {
 
       pdf.innerHTML = cifra.innerHTML;
 
-      const dashes = pdf.querySelectorAll(".verse-dash");
-      const inputs = pdf.querySelectorAll(".verse-input");
       const buttons = pdf.querySelectorAll("button");
       const spans = pdf.querySelectorAll("span");
       const tunningBtn = pdf.querySelector("#changeTuningBtn");
-
-      dashes.forEach((item) => {
-        item.style.visibility = "hidden";
-      });
-
-      inputs.forEach((item) => {
-        item.style.display = "none";
-      });
 
       buttons.forEach((item) => {
         item.style.display = "none";
@@ -91,23 +80,6 @@ export default {
       tunningBtn.style.display = "none";
 
       this.$refs.html2Pdf.generatePdf();
-    },
-
-    download(filename) {
-      // let element = document.createElement("a");
-      let content = document.getElementById("song");
-      const teste = content.innerText.replaceAll("|\n", "|");
-
-      const blob = new Blob([teste], { type: "text/txt" });
-
-      const elem = window.document.createElement("a");
-
-      elem.href = window.URL.createObjectURL(blob);
-
-      elem.download = filename;
-      document.body.appendChild(elem);
-      elem.click();
-      document.body.removeChild(elem);
     },
   },
 };
@@ -169,14 +141,6 @@ export default {
         font-family: "title";
         box-shadow: 0px 1px 6px 0px rgb(0 0 0 / 50%);
         border-radius: 0 0 20px 20px;
-
-        // &:first-child {
-        //   border-radius: 0 0 0 20px;
-        // }
-
-        // &:last-child {
-        //   border-radius: 0 0 20px 0;
-        // }
       }
     }
   }

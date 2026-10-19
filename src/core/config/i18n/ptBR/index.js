@@ -1,5 +1,4 @@
 export const locale = {
-  message: "Olá, mundo!",
   subtitle: "Um construtor de cifras, tablaturas e anotações.",
   help: "Saiba mais",
   details: [

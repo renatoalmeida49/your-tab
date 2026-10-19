@@ -103,10 +103,6 @@ export default {
 </script>
 
 <style lang="scss">
-#pdf-content {
-  margin: 40px;
-  font-family: monospace;
-}
 .home {
   min-height: calc(100vh - 167px);
   padding: 0 60px;

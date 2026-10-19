@@ -5,8 +5,6 @@
 
       <p>{{ $t("subtitle") }}</p>
 
-      <!-- <p>{{ $t("message") }}</p> -->
-
       <div class="links">
         <img
           v-for="(language, index) in languages"
@@ -140,7 +138,6 @@ export default {
     }
 
     #help {
-      // text-align: center;
       margin: 20px 0;
 
       p {

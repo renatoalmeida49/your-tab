@@ -69,14 +69,6 @@ export default {
           label: "1 tom",
           tunning: ["F", "C", "G", "D"],
         },
-        // dropDTuning: {
-        //   label: "Drop D",
-        //   tunning: ["G", "D", "A", "E"],
-        // },
-        // dropCTuning: {
-        //   label: "Drop C",
-        //   tunning: ["G", "D", "A", "E"],
-        // },
       },
     };
   },

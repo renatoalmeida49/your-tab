@@ -1,5 +1,4 @@
 export const locale = {
-  message: "Hello world!",
   subtitle: "A cipher, tablature and annotation builder.",
   help: "Read more",
   details: [
