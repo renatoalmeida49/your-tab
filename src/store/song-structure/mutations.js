@@ -11,6 +11,10 @@ const mutations = {
     state.songStructure = payload;
   },
 
+  setSongInfo(state, payload) {
+    state[payload.field] = payload.value;
+  },
+
   setFocusId(state, payload) {
     state.focusId = payload;
   },

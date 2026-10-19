@@ -68,6 +68,10 @@ const actions = {
     context.commit("setSong", payload);
   },
 
+  setSongInfo(context, payload) {
+    context.commit("setSongInfo", payload);
+  },
+
   addContentBetweenParts(context, payload) {
     context.commit("addContentBetweenParts", {
       part: createPart(context, payload.component, payload.content),

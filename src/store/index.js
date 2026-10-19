@@ -3,6 +3,7 @@ import Vuex from "vuex";
 
 import songStructure from "./song-structure";
 import instrument from "./instrument";
+import persistence from "./plugins/persistence";
 
 Vue.use(Vuex);
 
@@ -11,4 +12,5 @@ export default new Vuex.Store({
     songStructure,
     instrument,
   },
+  plugins: [persistence],
 });

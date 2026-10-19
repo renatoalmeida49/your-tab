@@ -5,23 +5,29 @@
       ref="title"
       role="textbox"
       @keydown="validate"
+      @input="saveField('title', $event)"
       contenteditable
       :placeholder="$t('components.tabHeader.songName')"
-    >
-    </span>
+    ></span>
     <span
       class="tab-header__artist"
+      ref="artist"
       role="textbox"
       @keydown="validate"
+      @input="saveField('artist', $event)"
       contenteditable
       :placeholder="$t('components.tabHeader.artistName')"
-    >
-    </span>
+    ></span>
     <div>
       <span>{{ $t("components.tabHeader.tone") }}: </span>
-      <span class="tab-header__tone" role="textbox" contenteditable>
-        {{ tone }}
-      </span>
+      <span
+        class="tab-header__tone"
+        ref="tone"
+        role="textbox"
+        @keydown="validate"
+        @input="newTone($event.target.innerText)"
+        contenteditable
+      ></span>
     </div>
     <div>
       <!-- <div>
@@ -73,8 +79,15 @@ export default {
     };
   },
 
+  mounted() {
+    this.$refs.title.innerText = this.title;
+    this.$refs.artist.innerText = this.artist;
+    this.$refs.tone.innerText = this.tone;
+  },
+
   computed: {
     ...mapGetters("instrument", ["tuning", "instrument", "tone"]),
+    ...mapGetters("songStructure", ["title", "artist"]),
 
     getTuning() {
       return this.tuning.join(" - ");
@@ -82,7 +95,12 @@ export default {
   },
 
   methods: {
-    ...mapActions("instrument", ["newTuning"]),
+    ...mapActions("instrument", ["newTuning", "newTone"]),
+    ...mapActions("songStructure", ["setSongInfo"]),
+
+    saveField(field, event) {
+      this.setSongInfo({ field, value: event.target.innerText });
+    },
 
     toggleModal(modal) {
       this[modal] = !this[modal];

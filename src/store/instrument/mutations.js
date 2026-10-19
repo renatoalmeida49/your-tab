@@ -6,6 +6,10 @@ const mutations = {
   newInstrument(state, payload) {
     state.instrument = payload;
   },
+
+  newTone(state, payload) {
+    state.tone = payload;
+  },
 };
 
 export default mutations;
