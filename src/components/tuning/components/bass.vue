@@ -67,7 +67,7 @@ export default {
         },
         oneTune: {
           label: "1 tom",
-          tunning: ["F", "E", "G", "D"],
+          tunning: ["F", "C", "G", "D"],
         },
         // dropDTuning: {
         //   label: "Drop D",
@@ -85,7 +85,7 @@ export default {
     if (this.instrument == "bass") {
       this.$set(this, "tuningModel", Object.assign([], this.tuning));
     } else {
-      this.tuningModel = this.tunnings.defaultTuning.tunning;
+      this.tuningModel = [...this.tunnings.defaultTuning.tunning];
     }
   },
 
@@ -104,7 +104,7 @@ export default {
     },
 
     setTuning(tunning) {
-      this.tuningModel = this.tunnings[tunning].tunning;
+      this.tuningModel = [...this.tunnings[tunning].tunning];
     },
 
     close() {

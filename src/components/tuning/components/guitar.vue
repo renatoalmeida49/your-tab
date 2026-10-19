@@ -63,7 +63,7 @@ export default {
     if (this.instrument == "guitar") {
       this.$set(this, "tuningModel", Object.assign([], this.tuning));
     } else {
-      this.tuningModel = this.tunnings.defaultTuning.tunning;
+      this.tuningModel = [...this.tunnings.defaultTuning.tunning];
     }
   },
 
@@ -82,7 +82,7 @@ export default {
     },
 
     setTuning(tunning) {
-      this.tuningModel = this.tunnings[tunning].tunning;
+      this.tuningModel = [...this.tunnings[tunning].tunning];
     },
 
     close() {

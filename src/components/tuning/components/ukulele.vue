@@ -1,10 +1,10 @@
 <template>
   <form @submit.prevent="submitTunning" class="ukulele">
     <div class="guitar__form-group">
-      <input type="text" required placeholder="A" value="A" />
-      <input type="text" required placeholder="E" value="E" />
-      <input type="text" required placeholder="C" value="C" />
-      <input type="text" required placeholder="G" value="G" />
+      <input type="text" required v-model="tuningModel[0]" placeholder="A" />
+      <input type="text" required v-model="tuningModel[1]" placeholder="E" />
+      <input type="text" required v-model="tuningModel[2]" placeholder="C" />
+      <input type="text" required v-model="tuningModel[3]" placeholder="G" />
     </div>
 
     <TheButton type="submit">Confirmar</TheButton>
@@ -29,7 +29,7 @@ export default {
     if (this.instrument == "ukulele") {
       this.$set(this, "tuningModel", Object.assign([], this.tuning));
     } else {
-      this.tuningModel = defaultTuning;
+      this.tuningModel = [...defaultTuning];
     }
   },
 
