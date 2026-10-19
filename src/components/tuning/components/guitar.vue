@@ -1,14 +1,14 @@
 <template>
-  <form @submit.prevent="submitTunning" class="guitar">
+  <form @submit.prevent="submitTuning" class="guitar">
     <div class="guitar__form-group">
       <p>Afinação rápida:</p>
 
       <TheButton
-        v-for="(tunning, index) in tunnings"
-        :key="index"
-        @click="setTuning(index)"
+        v-for="(preset, key) in presets"
+        :key="key"
+        @click="setTuning(key)"
       >
-        {{ tunning.label }}
+        {{ preset.label }}
       </TheButton>
     </div>
 
@@ -34,26 +34,26 @@ export default {
   data() {
     return {
       tuningModel: [],
-      tunnings: {
+      presets: {
         defaultTuning: {
           label: "Padrão",
-          tunning: ["e", "B", "G", "D", "A", "E"],
+          notes: ["e", "B", "G", "D", "A", "E"],
         },
         halfTuning: {
           label: "Meio tom",
-          tunning: ["eb", "Bb", "Gb", "Db", "Ab", "Eb"],
+          notes: ["eb", "Bb", "Gb", "Db", "Ab", "Eb"],
         },
         oneTune: {
           label: "1 tom",
-          tunning: ["d", "A", "F", "C", "G", "D"],
+          notes: ["d", "A", "F", "C", "G", "D"],
         },
         dropDTuning: {
           label: "Drop D",
-          tunning: ["e", "B", "G", "D", "A", "D"],
+          notes: ["e", "B", "G", "D", "A", "D"],
         },
         dropCTuning: {
           label: "Drop C",
-          tunning: ["d", "A", "F", "C", "G", "C"],
+          notes: ["d", "A", "F", "C", "G", "C"],
         },
       },
     };
@@ -63,7 +63,7 @@ export default {
     if (this.instrument == "guitar") {
       this.$set(this, "tuningModel", Object.assign([], this.tuning));
     } else {
-      this.tuningModel = [...this.tunnings.defaultTuning.tunning];
+      this.tuningModel = [...this.presets.defaultTuning.notes];
     }
   },
 
@@ -74,15 +74,15 @@ export default {
   methods: {
     ...mapActions("instrument", ["newTuning", "newInstrument"]),
 
-    submitTunning() {
+    submitTuning() {
       this.newInstrument("guitar");
       this.newTuning(this.tuningModel);
 
       this.close();
     },
 
-    setTuning(tunning) {
-      this.tuningModel = [...this.tunnings[tunning].tunning];
+    setTuning(key) {
+      this.tuningModel = [...this.presets[key].notes];
     },
 
     close() {

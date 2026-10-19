@@ -214,7 +214,7 @@ export default {
 
     &[placeholder]:empty:before {
       content: attr(placeholder);
-      color: $terciary;
+      color: $tertiary;
       opacity: 0.5;
     }
   }

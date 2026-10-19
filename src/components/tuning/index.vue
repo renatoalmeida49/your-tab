@@ -1,7 +1,7 @@
 <template>
-  <div class="tunning">
+  <div class="tuning">
     <header>
-      <ul class="tunning__menu">
+      <ul class="tuning__menu">
         <li
           @click="newTab('Guitar')"
           :class="{ active: selectedComponent == 'Guitar' }"
@@ -12,7 +12,7 @@
           @click="newTab('Ukulele')"
           :class="{ active: selectedComponent == 'Ukulele' }"
         >
-          Ukelele
+          Ukulele
         </li>
         <li
           @click="newTab('Bass')"
@@ -23,7 +23,7 @@
       </ul>
     </header>
 
-    <section class="tunning__tabs">
+    <section class="tuning__tabs">
       <component :is="selectedComponent" @close="close" />
     </section>
   </div>
@@ -62,7 +62,7 @@ export default {
 </script>
 
 <style lang="scss">
-.tunning {
+.tuning {
   > header {
     padding-top: 20px;
   }

@@ -110,7 +110,7 @@ test.describe("idioma", () => {
     await page.locator('.links img[alt="Idioma em inglês"]').click();
 
     await expect(page.locator("#app .container > p")).toHaveText(
-      "A cipher, tablature and annotation builder."
+      "A chord sheet, tablature and annotation builder."
     );
     expect(await songParts(page)).toEqual(["text:minha letra"]);
   });
@@ -171,7 +171,7 @@ test.describe("nova música", () => {
     await addFromMenu(page, "tab");
 
     await page.locator("#changeTuningBtn").click();
-    await page.locator(".tunning__menu li", { hasText: "Baixo" }).click();
+    await page.locator(".tuning__menu li", { hasText: "Baixo" }).click();
     await page.locator(".bass button[type=submit]").click();
   });
 

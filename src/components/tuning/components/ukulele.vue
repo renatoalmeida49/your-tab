@@ -1,6 +1,6 @@
 <template>
-  <form @submit.prevent="submitTunning" class="ukulele">
-    <div class="guitar__form-group">
+  <form @submit.prevent="submitTuning" class="ukulele">
+    <div class="ukulele__form-group">
       <input type="text" required v-model="tuningModel[0]" placeholder="A" />
       <input type="text" required v-model="tuningModel[1]" placeholder="E" />
       <input type="text" required v-model="tuningModel[2]" placeholder="C" />
@@ -17,7 +17,7 @@ import { mapGetters, mapActions } from "vuex";
 const defaultTuning = ["A", "E", "C", "G"];
 
 export default {
-  name: "Ukelele",
+  name: "Ukulele",
 
   data() {
     return {
@@ -40,7 +40,7 @@ export default {
   methods: {
     ...mapActions("instrument", ["newTuning", "newInstrument"]),
 
-    submitTunning() {
+    submitTuning() {
       this.newInstrument("ukulele");
       this.newTuning(this.tuningModel);
 

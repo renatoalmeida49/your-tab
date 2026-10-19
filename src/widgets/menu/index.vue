@@ -67,7 +67,7 @@ export default {
 
       const buttons = pdf.querySelectorAll("button");
       const spans = pdf.querySelectorAll("span");
-      const tunningBtn = pdf.querySelector("#changeTuningBtn");
+      const tuningBtn = pdf.querySelector("#changeTuningBtn");
 
       buttons.forEach((item) => {
         item.style.display = "none";
@@ -77,7 +77,7 @@ export default {
         item.style.border = "none";
       });
 
-      tunningBtn.style.display = "none";
+      tuningBtn.style.display = "none";
 
       this.$refs.html2Pdf.generatePdf();
     },

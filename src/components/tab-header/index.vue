@@ -31,14 +31,14 @@
     </div>
     <div>
       <div>
-        <span>{{ $t("components.tabHeader.tunning") }}: </span>
+        <span>{{ $t("components.tabHeader.tuning") }}: </span>
         <span class="tab-header__tuning">
           {{ getTuning }}
         </span>
         <TheButton id="changeTuningBtn" @click="toggleModal('showModalTuning')">
           <img
             src="@/assets/icons/edit.png"
-            :alt="$t('components.tabHeader.tunningButton')"
+            :alt="$t('components.tabHeader.tuningButton')"
             height="14px"
           />
         </TheButton>
@@ -48,7 +48,7 @@
     <Modal v-if="showModalTuning" @close="toggleModal('showModalTuning')">
       <div class="tab-header__modalTuning">
         <header>
-          <h3>{{ $t("components.tabHeader.tunningButton") }}</h3>
+          <h3>{{ $t("components.tabHeader.tuningButton") }}</h3>
         </header>
 
         <Tuning />
@@ -149,13 +149,13 @@ export default {
 
   &__artist {
     display: block;
-    color: $terciary;
+    color: $tertiary;
     font-size: 1.5rem;
     cursor: text;
 
     &[placeholder]:empty:before {
       content: attr(placeholder);
-      color: $terciary;
+      color: $tertiary;
       opacity: 0.5;
     }
   }

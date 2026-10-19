@@ -6,7 +6,7 @@ test.beforeEach(async ({ page }) => {
 });
 
 function openInstrument(page, name) {
-  return page.locator(".tunning__menu li", { hasText: name }).click();
+  return page.locator(".tuning__menu li", { hasText: name }).click();
 }
 
 function presets(page, form) {
@@ -50,7 +50,7 @@ test("baixo 1 tom abaixo é F C G D", async ({ page }) => {
 });
 
 test("afinação editada do ukulele é salva", async ({ page }) => {
-  await openInstrument(page, "Ukelele");
+  await openInstrument(page, "Ukulele");
   await page.locator(".ukulele input").first().fill("B");
   await confirm(page, "ukulele");
 

@@ -1,14 +1,14 @@
 <template>
-  <form @submit.prevent="submitTunning" class="bass">
-    <div class="guitar__form-group">
+  <form @submit.prevent="submitTuning" class="bass">
+    <div class="bass__form-group">
       <p>Afinação rápida:</p>
 
       <TheButton
-        v-for="(tunning, index) in tunnings"
-        :key="index"
-        @click="setTuning(index)"
+        v-for="(preset, key) in presets"
+        :key="key"
+        @click="setTuning(key)"
       >
-        {{ tunning.label }}
+        {{ preset.label }}
       </TheButton>
     </div>
 
@@ -56,18 +56,18 @@ export default {
   data() {
     return {
       tuningModel: [],
-      tunnings: {
+      presets: {
         defaultTuning: {
           label: "Padrão",
-          tunning: ["G", "D", "A", "E"],
+          notes: ["G", "D", "A", "E"],
         },
         halfTuning: {
           label: "Meio tom",
-          tunning: ["Gb", "Db", "Ab", "Eb"],
+          notes: ["Gb", "Db", "Ab", "Eb"],
         },
         oneTune: {
           label: "1 tom",
-          tunning: ["F", "C", "G", "D"],
+          notes: ["F", "C", "G", "D"],
         },
       },
     };
@@ -77,7 +77,7 @@ export default {
     if (this.instrument == "bass") {
       this.$set(this, "tuningModel", Object.assign([], this.tuning));
     } else {
-      this.tuningModel = [...this.tunnings.defaultTuning.tunning];
+      this.tuningModel = [...this.presets.defaultTuning.notes];
     }
   },
 
@@ -88,15 +88,15 @@ export default {
   methods: {
     ...mapActions("instrument", ["newTuning", "newInstrument"]),
 
-    submitTunning() {
+    submitTuning() {
       this.newInstrument("bass");
       this.newTuning(this.tuningModel);
 
       this.close();
     },
 
-    setTuning(tunning) {
-      this.tuningModel = [...this.tunnings[tunning].tunning];
+    setTuning(key) {
+      this.tuningModel = [...this.presets[key].notes];
     },
 
     close() {

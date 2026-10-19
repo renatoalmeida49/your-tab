@@ -1,12 +1,12 @@
 # tab builder
 
-O Tab Builder foi criado para te ajudar a criar tabs e cifras das sua música. Você pode adicionar tab, versos, anotações e movê-las para outros lugares da música.
+O Tab Builder foi criado para te ajudar a criar tabs e cifras das suas músicas. Você pode adicionar tab, versos, anotações e movê-las para outros lugares da música.
 
-Ao final você pode gerar um PDF ou um TXT pronto para uso em sua pasta de músicas ou um meio eletrônico.
+Ao final você pode gerar um PDF pronto para uso em sua pasta de músicas ou um meio eletrônico.
 
 * Comece preenchendo os dados gerais da música, como o nome e artista
 * Em seguida comece a montar sua música
-* Ao final escolha um formato para geração da tab
+* Ao final gere o PDF da sua tab
 
 ## :clipboard: Sumário
 
@@ -66,7 +66,7 @@ Há muitos recursos acessíveis pelo front e é possível construir muita coisa 
 ## :satellite: Futuras implementações
   
 :white_medium_square: Melhorar a tela inicial. Necessário deixar mais intuitiva e clara  
-:white_medium_square: Utilização da biblioteca i18n para multiplas linguagens   
+:white_check_mark: Utilização da biblioteca i18n para múltiplas linguagens   
 :white_medium_square: Rota 404  
 
 ## :arrow_forward: Como executar o projeto
@@ -75,7 +75,7 @@ Certifique-se de ter instalado o NodeJs em sua máquina. Você pode digitar no s
 ```
 node -v
 ```
-Após realizar o clone do repositório, navegue até a pasta raiz do proejto e no terminal execute o comando abaixo para as dependências serem instaladas:
+Após realizar o clone do repositório, navegue até a pasta raiz do projeto e no terminal execute o comando abaixo para as dependências serem instaladas:
 
 ```
 npm install

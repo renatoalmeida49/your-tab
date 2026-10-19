@@ -1,5 +1,5 @@
 export const locale = {
-  subtitle: "A cipher, tablature and annotation builder.",
+  subtitle: "A chord sheet, tablature and annotation builder.",
   help: "Read more",
   details: [
     {
@@ -10,13 +10,12 @@ export const locale = {
     {
       title: "Export in PDF",
       description:
-        "With PDF export you can save your cipher and take it anywhere.",
+        "With PDF export you can save your chord sheet and take it anywhere.",
     },
     {
       title: "Future implementations",
       description: [
         "Login functionality, where you can leave your tabs saved and complete them at another time.",
-        "Multiple languages",
         "Basses and guitars with more strings",
         "Other string instruments",
         "Improved use of shortcuts",
@@ -25,7 +24,7 @@ export const locale = {
     {
       title: "Easy to use",
       description:
-        "With eyes and navigation, it is quickly possible to build a complete cipher. Click anywhere below to start your notes.",
+        "With shortcuts and navigation, you can quickly build a complete chord sheet. Click anywhere below to start your notes.",
     },
     {
       title: "Contact us!",
@@ -36,9 +35,9 @@ export const locale = {
     tabHeader: {
       songName: "(Name)",
       artistName: "(Artist)",
-      tone: "Tone",
-      tunning: "Tunning",
-      tunningButton: "Change Tunning",
+      tone: "Key",
+      tuning: "Tuning",
+      tuningButton: "Change Tuning",
     },
     textField: {
       placeholder: "Press '/' to insert a tab or verse",
