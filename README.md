@@ -51,8 +51,12 @@ Encontrei um site que oferecia justamente isso: criação de tab de forma simple
 ### Construção  
   
 - Frontend:  
-  - VueJs 
-  - VueHtml2Pdf
+  - Vue 3, Vuex 4, Vue Router e Vue I18n
+  - Vite
+  - html2pdf.js
+  - Vue Draggable Plus
+- Testes:
+  - Playwright
 
 ### O que aprendi
 
@@ -71,27 +75,26 @@ Há muitos recursos acessíveis pelo front e é possível construir muita coisa 
 
 ## :arrow_forward: Como executar o projeto
 
-Certifique-se de ter instalado o NodeJs em sua máquina. Você pode digitar no seu terminal o comando: 
+O projeto precisa do NodeJs 22 ou superior. Se você usa o [nvm](https://github.com/nvm-sh/nvm), a versão já está definida no `.nvmrc`:
 ```
-node -v
+nvm use
 ```
-Após realizar o clone do repositório, navegue até a pasta raiz do projeto e no terminal execute o comando abaixo para as dependências serem instaladas:
 
+O gerenciador de pacotes é o Yarn 1 (definido em `packageManager` no `package.json`; com o [Corepack](https://nodejs.org/api/corepack.html) ativo a versão certa é usada automaticamente). Após realizar o clone do repositório, navegue até a pasta raiz do projeto e instale as dependências:
 ```
-npm install
-
-// ou usando yarn:
-
 yarn
 ```
   
 Com as dependências instaladas execute o comando seguinte para executar o projeto:
 ```
-npm run serve
-
-// ou usando yarn
-
 yarn serve
+```
+
+Outros comandos:
+```
+yarn build     // gera a versão de produção em dist/
+yarn preview   // serve localmente o build de produção
+yarn lint      // ESLint + Prettier
 ```
 
 ### Testes
