@@ -1,4 +1,4 @@
-const STORAGE_KEY = "your-tab:song";
+const STORAGE_KEY = "tab-builder:song";
 
 function load() {
   try {

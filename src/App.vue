@@ -1,7 +1,7 @@
 <template>
   <div id="app">
     <div class="container">
-      <h1>Cifra builder</h1>
+      <h1>Tab Builder</h1>
 
       <p>{{ $t("subtitle") }}</p>
 

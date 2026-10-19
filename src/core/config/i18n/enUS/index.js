@@ -9,7 +9,7 @@ export const locale = {
     {
       title: "Made for beginners and advanced",
       description:
-        "Cifra Builder can be used by all levels of guitarists, bassists or any other stringed instrument you play.",
+        "Tab Builder can be used by all levels of guitarists, bassists or any other stringed instrument you play.",
     },
     {
       title: "Export in PDF",

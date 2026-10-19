@@ -9,7 +9,7 @@ export const locale = {
     {
       title: "Feito para iniciantes e avançados",
       description:
-        "O Cifra Builder pode ser utilizado por todos os níveis de guitarristas, baixistas ou qualquer outro instrumento de corda que você toque.",
+        "O Tab Builder pode ser utilizado por todos os níveis de guitarristas, baixistas ou qualquer outro instrumento de corda que você toque.",
     },
     {
       title: "Exporte em PDF",
