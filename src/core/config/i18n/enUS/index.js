@@ -1,4 +1,8 @@
 export const locale = {
+  common: {
+    confirm: "Confirm",
+    cancel: "Cancel",
+  },
   subtitle: "A chord sheet, tablature and annotation builder.",
   help: "Read more",
   details: [
@@ -51,8 +55,22 @@ export const locale = {
       tab: "Tab",
       text: "Text",
       verse: "Verse",
+      downloadPdf: "Download PDF",
       newSong: "New song",
       newSongConfirm: "Start a new song? The current one will be erased.",
+    },
+    tuning: {
+      guitar: "Acoustic/Electric guitar",
+      bass: "Bass",
+      ukulele: "Ukulele",
+      quickTuning: "Quick tuning",
+      presets: {
+        defaultTuning: "Standard",
+        halfTuning: "Half step down",
+        oneTune: "Whole step down",
+        dropDTuning: "Drop D",
+        dropCTuning: "Drop C",
+      },
     },
   },
 };

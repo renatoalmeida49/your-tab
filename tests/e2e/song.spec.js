@@ -107,12 +107,43 @@ test.describe("idioma", () => {
     await addFromMenu(page, "textField");
     await page.keyboard.type("minha letra");
 
-    await page.locator('.links img[alt="Idioma em inglês"]').click();
+    await page.locator('.links img[alt="English"]').click();
 
     await expect(page.locator("#app .container > p")).toHaveText(
       "A chord sheet, tablature and annotation builder."
     );
     expect(await songParts(page)).toEqual(["text:minha letra"]);
+  });
+});
+
+test.describe("idioma inglês", () => {
+  test.beforeEach(async ({ page }) => {
+    await page.locator('.links img[alt="English"]').click();
+  });
+
+  test("traduz o modal de afinação e o atributo lang", async ({ page }) => {
+    await expect(page.locator("html")).toHaveAttribute("lang", "en-US");
+
+    await page.locator("#changeTuningBtn").click();
+
+    await expect(page.locator(".tuning__menu li")).toHaveText([
+      "Acoustic/Electric guitar",
+      "Ukulele",
+      "Bass",
+    ]);
+    await expect(page.locator(".guitar")).toContainText("Quick tuning");
+    await expect(page.locator(".guitar")).toContainText("Half step down");
+    await expect(page.locator(".guitar button[type=submit]")).toHaveText(
+      "Confirm"
+    );
+    await expect(page.locator(".modal footer")).toHaveText("Cancel");
+  });
+
+  test("idioma escolhido continua após o reload", async ({ page }) => {
+    await page.reload();
+
+    await expect(page.locator("html")).toHaveAttribute("lang", "en-US");
+    await expect(page.locator(".menu__new-song")).toHaveText("New song");
   });
 });
 

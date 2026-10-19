@@ -7,7 +7,7 @@
       <input type="text" required v-model="tuningModel[3]" placeholder="G" />
     </div>
 
-    <TheButton type="submit">Confirmar</TheButton>
+    <TheButton type="submit">{{ $t("common.confirm") }}</TheButton>
   </form>
 </template>
 

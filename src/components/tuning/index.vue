@@ -6,19 +6,19 @@
           @click="newTab('Guitar')"
           :class="{ active: selectedComponent == 'Guitar' }"
         >
-          Violão/Guitarra
+          {{ $t("components.tuning.guitar") }}
         </li>
         <li
           @click="newTab('Ukulele')"
           :class="{ active: selectedComponent == 'Ukulele' }"
         >
-          Ukulele
+          {{ $t("components.tuning.ukulele") }}
         </li>
         <li
           @click="newTab('Bass')"
           :class="{ active: selectedComponent == 'Bass' }"
         >
-          Baixo
+          {{ $t("components.tuning.bass") }}
         </li>
       </ul>
     </header>

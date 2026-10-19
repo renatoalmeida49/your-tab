@@ -12,7 +12,10 @@
         {{ $t("components.menu.newSong") }}
       </button>
       <button @click="generateReport">
-        <img src="@/assets/icons/download.png" alt="Mudar afinação" />
+        <img
+          src="@/assets/icons/download.png"
+          :alt="$t('components.menu.downloadPdf')"
+        />
       </button>
     </div>
 

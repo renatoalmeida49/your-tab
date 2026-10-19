@@ -1,14 +1,14 @@
 <template>
   <form @submit.prevent="submitTuning" class="bass">
     <div class="bass__form-group">
-      <p>Afinação rápida:</p>
+      <p>{{ $t("components.tuning.quickTuning") }}:</p>
 
       <TheButton
         v-for="(preset, key) in presets"
         :key="key"
         @click="setTuning(key)"
       >
-        {{ preset.label }}
+        {{ $t(`components.tuning.presets.${key}`) }}
       </TheButton>
     </div>
 
@@ -43,7 +43,7 @@
       />
     </div>
 
-    <TheButton type="submit">Confirmar</TheButton>
+    <TheButton type="submit">{{ $t("common.confirm") }}</TheButton>
   </form>
 </template>
 
@@ -58,15 +58,12 @@ export default {
       tuningModel: [],
       presets: {
         defaultTuning: {
-          label: "Padrão",
           notes: ["G", "D", "A", "E"],
         },
         halfTuning: {
-          label: "Meio tom",
           notes: ["Gb", "Db", "Ab", "Eb"],
         },
         oneTune: {
-          label: "1 tom",
           notes: ["F", "C", "G", "D"],
         },
       },

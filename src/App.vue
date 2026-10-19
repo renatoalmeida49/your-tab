@@ -46,6 +46,8 @@
 </template>
 
 <script>
+import { setLanguage } from "@/core/plugins/i18n";
+
 export default {
   name: "App",
 
@@ -54,12 +56,12 @@ export default {
       languages: [
         {
           icon: require("@/assets/flags/brazil.png"),
-          alt: "Idioma em português",
+          alt: "Português (Brasil)",
           key: "ptBR",
         },
         {
           icon: require("@/assets/flags/united-states.png"),
-          alt: "Idioma em inglês",
+          alt: "English",
           key: "enUS",
         },
       ],
@@ -68,9 +70,7 @@ export default {
 
   methods: {
     changeLanguage(language) {
-      localStorage.setItem("lang", language);
-
-      this.$i18n.locale = language;
+      setLanguage(language);
     },
   },
 };

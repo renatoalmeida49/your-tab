@@ -1,4 +1,8 @@
 export const locale = {
+  common: {
+    confirm: "Confirmar",
+    cancel: "Cancelar",
+  },
   subtitle: "Um construtor de cifras, tablaturas e anotações.",
   help: "Saiba mais",
   details: [
@@ -52,8 +56,22 @@ export const locale = {
       tab: "Tab",
       text: "Texto",
       verse: "Verso",
+      downloadPdf: "Baixar PDF",
       newSong: "Nova música",
       newSongConfirm: "Começar uma nova música? A atual será apagada.",
+    },
+    tuning: {
+      guitar: "Violão/Guitarra",
+      bass: "Baixo",
+      ukulele: "Ukulele",
+      quickTuning: "Afinação rápida",
+      presets: {
+        defaultTuning: "Padrão",
+        halfTuning: "Meio tom",
+        oneTune: "1 tom",
+        dropDTuning: "Drop D",
+        dropCTuning: "Drop C",
+      },
     },
   },
 };
