@@ -18,6 +18,13 @@ const mutations = {
     if (part) Object.assign(part.info, payload.info);
   },
 
+  resetSong(state) {
+    state.songStructure = [];
+    state.title = "";
+    state.artist = "";
+    state.focusId = null;
+  },
+
   setSongInfo(state, payload) {
     state[payload.field] = payload.value;
   },

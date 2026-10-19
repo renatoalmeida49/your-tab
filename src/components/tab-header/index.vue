@@ -80,9 +80,25 @@ export default {
   },
 
   mounted() {
-    this.$refs.title.innerText = this.title;
-    this.$refs.artist.innerText = this.artist;
-    this.$refs.tone.innerText = this.tone;
+    this.syncField("title", this.title);
+    this.syncField("artist", this.artist);
+    this.syncField("tone", this.tone);
+  },
+
+  // CONTENTEDITABLE NÃO É REATIVO: ATUALIZA QUANDO O STORE MUDA POR FORA
+  // (EX: NOVA MÚSICA). SE O TEXTO JÁ É O MESMO, NÃO MEXE PARA NÃO MOVER O CURSOR
+  watch: {
+    title(value) {
+      this.syncField("title", value);
+    },
+
+    artist(value) {
+      this.syncField("artist", value);
+    },
+
+    tone(value) {
+      this.syncField("tone", value);
+    },
   },
 
   computed: {
@@ -97,6 +113,10 @@ export default {
   methods: {
     ...mapActions("instrument", ["newTuning", "newTone"]),
     ...mapActions("songStructure", ["setSongInfo"]),
+
+    syncField(ref, value) {
+      if (this.$refs[ref].innerText != value) this.$refs[ref].innerText = value;
+    },
 
     saveField(field, event) {
       this.setSongInfo({ field, value: event.target.innerText });

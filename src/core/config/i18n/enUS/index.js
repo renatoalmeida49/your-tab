@@ -53,6 +53,8 @@ export const locale = {
       tab: "Tab",
       text: "Text",
       verse: "Verse",
+      newSong: "New song",
+      newSongConfirm: "Start a new song? The current one will be erased.",
     },
   },
 };

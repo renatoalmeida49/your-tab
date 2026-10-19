@@ -8,6 +8,9 @@
       <button @click="add('verse')">{{ $t("components.menu.verse") }}</button>
     </div>
     <div class="menu__buttons-downloads">
+      <button class="menu__new-song" @click="startNewSong">
+        {{ $t("components.menu.newSong") }}
+      </button>
       <!-- <button @click="download('tab.txt')">Download TXT</button> -->
       <button @click="generateReport">
         <img src="@/assets/icons/download.png" alt="Mudar afinação" />
@@ -45,7 +48,13 @@ export default {
   },
 
   methods: {
-    ...mapActions("songStructure", ["addContent"]),
+    ...mapActions("songStructure", ["addContent", "newSong"]),
+
+    startNewSong() {
+      if (window.confirm(this.$t("components.menu.newSongConfirm"))) {
+        this.newSong();
+      }
+    },
 
     add(component) {
       this.addContent(component);
@@ -144,6 +153,10 @@ export default {
     }
 
     &-downloads {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+
       button {
         cursor: pointer;
         font-size: 14px;

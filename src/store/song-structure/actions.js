@@ -72,6 +72,11 @@ const actions = {
     context.commit("updatePart", payload);
   },
 
+  newSong(context) {
+    context.commit("resetSong");
+    context.commit("instrument/newTone", "C", { root: true });
+  },
+
   setSongInfo(context, payload) {
     context.commit("setSongInfo", payload);
   },

@@ -54,6 +54,8 @@ export const locale = {
       tab: "Tab",
       text: "Texto",
       verse: "Verso",
+      newSong: "Nova música",
+      newSongConfirm: "Começar uma nova música? A atual será apagada.",
     },
   },
 };

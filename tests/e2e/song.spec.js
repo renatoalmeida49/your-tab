@@ -160,3 +160,46 @@ test.describe("persistência", () => {
     await expect(page.locator(".text-field__input:focus")).toHaveCount(0);
   });
 });
+
+test.describe("nova música", () => {
+  test.beforeEach(async ({ page }) => {
+    await page.locator(".tab-header__title").click();
+    await page.keyboard.type("Antiga");
+    await page.locator(".tab-header__tone").fill("Am");
+    await addFromMenu(page, "textField");
+    await page.keyboard.type("letra antiga");
+    await addFromMenu(page, "tab");
+
+    await page.locator("#changeTuningBtn").click();
+    await page.locator(".tunning__menu li", { hasText: "Baixo" }).click();
+    await page.locator(".bass button[type=submit]").click();
+  });
+
+  test("confirmar apaga a música e o cabeçalho, mantendo a afinação", async ({
+    page,
+  }) => {
+    page.once("dialog", (dialog) => dialog.accept());
+    await page.locator(".menu__new-song").click();
+
+    expect(await songParts(page)).toEqual([]);
+    await expect(page.locator(".tab-header__title")).toHaveText("");
+    await expect(page.locator(".tab-header__tone")).toHaveText("C");
+    await expect(page.locator(".tab-header__tuning")).toHaveText(
+      "G - D - A - E"
+    );
+
+    await page.reload();
+
+    expect(await songParts(page)).toEqual([]);
+    await expect(page.locator(".tab-header__title")).toHaveText("");
+  });
+
+  test("cancelar mantém tudo", async ({ page }) => {
+    page.once("dialog", (dialog) => dialog.dismiss());
+    await page.locator(".menu__new-song").click();
+
+    expect(await songParts(page)).toEqual(["text:letra antiga", "tab"]);
+    await expect(page.locator(".tab-header__title")).toHaveText("Antiga");
+    await expect(page.locator(".tab-header__tone")).toHaveText("Am");
+  });
+});
