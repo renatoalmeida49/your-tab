@@ -102,9 +102,8 @@ export default {
 
     change(event) {
       // MOSTRAR SELECT PARA ADICIONAR PARTE
-      if (event.keyCode == 191) {
-        if (event.shiftKey) return;
-
+      // event.key: keyCode MUDA COM O LAYOUT (ABNT2, TECLADO NUMÉRICO)
+      if (event.key == "/") {
         this.showSelect = true;
         this.selectedOption = 0;
 
