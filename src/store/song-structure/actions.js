@@ -58,6 +58,14 @@ const actions = {
     context.commit("removeContent", payload);
   },
 
+  // REMOÇÃO PELO "X": AVISA E OFERECE DESFAZER
+  removePart(context, index) {
+    context.commit("removeContent", index);
+    context.dispatch("history/notify", "components.toast.partRemoved", {
+      root: true,
+    });
+  },
+
   setSong(context, payload) {
     context.commit("setSong", payload);
   },

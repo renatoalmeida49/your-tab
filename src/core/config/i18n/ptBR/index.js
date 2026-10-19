@@ -60,6 +60,10 @@ export const locale = {
       newSong: "Nova música",
       newSongConfirm: "Começar uma nova música? A atual será apagada.",
     },
+    toast: {
+      partRemoved: "Parte removida",
+      undo: "Desfazer",
+    },
     tuning: {
       guitar: "Violão/Guitarra",
       bass: "Baixo",

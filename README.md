@@ -99,6 +99,11 @@ yarn lint      // ESLint + Prettier
 
 ### Testes
 
+Os testes unitários (lógica da tab em `src/core`) usam o [Vitest](https://vitest.dev/):
+```
+yarn test:unit
+```
+
 Os testes E2E usam o [Playwright](https://playwright.dev/) e sobem o servidor de desenvolvimento sozinhos. Na primeira vez, instale o navegador:
 ```
 npx playwright install chromium

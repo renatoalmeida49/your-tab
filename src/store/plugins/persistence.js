@@ -1,3 +1,5 @@
+import { pickSong } from "../snapshot";
+
 const STORAGE_KEY = "tab-builder:song";
 
 function load() {
@@ -9,16 +11,8 @@ function load() {
 }
 
 function save(state) {
-  const { title, artist, songStructure } = state.songStructure;
-
   try {
-    localStorage.setItem(
-      STORAGE_KEY,
-      JSON.stringify({
-        songStructure: { title, artist, songStructure },
-        instrument: state.instrument,
-      })
-    );
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(pickSong(state)));
   } catch {
     // STORAGE CHEIO OU BLOQUEADO (EX: ABA ANÔNIMA). SEGUE SEM SALVAR
   }
@@ -36,7 +30,7 @@ export default (store) => {
   }
 
   store.subscribe((mutation, state) => {
-    if (mutation.type == "songStructure/setFocusId") return;
+    if (/^(history\/|songStructure\/setFocusId$)/.test(mutation.type)) return;
 
     save(state);
   });

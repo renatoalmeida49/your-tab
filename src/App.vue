@@ -19,6 +19,7 @@
       </div>
 
       <TheMenu />
+      <TheToast />
       <router-view />
 
       <section id="help">
@@ -68,9 +69,32 @@ export default {
     };
   },
 
+  mounted() {
+    window.addEventListener("keydown", this.handleShortcuts);
+  },
+
+  beforeUnmount() {
+    window.removeEventListener("keydown", this.handleShortcuts);
+  },
+
   methods: {
     changeLanguage(language) {
       setLanguage(language);
+    },
+
+    // Ctrl/Cmd+Z DESFAZ, Ctrl/Cmd+Shift+Z OU Ctrl+Y REFAZ, NA MÚSICA INTEIRA.
+    // CAMPOS <input> (EX: AFINAÇÃO) MANTÊM O DESFAZER DO NAVEGADOR
+    handleShortcuts(event) {
+      if (!(event.ctrlKey || event.metaKey) || event.altKey) return;
+      if (["INPUT", "TEXTAREA"].includes(event.target.tagName)) return;
+
+      const key = event.key.toLowerCase();
+      const redo = (key == "z" && event.shiftKey) || key == "y";
+
+      if (key != "z" && !redo) return;
+
+      event.preventDefault();
+      this.$store.dispatch(redo ? "history/redo" : "history/undo");
     },
   },
 };
