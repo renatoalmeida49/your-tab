@@ -93,6 +93,22 @@ npm run serve
 
 yarn serve
 ```
+
+### Testes
+
+Os testes E2E usam o [Playwright](https://playwright.dev/) e sobem o servidor de desenvolvimento sozinhos. Na primeira vez, instale o navegador:
+```
+npx playwright install chromium
+```
+
+Depois execute:
+```
+yarn test:e2e
+
+// para acompanhar no navegador:
+
+yarn test:e2e --ui
+```
   
 ## :smile: Autor  
   

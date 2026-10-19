@@ -1,0 +1,161 @@
+import { test, expect } from "@playwright/test";
+import {
+  addFromMenu,
+  partSelect,
+  paste,
+  songParts,
+  textFields,
+} from "./helpers";
+
+test.beforeEach(async ({ page }) => {
+  await page.goto("/");
+});
+
+test.describe("campos de texto", () => {
+  test("campo adicionado pelo menu recebe foco", async ({ page }) => {
+    await addFromMenu(page, "textField");
+
+    await expect(textFields(page).first()).toBeFocused();
+  });
+
+  test("Enter cria um novo campo abaixo e foca nele", async ({ page }) => {
+    await addFromMenu(page, "textField");
+    await page.keyboard.type("linha 1");
+    await page.keyboard.press("Enter");
+    await page.keyboard.type("linha 2");
+
+    expect(await songParts(page)).toEqual(["text:linha 1", "text:linha 2"]);
+    await expect(textFields(page).nth(1)).toBeFocused();
+  });
+
+  test("setas navegam entre os campos", async ({ page }) => {
+    await addFromMenu(page, "textField");
+    await page.keyboard.press("Enter");
+
+    await page.keyboard.press("ArrowUp");
+    await expect(textFields(page).first()).toBeFocused();
+
+    await page.keyboard.press("ArrowDown");
+    await expect(textFields(page).nth(1)).toBeFocused();
+  });
+
+  test("colar várias linhas cria um campo por linha, na ordem", async ({
+    page,
+  }) => {
+    await addFromMenu(page, "textField");
+    await page.keyboard.type("antes");
+    await page.keyboard.press("Enter");
+    await page.keyboard.press("Enter");
+    await page.keyboard.type("depois");
+
+    await paste(textFields(page).nth(1), "p1\np2\np3");
+
+    expect(await songParts(page)).toEqual([
+      "text:antes",
+      "text:p1",
+      "text:p2",
+      "text:p3",
+      "text:depois",
+    ]);
+  });
+});
+
+test.describe("seletor de partes (/)", () => {
+  test.beforeEach(async ({ page }) => {
+    await addFromMenu(page, "textField");
+    await page.keyboard.type("linha");
+  });
+
+  test("'/' seguido de Enter insere uma tab abaixo", async ({ page }) => {
+    await page.keyboard.press("/");
+    await expect(partSelect(page)).toBeVisible();
+
+    await page.keyboard.press("Enter");
+
+    expect(await songParts(page)).toEqual(["text:linha", "tab"]);
+    await expect(partSelect(page)).toHaveCount(0);
+  });
+
+  test("'/' seguido de seta e Enter insere um verso acima", async ({
+    page,
+  }) => {
+    await page.keyboard.press("/");
+    await page.keyboard.press("ArrowDown");
+    await page.keyboard.press("Enter");
+
+    expect(await songParts(page)).toEqual(["verse", "text:linha"]);
+  });
+
+  test("'/' do teclado numérico também abre o seletor", async ({ page }) => {
+    await page.keyboard.press("NumpadDivide");
+
+    await expect(partSelect(page)).toBeVisible();
+  });
+
+  test("Esc fecha o seletor sem inserir nada", async ({ page }) => {
+    await page.keyboard.press("/");
+    await page.keyboard.press("Escape");
+
+    await expect(partSelect(page)).toHaveCount(0);
+    expect(await songParts(page)).toEqual(["text:linha"]);
+  });
+});
+
+test.describe("idioma", () => {
+  test("trocar o idioma mantém a música na tela", async ({ page }) => {
+    await addFromMenu(page, "textField");
+    await page.keyboard.type("minha letra");
+
+    await page.locator('.links img[alt="Idioma em inglês"]').click();
+
+    await expect(page.locator("#app .container > p")).toHaveText(
+      "A cipher, tablature and annotation builder."
+    );
+    expect(await songParts(page)).toEqual(["text:minha letra"]);
+  });
+});
+
+test.describe("persistência", () => {
+  test("música e cabeçalho sobrevivem ao reload", async ({ page }) => {
+    await page.locator(".tab-header__title").click();
+    await page.keyboard.type("Minha Música");
+    await page.locator(".tab-header__artist").click();
+    await page.keyboard.type("Artista X");
+
+    await addFromMenu(page, "verse");
+    await addFromMenu(page, "textField");
+    await page.keyboard.type("letra");
+    await addFromMenu(page, "tab");
+
+    const before = await songParts(page);
+    await page.reload();
+
+    expect(await songParts(page)).toEqual(before);
+    await expect(page.locator(".tab-header__title")).toHaveText("Minha Música");
+    await expect(page.locator(".tab-header__artist")).toHaveText("Artista X");
+  });
+
+  test("tab editada sobrevive ao reload", async ({ page }) => {
+    await addFromMenu(page, "tab");
+
+    const tab = page.locator(".tab");
+    await tab.evaluate((element) => {
+      element.querySelector("pre").innerText = "B|--3--\nE|-----";
+    });
+    await tab.focus();
+    await tab.blur();
+
+    await page.reload();
+
+    await expect(page.locator(".tab")).toHaveText("B|--3--\nE|-----");
+  });
+
+  test("nenhum campo rouba o foco ao recarregar", async ({ page }) => {
+    await addFromMenu(page, "textField");
+    await page.keyboard.press("Enter");
+
+    await page.reload();
+
+    await expect(page.locator(".text-field__input:focus")).toHaveCount(0);
+  });
+});
