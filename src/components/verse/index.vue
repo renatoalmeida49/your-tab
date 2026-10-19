@@ -5,6 +5,8 @@
       ref="input"
       role="textbox"
       contenteditable
+      spellcheck="false"
+      @input="sync"
       @blur="validate"
       @keydown="change"
       @focus="changePlaceholder"
@@ -15,9 +17,12 @@
 
 <script>
 import { mapActions } from "vuex";
+import { focusAt, getSelectionOffsets } from "@/core/caret";
 
 export default {
   name: "Verse",
+
+  emits: ["newTextField", "moveCursor"],
 
   props: {
     partId: { type: String, required: true },
@@ -35,15 +40,36 @@ export default {
     this.$refs.input.innerText = this.info.chords;
   },
 
-  methods: {
-    ...mapActions("songStructure", ["addContentBetweenParts", "updatePart"]),
+  // CONTENTEDITABLE NÃO É REATIVO: ATUALIZA QUANDO O STORE MUDA POR FORA
+  watch: {
+    "info.chords"(chords) {
+      if (chords != this.$refs.input.innerText) {
+        this.$refs.input.innerText = chords;
+      }
+    },
+  },
 
-    validate(event) {
-      this.placeholder = "";
+  methods: {
+    ...mapActions("songStructure", ["updatePart"]),
+
+    sync() {
+      if (!this.$refs.input) return;
+
       this.updatePart({
         id: this.partId,
-        info: { chords: event.target.innerText },
+        info: { chords: this.$refs.input.innerText.replace(/\n$/, "") },
       });
+    },
+
+    validate() {
+      this.placeholder = "";
+      this.sync();
+    },
+
+    focusAt({ column }) {
+      const length = this.$refs.input.innerText.length;
+
+      focusAt(this.$refs.input, Math.min(column, length));
     },
 
     changePlaceholder() {
@@ -52,9 +78,18 @@ export default {
 
     change(event) {
       if (event.key == "Enter") {
-        this.addContentBetweenParts({
-          component: "textField",
-          index: this.songIndex + 1,
+        this.$emit("newTextField", { index: this.songIndex });
+
+        event.preventDefault();
+      }
+
+      if (event.key == "ArrowUp" || event.key == "ArrowDown") {
+        const offsets = getSelectionOffsets(this.$refs.input);
+
+        this.$emit("moveCursor", {
+          direction: event.key == "ArrowUp" ? "up" : "down",
+          index: this.songIndex,
+          column: offsets ? offsets.start : 0,
         });
 
         event.preventDefault();
@@ -70,10 +105,21 @@ export default {
   display: flex;
   align-items: center;
 
+  // MESMA FONTE MONOESPAÇADA E ESPAÇAMENTO DO TEXTO: CADA COLUNA DO ACORDE
+  // CAI EXATAMENTE SOBRE A MESMA COLUNA DA LETRA
   &__input {
     width: 100%;
     color: $primary;
-    font-family: "title";
+    font-family: monospace;
+    font-weight: 700;
+    padding: 3px;
+    border: 1px solid transparent;
+    white-space: pre-wrap;
+
+    &:focus {
+      outline: none;
+      border-color: $gray;
+    }
 
     &[placeholder]:empty:before {
       content: attr(placeholder);

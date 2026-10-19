@@ -4,7 +4,9 @@
       class="text-field__input"
       ref="input"
       :id="idInputTag"
+      spellcheck="false"
       @keydown="change"
+      @input="sync"
       @blur="validate"
       @focus="changePlaceholder"
       role="textbox"
@@ -27,6 +29,7 @@
 
 <script>
 import { mapActions, mapGetters } from "vuex";
+import { focusAt, getSelectionOffsets } from "@/core/caret";
 
 export default {
   name: "TextField",
@@ -78,6 +81,13 @@ export default {
     });
   },
 
+  // CONTENTEDITABLE NÃO É REATIVO: ATUALIZA QUANDO O STORE MUDA POR FORA
+  watch: {
+    "info.text"(text) {
+      if (text != this.$refs.input.innerText) this.$refs.input.innerText = text;
+    },
+  },
+
   computed: {
     ...mapGetters("songStructure", ["focusId"]),
 
@@ -95,6 +105,18 @@ export default {
 
     setText(text) {
       this.updatePart({ id: this.partId, info: { text } });
+    },
+
+    sync() {
+      if (!this.$refs.input) return;
+
+      this.setText(this.$refs.input.innerText.replace(/\n$/, ""));
+    },
+
+    focusAt({ column }) {
+      const length = this.$refs.input.innerText.length;
+
+      focusAt(this.$refs.input, Math.min(column, length));
     },
 
     remove() {
@@ -159,8 +181,6 @@ export default {
         event.preventDefault();
       }
 
-      this.setText(event.target.innerText);
-
       // BACKSPACE OU DELETE
       if (event.key == "Backspace" || event.key == "Delete") {
         this.checkRemove();
@@ -174,7 +194,13 @@ export default {
     },
 
     moveCursor(direction) {
-      this.$emit("moveCursor", { direction: direction, index: this.songIndex });
+      const offsets = getSelectionOffsets(this.$refs.input);
+
+      this.$emit("moveCursor", {
+        direction,
+        index: this.songIndex,
+        column: offsets ? offsets.start : 0,
+      });
     },
 
     checkRemove() {
@@ -187,10 +213,10 @@ export default {
       this.placeholder = "components.textField.placeholder";
     },
 
-    validate(event) {
+    validate() {
       this.placeholder = "";
       this.showSelect = false;
-      this.setText(event.target.innerText);
+      this.sync();
     },
   },
 };
@@ -207,10 +233,13 @@ export default {
     height: auto;
     padding: 3px;
     min-height: 30px;
+    border: 1px solid transparent;
+    white-space: pre-wrap;
 
+    // SÓ A COR MUDA NO FOCO: UMA BORDA NOVA EMPURRARIA O TEXTO 1px
     &:focus {
       outline: none;
-      border: 1px solid $gray;
+      border-color: $gray;
     }
 
     &[placeholder]:empty:before {

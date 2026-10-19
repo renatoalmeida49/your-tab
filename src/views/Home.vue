@@ -17,6 +17,7 @@
         >
           <component
             :is="componentFor(part.type)"
+            :ref="(component) => setPartRef(part.id, component)"
             :partId="part.id"
             :info="part.info"
             :songIndex="index"
@@ -52,6 +53,11 @@ export default {
     TabHeader,
   },
 
+  // REFERÊNCIAS AOS COMPONENTES DAS PARTES, PARA MOVER O CURSOR ENTRE ELAS
+  created() {
+    this.partRefs = {};
+  },
+
   computed: {
     ...mapGetters("songStructure", ["song"]),
   },
@@ -68,19 +74,28 @@ export default {
       return componentList[type];
     },
 
+    setPartRef(id, component) {
+      if (component) this.partRefs[id] = component;
+      else delete this.partRefs[id];
+    },
+
     checkPart(part) {
       if (part.type == "textField") return false;
 
       return true;
     },
 
+    // SETAS PASSAM POR TODAS AS PARTES (TEXTO, VERSO E TAB), MANTENDO A COLUNA
     moveCursor(payload) {
       const step = payload.direction == "up" ? -1 : 1;
       const target = this.song[payload.index + step];
 
-      if (!target || target.type != "textField") return;
+      if (!target) return;
 
-      document.getElementById(`input-${target.id}`).focus();
+      this.partRefs[target.id].focusAt({
+        direction: payload.direction,
+        column: payload.column,
+      });
     },
 
     newTextField(payload) {

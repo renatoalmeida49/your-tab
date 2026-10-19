@@ -25,6 +25,11 @@ export default defineConfig({
     chunkSizeWarningLimit: 1000,
   },
 
+  test: {
+    // OS E2E (tests/e2e) RODAM NO PLAYWRIGHT
+    include: ["src/**/*.spec.js"],
+  },
+
   define: {
     __VUE_I18N_FULL_INSTALL__: true,
     __VUE_I18N_LEGACY_API__: false,
