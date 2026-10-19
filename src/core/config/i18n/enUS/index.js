@@ -64,6 +64,8 @@ export const locale = {
       bass: "Bass",
       ukulele: "Ukulele",
       quickTuning: "Quick tuning",
+      loseNotesConfirm:
+        "Some tabs have notes on strings that don't exist in the new tuning. Those notes will be erased. Continue?",
       presets: {
         defaultTuning: "Standard",
         halfTuning: "Half step down",

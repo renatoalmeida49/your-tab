@@ -66,14 +66,20 @@ export default {
 
   computed: {
     ...mapGetters("instrument", ["tuning", "instrument"]),
+    ...mapGetters("songStructure", ["tabsLoseNotes"]),
   },
 
   methods: {
-    ...mapActions("instrument", ["newTuning", "newInstrument"]),
+    ...mapActions("instrument", ["applyTuning"]),
 
     submitTuning() {
-      this.newInstrument("guitar");
-      this.newTuning(this.tuningModel);
+      const confirmed =
+        !this.tabsLoseNotes(this.tuningModel.length) ||
+        window.confirm(this.$t("components.tuning.loseNotesConfirm"));
+
+      if (!confirmed) return;
+
+      this.applyTuning({ instrument: "guitar", tuning: this.tuningModel });
 
       this.close();
     },

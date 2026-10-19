@@ -1,4 +1,4 @@
-import string from "@/core/config/string";
+import { createTab } from "@/core/tab";
 
 let lastId = 0;
 
@@ -20,14 +20,8 @@ function getInfo(type, content = "", tuning) {
 }
 
 function defaultTab(tuning) {
-  let tab = "";
-
-  tuning.map((tune) => {
-    tab += `${tune}|${string()}\n`;
-  });
-
   return {
-    text: tab,
+    text: createTab(tuning),
   };
 }
 

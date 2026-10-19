@@ -1,40 +1,16 @@
-import { test, expect, addFromMenu, songParts, textFields } from "./helpers";
+import {
+  test,
+  expect,
+  addFromMenu,
+  placeCaret,
+  songParts,
+  tabLines,
+  textFields,
+} from "./helpers";
 
 test.beforeEach(async ({ page }) => {
   await page.goto("/");
 });
-
-function tabLines(page, index = 0) {
-  return page
-    .locator(".tab pre")
-    .nth(index)
-    .evaluate((pre) => pre.innerText.split("\n"));
-}
-
-// POSICIONA O CURSOR NA CORDA `line`, COLUNA `column` DA TAB
-async function placeCaret(page, line, column, index = 0) {
-  await page
-    .locator(".tab")
-    .nth(index)
-    .evaluate(
-      (tab, [line, column]) => {
-        const pre = tab.querySelector("pre");
-        const rows = pre.textContent.split("\n");
-        const offset =
-          rows
-            .slice(0, line)
-            .reduce((total, row) => total + row.length + 1, 0) + column;
-        const range = document.createRange();
-
-        tab.focus();
-        range.setStart(pre.firstChild, offset);
-        range.collapse(true);
-        window.getSelection().removeAllRanges();
-        window.getSelection().addRange(range);
-      },
-      [line, column]
-    );
-}
 
 // LINHA E COLUNA DO CURSOR DENTRO DA TAB FOCADA
 function caretInTab(page) {

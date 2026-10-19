@@ -65,6 +65,8 @@ export const locale = {
       bass: "Baixo",
       ukulele: "Ukulele",
       quickTuning: "Afinação rápida",
+      loseNotesConfirm:
+        "Algumas tabs têm notas em cordas que não existem na nova afinação. Essas notas serão apagadas. Continuar?",
       presets: {
         defaultTuning: "Padrão",
         halfTuning: "Meio tom",

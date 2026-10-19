@@ -1,3 +1,9 @@
+import { retune } from "@/core/tab";
+
+function cleanTab(text) {
+  return text.replace(/^\n+|\n+$/g, "");
+}
+
 const mutations = {
   addContent(state, payload) {
     state.songStructure.push(payload);
@@ -23,6 +29,14 @@ const mutations = {
     state.title = "";
     state.artist = "";
     state.focusId = null;
+  },
+
+  retuneTabs(state, tuning) {
+    state.songStructure
+      .filter((part) => part.type == "tab")
+      .forEach((part) => {
+        part.info.text = retune(cleanTab(part.info.text), tuning);
+      });
   },
 
   setSongInfo(state, payload) {
