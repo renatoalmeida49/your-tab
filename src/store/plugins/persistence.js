@@ -35,6 +35,9 @@ export default (store) => {
     });
   }
 
-  // DEEP WATCH: OS CAMPOS AINDA EDITAM `info` DIRETO, SEM MUTATION
-  store.watch((state) => state, save, { deep: true });
+  store.subscribe((mutation, state) => {
+    if (mutation.type == "songStructure/setFocusId") return;
+
+    save(state);
+  });
 };

@@ -12,6 +12,8 @@
 </template>
 
 <script>
+import { mapActions } from "vuex";
+
 export default {
   name: "Tab",
 
@@ -28,8 +30,13 @@ export default {
   },
 
   methods: {
+    ...mapActions("songStructure", ["updatePart"]),
+
     validate(event) {
-      this.info.text = event.target.innerText;
+      this.updatePart({
+        id: this.partId,
+        info: { text: event.target.innerText },
+      });
     },
 
     change(event) {

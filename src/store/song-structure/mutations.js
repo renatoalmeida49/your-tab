@@ -11,6 +11,13 @@ const mutations = {
     state.songStructure = payload;
   },
 
+  updatePart(state, payload) {
+    const part = state.songStructure.find((item) => item.id == payload.id);
+
+    // MESMO OBJETO: A PROP `info` DOS COMPONENTES JÁ ENXERGA O VALOR NOVO
+    if (part) Object.assign(part.info, payload.info);
+  },
+
   setSongInfo(state, payload) {
     state[payload.field] = payload.value;
   },

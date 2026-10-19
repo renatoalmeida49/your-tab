@@ -68,6 +68,10 @@ const actions = {
     context.commit("setSong", payload);
   },
 
+  updatePart(context, payload) {
+    context.commit("updatePart", payload);
+  },
+
   setSongInfo(context, payload) {
     context.commit("setSongInfo", payload);
   },

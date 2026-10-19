@@ -36,11 +36,14 @@ export default {
   },
 
   methods: {
-    ...mapActions("songStructure", ["addContentBetweenParts"]),
+    ...mapActions("songStructure", ["addContentBetweenParts", "updatePart"]),
 
     validate(event) {
       this.placeholder = "";
-      this.info.chords = event.target.innerText;
+      this.updatePart({
+        id: this.partId,
+        info: { chords: event.target.innerText },
+      });
     },
 
     changePlaceholder() {

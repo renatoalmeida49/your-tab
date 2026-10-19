@@ -1,3 +1,24 @@
+import { test as base, expect } from "@playwright/test";
+
+// FALHA O TESTE SE HOUVER ERRO NO CONSOLE: PEGA WARNINGS DO VUE E
+// MUTAÇÕES FORA DE MUTATION (STORE EM STRICT MODE NO DEV)
+export const test = base.extend({
+  page: async ({ page }, use) => {
+    const errors = [];
+
+    page.on("pageerror", (error) => errors.push(error.message));
+    page.on("console", (message) => {
+      if (message.type() == "error") errors.push(message.text());
+    });
+
+    await use(page);
+
+    expect(errors).toEqual([]);
+  },
+});
+
+export { expect };
+
 // RESUMO DA MÚSICA NA TELA: "text:<conteúdo>", "tab" OU "verse"
 export function songParts(page) {
   return page.locator("#song .song-content").evaluateAll((parts) =>

@@ -64,7 +64,7 @@ export default {
       array.map((line, index) => {
         if (index == 0) {
           this.$refs.input.innerText = line;
-          this.info.text = line;
+          this.setText(line);
           return;
         }
 
@@ -90,7 +90,12 @@ export default {
       "removeContent",
       "addContent",
       "addContentBetweenParts",
+      "updatePart",
     ]),
+
+    setText(text) {
+      this.updatePart({ id: this.partId, info: { text } });
+    },
 
     remove() {
       this.removeContent(this.songIndex);
@@ -159,7 +164,7 @@ export default {
         event.preventDefault();
       }
 
-      this.info.text = event.target.innerText;
+      this.setText(event.target.innerText);
 
       // BACKSPACE OU DELETE
       if (event.keyCode == 8 || event.keyCode == 46) {
@@ -190,7 +195,7 @@ export default {
     validate(event) {
       this.placeholder = "";
       this.showSelect = false;
-      this.info.text = event.target.innerText;
+      this.setText(event.target.innerText);
     },
   },
 };

@@ -1,5 +1,4 @@
-import { test, expect } from "@playwright/test";
-import { addFromMenu, tuningLabel } from "./helpers";
+import { test, expect, addFromMenu, tuningLabel } from "./helpers";
 
 test.beforeEach(async ({ page }) => {
   await page.goto("/");

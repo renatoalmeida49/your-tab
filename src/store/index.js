@@ -13,4 +13,5 @@ export default new Vuex.Store({
     instrument,
   },
   plugins: [persistence],
+  strict: process.env.NODE_ENV !== "production",
 });

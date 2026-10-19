@@ -1,6 +1,6 @@
 const mutations = {
   newTuning(state, payload) {
-    state.tuning = payload;
+    state.tuning = [...payload];
   },
 
   newInstrument(state, payload) {
