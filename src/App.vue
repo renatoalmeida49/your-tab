@@ -68,7 +68,7 @@ export default {
     changeLanguage(language) {
       localStorage.setItem("lang", language);
 
-      document.location.reload();
+      this.$i18n.locale = language;
     },
 
     keyGenerator(index) {
