@@ -25,18 +25,22 @@
 
       <section id="help">
         <template v-for="(item, indexItem) in $t('details')">
-          <h2 :key="keyGenerator(indexItem)">{{ item.title }}</h2>
+          <h2 :key="`title-${indexItem}`">{{ item.title }}</h2>
 
-          <template v-if="Array.isArray(item.description)">
-            <ul :key="keyGenerator(indexItem)">
-              <template v-for="(subitem, indexSubitem) in item.description">
-                <li :key="keyGenerator(indexSubitem)">{{ subitem }}</li>
-              </template>
-            </ul>
-          </template>
-          <template v-else>
-            <p :key="keyGenerator(indexItem)">{{ item.description }}</p>
-          </template>
+          <ul
+            v-if="Array.isArray(item.description)"
+            :key="`description-${indexItem}`"
+          >
+            <li
+              v-for="(subitem, indexSubitem) in item.description"
+              :key="indexSubitem"
+            >
+              {{ subitem }}
+            </li>
+          </ul>
+          <p v-else :key="`description-${indexItem}`">
+            {{ item.description }}
+          </p>
         </template>
       </section>
     </div>
@@ -69,10 +73,6 @@ export default {
       localStorage.setItem("lang", language);
 
       this.$i18n.locale = language;
-    },
-
-    keyGenerator(index) {
-      return index + 1 + (Math.random() * 100).toFixed(0);
     },
   },
 };
