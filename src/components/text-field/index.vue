@@ -13,16 +13,14 @@
       :placeholder="$t(placeholder)"
     ></div>
 
-    <div
-      class="text-field__select"
-      :id="idSelecTag"
-      :class="{ show: showSelect }"
-    >
-      <div class="text-field__option" data-key="tab">
-        {{ $t("components.textField.selectTab") }}
-      </div>
-      <div class="text-field__option" data-key="verse">
-        {{ $t("components.textField.selectVerse") }}
+    <div class="text-field__select" :class="{ show: showSelect }">
+      <div
+        v-for="(option, index) in options"
+        :key="option.key"
+        class="text-field__option"
+        :class="{ show: index === selectedOption }"
+      >
+        {{ $t(option.label) }}
       </div>
     </div>
   </div>
@@ -42,6 +40,11 @@ export default {
   data() {
     return {
       showSelect: false,
+      selectedOption: 0,
+      options: [
+        { key: "tab", label: "components.textField.selectTab" },
+        { key: "verse", label: "components.textField.selectVerse" },
+      ],
       placeholder: "",
     };
   },
@@ -79,10 +82,6 @@ export default {
     idInputTag() {
       return `input-${this.songIndex}`;
     },
-
-    idSelecTag() {
-      return `select-${this.songIndex}`;
-    },
   },
 
   methods: {
@@ -107,37 +106,23 @@ export default {
         if (event.shiftKey) return;
 
         this.showSelect = true;
-
-        let i = 0; // iterate over children elements inside dropdown
-        const dropdown = document.querySelector(`#${this.idSelecTag}`);
-        dropdown.classList.toggle("show");
-        const childs = dropdown.children; // get all dropdown elements
-
-        // attach keyboard events
-        window.addEventListener("keydown", (event) => {
-          switch (event.code) {
-            case "ArrowDown":
-              for (let c of childs) c.classList.remove("show");
-              childs[Math.abs(i) % childs.length].classList.add("show");
-              i++;
-              break;
-            case "ArrowUp":
-              for (let c of childs) c.classList.remove("show");
-              childs[Math.abs(i) % childs.length].classList.add("show");
-              i--;
-              break;
-          }
-          if (event.isComposing || event.keyCode === 229) {
-            return;
-          }
-        });
+        this.selectedOption = 0;
 
         event.preventDefault();
       }
 
-      // CHECA O ID DO EVENT E MOVE ELE PRA CIMA OU BAIXO
+      // ESC FECHA O SELECT
+      if (event.keyCode == 27 && this.showSelect) {
+        this.showSelect = false;
+
+        event.preventDefault();
+      }
+
+      // NAVEGA NO SELECT OU MOVE O CURSOR PRA CIMA/BAIXO
       if (event.keyCode == 38) {
-        if (!this.showSelect) {
+        if (this.showSelect) {
+          this.moveSelection(-1);
+        } else {
           this.moveCursor("up", event.target.id);
         }
 
@@ -145,7 +130,9 @@ export default {
       }
 
       if (event.keyCode == 40) {
-        if (!this.showSelect) {
+        if (this.showSelect) {
+          this.moveSelection(1);
+        } else {
           this.moveCursor("down", event.target.id);
         }
 
@@ -157,8 +144,7 @@ export default {
         if (!this.showSelect) {
           this.$emit("newTextField", { index: this.songIndex });
         } else {
-          const partToAdd = document.querySelector(".text-field__option.show")
-            .dataset.key;
+          const partToAdd = this.options[this.selectedOption].key;
 
           const index =
             partToAdd == "verse" ? this.songIndex : this.songIndex + 1;
@@ -182,6 +168,12 @@ export default {
       }
     },
 
+    moveSelection(step) {
+      const total = this.options.length;
+
+      this.selectedOption = (this.selectedOption + step + total) % total;
+    },
+
     moveCursor(direction, id) {
       this.$emit("moveCursor", { direction: direction, id: id });
     },
@@ -198,6 +190,7 @@ export default {
 
     validate(event) {
       this.placeholder = "";
+      this.showSelect = false;
       this.info.text = event.target.innerText;
     },
   },
