@@ -16,6 +16,7 @@ export default {
   name: "Tab",
 
   props: {
+    partId: { type: String, required: true },
     info: { type: Object, required: true },
     songIndex: { type: Number, required: true },
   },

@@ -1,6 +1,6 @@
 const state = {
   songStructure: [],
-  focusTextFieldIndex: null,
+  focusId: null,
 };
 
 export default state;

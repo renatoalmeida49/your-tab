@@ -33,6 +33,7 @@ export default {
   name: "TextField",
 
   props: {
+    partId: { type: String, required: true },
     info: { type: Object, required: true },
     songIndex: { type: Number, required: true },
   },
@@ -51,11 +52,10 @@ export default {
 
   mounted() {
     this.$refs.input.innerText = this.info.text;
-    this.$refs.input.focus();
 
-    const target = document.querySelector(`#${this.idInputTag}`);
+    if (this.focusId == this.partId) this.$refs.input.focus();
 
-    target.addEventListener("paste", (event) => {
+    this.$refs.input.addEventListener("paste", (event) => {
       event.preventDefault();
       let paste = event.clipboardData.getData("text");
 
@@ -63,31 +63,31 @@ export default {
 
       array.map((line, index) => {
         if (index == 0) {
-          document.querySelector(`#${this.idInputTag}`).innerText = array[0];
+          this.$refs.input.innerText = line;
+          this.info.text = line;
           return;
         }
 
         this.addContentBetweenParts({
           component: "textField",
           content: line,
-          index: this.songIndex + index + 1,
+          index: this.songIndex + index,
         });
       });
     });
   },
 
   computed: {
-    ...mapGetters("instrument", ["tuning"]),
+    ...mapGetters("songStructure", ["focusId"]),
 
     idInputTag() {
-      return `input-${this.songIndex}`;
+      return `input-${this.partId}`;
     },
   },
 
   methods: {
     ...mapActions("songStructure", [
       "removeContent",
-      "focusTextFieldIndex",
       "addContent",
       "addContentBetweenParts",
     ]),
@@ -123,7 +123,7 @@ export default {
         if (this.showSelect) {
           this.moveSelection(-1);
         } else {
-          this.moveCursor("up", event.target.id);
+          this.moveCursor("up");
         }
 
         event.preventDefault();
@@ -133,7 +133,7 @@ export default {
         if (this.showSelect) {
           this.moveSelection(1);
         } else {
-          this.moveCursor("down", event.target.id);
+          this.moveCursor("down");
         }
 
         event.preventDefault();
@@ -174,8 +174,8 @@ export default {
       this.selectedOption = (this.selectedOption + step + total) % total;
     },
 
-    moveCursor(direction, id) {
-      this.$emit("moveCursor", { direction: direction, id: id });
+    moveCursor(direction) {
+      this.$emit("moveCursor", { direction: direction, index: this.songIndex });
     },
 
     checkRemove() {

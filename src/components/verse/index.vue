@@ -20,6 +20,7 @@ export default {
   name: "Verse",
 
   props: {
+    partId: { type: String, required: true },
     info: { type: Object, required: true },
     songIndex: { type: Number, required: true },
   },

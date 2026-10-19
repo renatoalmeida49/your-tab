@@ -7,16 +7,16 @@ const mutations = {
     state.songStructure.splice(payload, 1);
   },
 
-  addTextField(state, payload) {
-    state.songStructure.splice(payload.index, 0, payload.component);
+  setSong(state, payload) {
+    state.songStructure = payload;
   },
 
-  focusTextFieldIndex(state, payload) {
-    state.focusTextFieldIndex = payload;
+  setFocusId(state, payload) {
+    state.focusId = payload;
   },
 
   addContentBetweenParts(state, payload) {
-    state.songStructure.splice(payload.index, 0, payload.component);
+    state.songStructure.splice(payload.index, 0, payload.part);
   },
 };
 

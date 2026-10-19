@@ -3,8 +3,8 @@ const getters = {
     return state.songStructure;
   },
 
-  focusTextField(state) {
-    return state.focusTextFieldIndex;
+  focusId(state) {
+    return state.focusId;
   },
 };
 

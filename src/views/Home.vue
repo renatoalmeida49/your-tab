@@ -3,21 +3,17 @@
     <div id="song" class="home__song">
       <TabHeader />
 
-      <Draggable
-        :list="song"
-        @change="forceRender"
-        @remove="forceRender"
-        :key="render"
-      >
+      <Draggable :value="song" @input="setSong" handle=".song-content__move">
         <SongContent
           v-for="(part, index) in song"
-          :key="index"
+          :key="part.id"
           :contentIndex="index"
           :type="part.type"
           :showCloseButton="checkPart(part)"
         >
           <component
-            :is="part.component"
+            :is="componentList[part.type]"
+            :partId="part.id"
             :info="part.info"
             :songIndex="index"
             @newTextField="newTextField"
@@ -33,6 +29,8 @@
 import { mapGetters, mapActions } from "vuex";
 import Draggable from "vuedraggable";
 import TabHeader from "@/components/tab-header";
+import Tab from "@/components/tab";
+import Verse from "@/components/verse";
 import TextField from "@/components/text-field";
 
 export default {
@@ -41,35 +39,29 @@ export default {
   components: {
     Draggable,
     TabHeader,
-    TextField,
   },
 
   data() {
     return {
-      render: 1,
+      componentList: {
+        tab: Tab,
+        verse: Verse,
+        textField: TextField,
+      },
     };
   },
 
-  watch: {
-    song() {
-      this.forceRender();
-    },
-  },
-
   computed: {
-    ...mapGetters("songStructure", ["song", "focusTextField"]),
+    ...mapGetters("songStructure", ["song"]),
   },
 
   methods: {
     ...mapActions("songStructure", [
       "addContent",
-      "addTextFiled",
-      "focusTextFieldIndex",
+      "addContentBetweenParts",
+      "removeContent",
+      "setSong",
     ]),
-
-    forceRender() {
-      this.render++;
-    },
 
     checkPart(part) {
       if (part.type == "textField") return false;
@@ -78,74 +70,29 @@ export default {
     },
 
     moveCursor(payload) {
-      let id = payload.id.split("-")[1];
+      const step = payload.direction == "up" ? -1 : 1;
+      const target = this.song[payload.index + step];
 
-      this.focusTextFieldIndex(id);
+      if (!target || target.type != "textField") return;
 
-      if (id == 0 && payload.direction == "up") {
-        return;
-      }
-
-      if (payload.direction == "up") {
-        id = id - 1;
-      }
-
-      if (payload.direction == "down") {
-        id = parseInt(id) + 1;
-      }
-
-      if (!document.getElementById(`input-${id}`)) return;
-
-      this.$nextTick(() => {
-        document.getElementById(`input-${id}`).focus();
-        // setTimeout(() => {
-        //   console.log(document.querySelector(`#input-${indexToFocus}`));
-        // }, 200);
-      });
-
-      this.focusTextFieldIndex(null);
+      document.getElementById(`input-${target.id}`).focus();
     },
 
     newTextField(payload) {
-      this.focusTextFieldIndex(payload.index);
-
-      this.addTextFiled({
+      this.addContentBetweenParts({
+        component: "textField",
         index: payload.index + 1,
-        component: {
-          type: "textField",
-          component: TextField,
-          info: { text: "", type: "text" },
-        },
       });
-
-      // VERIFICA NO VUEX SE HÁ INDICE SALVO.
-      // SE HOUVER SETA O FOCUS PRA ELE
-      // SE NAO HOUVER, SETA ALEATORIO MESMO
-      if (this.focusTextField >= 0) {
-        const indexToFocus = this.focusTextField + 1;
-
-        this.$nextTick(() => {
-          document.getElementById(`input-${indexToFocus}`).focus();
-          // setTimeout(() => {
-          //   console.log(document.querySelector(`#input-${indexToFocus}`));
-          // }, 200);
-        });
-
-        this.focusTextFieldIndex(null);
-      }
-
-      this.forceRender();
     },
 
     newContent(event) {
       if (event.target === event.currentTarget) {
-        if (this.song.length > 0) {
-          if (this.song[this.song.length - 1].type == "textField") {
-            if (this.song[this.song.length - 1].info.text == "") {
-              this.song.pop();
-              return;
-            }
-          }
+        const lastIndex = this.song.length - 1;
+        const last = this.song[lastIndex];
+
+        if (last && last.type == "textField" && last.info.text == "") {
+          this.removeContent(lastIndex);
+          return;
         }
 
         this.addContent("textField");
