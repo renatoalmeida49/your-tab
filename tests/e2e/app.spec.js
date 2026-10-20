@@ -85,3 +85,52 @@ test.describe("PDF", () => {
     await expect(page.locator(".menu__pdf-preview")).toHaveCount(0);
   });
 });
+
+test.describe("compatibilidade", () => {
+  test("abre uma música salva pela versão com Vuex", async ({ browser }) => {
+    // FORMATO GRAVADO PELA VERSÃO ANTERIOR (VUEX) NO localStorage
+    const saved = {
+      songStructure: {
+        title: "Música antiga",
+        artist: "Artista antigo",
+        songStructure: [
+          { id: "a1", type: "textField", info: { text: "[Intro]" } },
+          { id: "a2", type: "verse", info: { chords: "Am   G" } },
+          {
+            id: "a3",
+            type: "tab",
+            info: { text: "G|--5--\nD|-----\nA|-----\nE|-----" },
+          },
+        ],
+      },
+      instrument: {
+        tuning: ["G", "D", "A", "E"],
+        instrument: "bass",
+        tone: "Am",
+      },
+    };
+
+    const context = await browser.newContext();
+    await context.addInitScript((data) => {
+      if (!localStorage.getItem("tab-builder:song")) {
+        localStorage.setItem("tab-builder:song", JSON.stringify(data));
+      }
+    }, saved);
+
+    const page = await context.newPage();
+    await page.goto("/");
+
+    await expect(page.locator(".tab-header__title")).toHaveText(
+      "Música antiga"
+    );
+    await expect(page.locator(".tab-header__tone")).toHaveText("Am");
+    await expect(page.locator(".tab-header__tuning")).toHaveText(
+      "G - D - A - E"
+    );
+    expect(await songParts(page)).toEqual(["text:[Intro]", "verse", "tab"]);
+    await expect(page.locator(".verse__input")).toHaveText("Am   G");
+    await expect(page.locator(".tab pre")).toContainText("G|--5--");
+
+    await context.close();
+  });
+});

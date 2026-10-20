@@ -16,7 +16,8 @@
 </template>
 
 <script>
-import { mapActions } from "vuex";
+import { mapActions } from "pinia";
+import { useSongStore } from "@/stores/song";
 import { focusAt, getSelectionOffsets } from "@/core/caret";
 
 export default {
@@ -50,7 +51,7 @@ export default {
   },
 
   methods: {
-    ...mapActions("songStructure", ["updatePart"]),
+    ...mapActions(useSongStore, ["updatePart"]),
 
     sync() {
       if (!this.$refs.input) return;

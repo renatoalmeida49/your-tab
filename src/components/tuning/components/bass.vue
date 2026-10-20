@@ -48,7 +48,9 @@
 </template>
 
 <script>
-import { mapGetters, mapActions } from "vuex";
+import { mapActions, mapState } from "pinia";
+import { useInstrumentStore } from "@/stores/instrument";
+import { useSongStore } from "@/stores/song";
 
 export default {
   name: "Bass",
@@ -81,12 +83,12 @@ export default {
   },
 
   computed: {
-    ...mapGetters("instrument", ["tuning", "instrument"]),
-    ...mapGetters("songStructure", ["tabsLoseNotes"]),
+    ...mapState(useInstrumentStore, ["tuning", "instrument"]),
+    ...mapState(useSongStore, ["tabsLoseNotes"]),
   },
 
   methods: {
-    ...mapActions("instrument", ["applyTuning"]),
+    ...mapActions(useInstrumentStore, ["applyTuning"]),
 
     submitTuning() {
       const confirmed =

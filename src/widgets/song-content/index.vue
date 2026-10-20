@@ -25,7 +25,8 @@
 </template>
 
 <script>
-import { mapActions } from "vuex";
+import { mapActions } from "pinia";
+import { useSongStore } from "@/stores/song";
 
 export default {
   name: "SongContent",
@@ -52,7 +53,7 @@ export default {
   },
 
   methods: {
-    ...mapActions("songStructure", ["removePart"]),
+    ...mapActions(useSongStore, ["removePart"]),
 
     remove() {
       this.removePart(this.contentIndex);

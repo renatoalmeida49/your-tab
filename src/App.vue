@@ -45,7 +45,9 @@
 </template>
 
 <script>
+import { mapActions } from "pinia";
 import { setLanguage } from "@/core/plugins/i18n";
+import { useHistoryStore } from "@/stores/history";
 import brazilFlag from "@/assets/flags/brazil.png";
 import unitedStatesFlag from "@/assets/flags/united-states.png";
 
@@ -78,6 +80,8 @@ export default {
   },
 
   methods: {
+    ...mapActions(useHistoryStore, ["undo", "redo"]),
+
     changeLanguage(language) {
       setLanguage(language);
     },
@@ -94,7 +98,8 @@ export default {
       if (key != "z" && !redo) return;
 
       event.preventDefault();
-      this.$store.dispatch(redo ? "history/redo" : "history/undo");
+      if (redo) this.redo();
+      else this.undo();
     },
   },
 };

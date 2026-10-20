@@ -31,7 +31,8 @@
 </template>
 
 <script>
-import { mapGetters, mapActions } from "vuex";
+import { mapActions, mapState } from "pinia";
+import { useSongStore } from "@/stores/song";
 import { VueDraggable } from "vue-draggable-plus";
 import TabHeader from "@/components/tab-header/index.vue";
 import Tab from "@/components/tab/index.vue";
@@ -59,11 +60,11 @@ export default {
   },
 
   computed: {
-    ...mapGetters("songStructure", ["song"]),
+    ...mapState(useSongStore, { song: "parts" }),
   },
 
   methods: {
-    ...mapActions("songStructure", [
+    ...mapActions(useSongStore, [
       "addContent",
       "addContentBetweenParts",
       "removeContent",

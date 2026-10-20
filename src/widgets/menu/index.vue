@@ -37,7 +37,8 @@
 </template>
 
 <script>
-import { mapActions } from "vuex";
+import { mapActions } from "pinia";
+import { useSongStore } from "@/stores/song";
 
 const pdfOptions = {
   margin: 0,
@@ -60,7 +61,7 @@ export default {
   },
 
   methods: {
-    ...mapActions("songStructure", ["addContent", "newSong"]),
+    ...mapActions(useSongStore, ["addContent", "newSong"]),
 
     startNewSong() {
       if (window.confirm(this.$t("components.menu.newSongConfirm"))) {

@@ -13,7 +13,8 @@
 </template>
 
 <script>
-import { mapActions } from "vuex";
+import { mapActions } from "pinia";
+import { useSongStore } from "@/stores/song";
 import { getSelectionOffsets, setCaret } from "@/core/caret";
 import {
   cursorToPosition,
@@ -54,7 +55,7 @@ export default {
   },
 
   methods: {
-    ...mapActions("songStructure", ["updatePart"]),
+    ...mapActions(useSongStore, ["updatePart"]),
 
     // innerText: CONTA <br> COMO QUEBRA DE LINHA (ALGUNS TECLADOS E COLAGENS
     // NATIVAS INSEREM <br> EM VEZ DE "\n")

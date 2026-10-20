@@ -28,7 +28,8 @@
 </template>
 
 <script>
-import { mapActions, mapGetters } from "vuex";
+import { mapActions, mapState } from "pinia";
+import { useSongStore } from "@/stores/song";
 import { focusAt, getSelectionOffsets } from "@/core/caret";
 
 export default {
@@ -89,7 +90,7 @@ export default {
   },
 
   computed: {
-    ...mapGetters("songStructure", ["focusId"]),
+    ...mapState(useSongStore, ["focusId"]),
 
     idInputTag() {
       return `input-${this.partId}`;
@@ -97,7 +98,7 @@ export default {
   },
 
   methods: {
-    ...mapActions("songStructure", [
+    ...mapActions(useSongStore, [
       "removeContent",
       "addContentBetweenParts",
       "updatePart",

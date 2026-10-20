@@ -58,7 +58,9 @@
 </template>
 
 <script>
-import { mapActions, mapGetters } from "vuex";
+import { mapActions, mapState } from "pinia";
+import { useInstrumentStore } from "@/stores/instrument";
+import { useSongStore } from "@/stores/song";
 import Tuning from "@/components/tuning/index.vue";
 
 export default {
@@ -97,8 +99,8 @@ export default {
   },
 
   computed: {
-    ...mapGetters("instrument", ["tuning", "tone"]),
-    ...mapGetters("songStructure", ["title", "artist"]),
+    ...mapState(useInstrumentStore, ["tuning", "tone"]),
+    ...mapState(useSongStore, ["title", "artist"]),
 
     getTuning() {
       return this.tuning.join(" - ");
@@ -106,8 +108,8 @@ export default {
   },
 
   methods: {
-    ...mapActions("instrument", ["newTone"]),
-    ...mapActions("songStructure", ["setSongInfo"]),
+    ...mapActions(useInstrumentStore, ["newTone"]),
+    ...mapActions(useSongStore, ["setSongInfo"]),
 
     syncField(ref, value) {
       if (this.$refs[ref].innerText != value) this.$refs[ref].innerText = value;
