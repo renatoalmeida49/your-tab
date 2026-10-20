@@ -53,6 +53,8 @@ import { mapActions, mapState } from "pinia";
 import { useSongStore } from "@/stores/song";
 import { focusAt, getSelectionOffsets } from "@/core/caret";
 import { partOptions } from "@/core/config/parts";
+import { parsePaste } from "@/core/paste";
+import { pasteSong } from "@/stores/commands";
 import { partEmits, type Direction, type FocusTarget } from "@/types/editor";
 import type { TextInfo } from "@/types/song";
 
@@ -90,6 +92,18 @@ export default defineComponent({
     this.input().addEventListener("paste", (event: ClipboardEvent) => {
       event.preventDefault();
       const paste = event.clipboardData?.getData("text") ?? "";
+      const pasted = parsePaste(paste);
+
+      // TEM TAB OU ACORDES: CADA BLOCO VIRA SUA PARTE. CAMPO VAZIO DÁ LUGAR
+      // À COLAGEM; COM TEXTO, ELA ENTRA LOGO ABAIXO
+      if (pasted.parts.some((part) => part.type != "textField")) {
+        pasteSong({
+          pasted,
+          index: this.songIndex + 1,
+          replaceId: this.info.text.trim() ? undefined : this.partId,
+        });
+        return;
+      }
 
       const array = paste.split("\n");
 

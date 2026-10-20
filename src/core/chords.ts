@@ -59,6 +59,13 @@ function matchChordAt(line: string, start: number): RegExpExecArray | null {
   return match;
 }
 
+// O TEXTO INTEIRO É UM ACORDE? ("Am7", "C/G"; NÃO "Ama", "Bridge")
+export function isChord(text: string): boolean {
+  const match = matchChordAt(text, 0);
+
+  return !!match && match[0].length == text.length;
+}
+
 export function transposeChord(chord: string, semitones: number): string {
   const match = matchChordAt(chord, 0);
 

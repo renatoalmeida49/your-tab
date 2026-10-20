@@ -14,7 +14,7 @@
         <div class="confirm__actions">
           <AlertDialogCancel as-child>
             <TheButton variant="ghost" class="confirm__cancel">
-              {{ $t("common.cancel") }}
+              {{ $t(request.cancelLabel || "common.cancel") }}
             </TheButton>
           </AlertDialogCancel>
           <!-- SEM AlertDialogAction: ELE FECHARIA (= CANCELAR) ANTES DO answer(true) -->
