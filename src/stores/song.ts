@@ -35,7 +35,7 @@ function createPart(type: PartType, content = ""): Part {
       return {
         id,
         type,
-        info: { text: createTab(useInstrumentStore().tuning) },
+        info: { text: content || createTab(useInstrumentStore().tuning) },
       };
     case "verse":
       return { id, type, info: { chords: content } };
@@ -86,6 +86,24 @@ export const useSongStore = defineStore("song", {
         0,
         this.newPart(payload.component, payload.content)
       );
+    },
+
+    // PARTES COLADAS, EM ORDEM, A PARTIR DE `index`. replaceId: CAMPO VAZIO
+    // ONDE SE COLOU, QUE DÁ LUGAR A ELAS
+    insertParts(payload: {
+      index: number;
+      parts: { type: PartType; content: string }[];
+      replaceId?: string;
+    }) {
+      const created = payload.parts.map((part) =>
+        createPart(part.type, part.content)
+      );
+      const replaced = this.parts.findIndex(
+        (part) => part.id == payload.replaceId
+      );
+
+      if (replaced >= 0) this.parts.splice(replaced, 1, ...created);
+      else this.parts.splice(payload.index, 0, ...created);
     },
 
     removeContent(index: number) {

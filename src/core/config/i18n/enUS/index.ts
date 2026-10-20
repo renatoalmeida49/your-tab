@@ -51,6 +51,14 @@ export const locale: MessageSchema = {
       placeholder: "Press '/' to insert a tab or verse",
       insert: "Insert",
     },
+    paste: {
+      retuneConfirm:
+        "The pasted tab uses a different tuning. Switch the song to its tuning? Existing tabs will be adjusted.",
+      retuneLoseNotesConfirm:
+        "The pasted tab uses a different tuning. Switching will erase notes of the current tabs on strings that no longer exist.",
+      retuneConfirmAction: "Use the pasted tuning",
+      keepTuning: "Keep the current one",
+    },
     songContent: {
       insertBelow: "Insert below",
       actions: "Drag to move or click for more actions",

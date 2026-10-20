@@ -49,6 +49,14 @@ export const locale = {
       placeholder: "Pressione '/' para inserir uma tablatura ou verso",
       insert: "Inserir",
     },
+    paste: {
+      retuneConfirm:
+        "A tablatura colada usa outra afinação. Trocar a afinação da música para a dela? As tabs que já existem serão ajustadas.",
+      retuneLoseNotesConfirm:
+        "A tablatura colada usa outra afinação. Trocando, as notas das tabs atuais em cordas que deixam de existir serão apagadas.",
+      retuneConfirmAction: "Usar a afinação colada",
+      keepTuning: "Manter a atual",
+    },
     songContent: {
       insertBelow: "Inserir abaixo",
       actions: "Arraste para mover ou clique para mais ações",

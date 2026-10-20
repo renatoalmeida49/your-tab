@@ -4,6 +4,8 @@ export interface ConfirmRequest {
   // CHAVES DO i18n
   message: string;
   confirmLabel: string;
+  // PADRÃO: "Cancelar"
+  cancelLabel?: string;
   danger?: boolean;
 }
 
