@@ -29,12 +29,15 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent } from "vue";
 import Bass from "./components/bass.vue";
 import Guitar from "./components/guitar.vue";
 import Ukulele from "./components/ukulele.vue";
 
-export default {
+type TuningTab = "Guitar" | "Ukulele" | "Bass";
+
+export default defineComponent({
   name: "Tuning",
 
   emits: ["close"],
@@ -47,12 +50,12 @@ export default {
 
   data() {
     return {
-      selectedComponent: "Guitar",
+      selectedComponent: "Guitar" as TuningTab,
     };
   },
 
   methods: {
-    newTab(component) {
+    newTab(component: TuningTab) {
       this.selectedComponent = component;
     },
 
@@ -60,7 +63,7 @@ export default {
       this.$emit("close");
     },
   },
-};
+});
 </script>
 
 <style lang="scss">

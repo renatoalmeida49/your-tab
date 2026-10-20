@@ -15,19 +15,23 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent, type PropType } from "vue";
 import { mapActions } from "pinia";
 import { useSongStore } from "@/stores/song";
 import { focusAt, getSelectionOffsets } from "@/core/caret";
+import { partEmits, type FocusTarget } from "@/types/editor";
+import type { VerseInfo } from "@/types/song";
 
-export default {
+export default defineComponent({
   name: "Verse",
 
-  emits: ["newTextField", "moveCursor"],
+  emits: partEmits,
 
   props: {
     partId: { type: String, required: true },
-    info: { type: Object, required: true },
+    // Readonly: A MÚSICA SÓ MUDA PELAS ACTIONS DO STORE
+    info: { type: Object as PropType<Readonly<VerseInfo>>, required: true },
     songIndex: { type: Number, required: true },
   },
 
@@ -38,14 +42,14 @@ export default {
   },
 
   mounted() {
-    this.$refs.input.innerText = this.info.chords;
+    this.input().innerText = this.info.chords;
   },
 
   // CONTENTEDITABLE NÃO É REATIVO: ATUALIZA QUANDO O STORE MUDA POR FORA
   watch: {
-    "info.chords"(chords) {
-      if (chords != this.$refs.input.innerText) {
-        this.$refs.input.innerText = chords;
+    "info.chords"(chords: string) {
+      if (chords != this.input().innerText) {
+        this.input().innerText = chords;
       }
     },
   },
@@ -53,12 +57,16 @@ export default {
   methods: {
     ...mapActions(useSongStore, ["updatePart"]),
 
+    input(): HTMLElement {
+      return this.$refs.input as HTMLElement;
+    },
+
     sync() {
-      if (!this.$refs.input) return;
+      if (!this.input()) return;
 
       this.updatePart({
         id: this.partId,
-        info: { chords: this.$refs.input.innerText.replace(/\n$/, "") },
+        info: { chords: this.input().innerText.replace(/\n$/, "") },
       });
     },
 
@@ -67,17 +75,17 @@ export default {
       this.sync();
     },
 
-    focusAt({ column }) {
-      const length = this.$refs.input.innerText.length;
+    focusAt({ column }: FocusTarget) {
+      const length = this.input().innerText.length;
 
-      focusAt(this.$refs.input, Math.min(column, length));
+      focusAt(this.input(), Math.min(column, length));
     },
 
     changePlaceholder() {
       this.placeholder = "components.verse.placeholder";
     },
 
-    change(event) {
+    change(event: KeyboardEvent) {
       if (event.key == "Enter") {
         this.$emit("newTextField", { index: this.songIndex });
 
@@ -85,7 +93,7 @@ export default {
       }
 
       if (event.key == "ArrowUp" || event.key == "ArrowDown") {
-        const offsets = getSelectionOffsets(this.$refs.input);
+        const offsets = getSelectionOffsets(this.input());
 
         this.$emit("moveCursor", {
           direction: event.key == "ArrowUp" ? "up" : "down",
@@ -97,7 +105,7 @@ export default {
       }
     },
   },
-};
+});
 </script>
 
 <style lang="scss">

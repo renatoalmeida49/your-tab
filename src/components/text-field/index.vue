@@ -27,19 +27,29 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent, type PropType } from "vue";
 import { mapActions, mapState } from "pinia";
 import { useSongStore } from "@/stores/song";
 import { focusAt, getSelectionOffsets } from "@/core/caret";
+import { partEmits, type Direction, type FocusTarget } from "@/types/editor";
+import type { PartType, TextInfo } from "@/types/song";
 
-export default {
+// PARTES QUE O "/" OFERECE PARA INSERIR
+const options: { key: PartType; label: string }[] = [
+  { key: "tab", label: "components.textField.selectTab" },
+  { key: "verse", label: "components.textField.selectVerse" },
+];
+
+export default defineComponent({
   name: "TextField",
 
-  emits: ["newTextField", "moveCursor"],
+  emits: partEmits,
 
   props: {
     partId: { type: String, required: true },
-    info: { type: Object, required: true },
+    // Readonly: A MÚSICA SÓ MUDA PELAS ACTIONS DO STORE
+    info: { type: Object as PropType<Readonly<TextInfo>>, required: true },
     songIndex: { type: Number, required: true },
   },
 
@@ -47,28 +57,25 @@ export default {
     return {
       showSelect: false,
       selectedOption: 0,
-      options: [
-        { key: "tab", label: "components.textField.selectTab" },
-        { key: "verse", label: "components.textField.selectVerse" },
-      ],
+      options,
       placeholder: "",
     };
   },
 
   mounted() {
-    this.$refs.input.innerText = this.info.text;
+    this.input().innerText = this.info.text;
 
-    if (this.focusId == this.partId) this.$refs.input.focus();
+    if (this.focusId == this.partId) this.input().focus();
 
-    this.$refs.input.addEventListener("paste", (event) => {
+    this.input().addEventListener("paste", (event: ClipboardEvent) => {
       event.preventDefault();
-      let paste = event.clipboardData.getData("text");
+      const paste = event.clipboardData?.getData("text") ?? "";
 
-      let array = paste.split("\n");
+      const array = paste.split("\n");
 
       array.map((line, index) => {
         if (index == 0) {
-          this.$refs.input.innerText = line;
+          this.input().innerText = line;
           this.setText(line);
           return;
         }
@@ -84,8 +91,8 @@ export default {
 
   // CONTENTEDITABLE NÃO É REATIVO: ATUALIZA QUANDO O STORE MUDA POR FORA
   watch: {
-    "info.text"(text) {
-      if (text != this.$refs.input.innerText) this.$refs.input.innerText = text;
+    "info.text"(text: string) {
+      if (text != this.input().innerText) this.input().innerText = text;
     },
   },
 
@@ -104,27 +111,31 @@ export default {
       "updatePart",
     ]),
 
-    setText(text) {
+    input(): HTMLElement {
+      return this.$refs.input as HTMLElement;
+    },
+
+    setText(text: string) {
       this.updatePart({ id: this.partId, info: { text } });
     },
 
     sync() {
-      if (!this.$refs.input) return;
+      if (!this.input()) return;
 
-      this.setText(this.$refs.input.innerText.replace(/\n$/, ""));
+      this.setText(this.input().innerText.replace(/\n$/, ""));
     },
 
-    focusAt({ column }) {
-      const length = this.$refs.input.innerText.length;
+    focusAt({ column }: FocusTarget) {
+      const length = this.input().innerText.length;
 
-      focusAt(this.$refs.input, Math.min(column, length));
+      focusAt(this.input(), Math.min(column, length));
     },
 
     remove() {
       this.removeContent(this.songIndex);
     },
 
-    change(event) {
+    change(event: KeyboardEvent) {
       // MOSTRAR SELECT PARA ADICIONAR PARTE
       if (event.key == "/") {
         this.showSelect = true;
@@ -188,14 +199,14 @@ export default {
       }
     },
 
-    moveSelection(step) {
+    moveSelection(step: number) {
       const total = this.options.length;
 
       this.selectedOption = (this.selectedOption + step + total) % total;
     },
 
-    moveCursor(direction) {
-      const offsets = getSelectionOffsets(this.$refs.input);
+    moveCursor(direction: Direction) {
+      const offsets = getSelectionOffsets(this.input());
 
       this.$emit("moveCursor", {
         direction,
@@ -220,7 +231,7 @@ export default {
       this.sync();
     },
   },
-};
+});
 </script>
 
 <style lang="scss">

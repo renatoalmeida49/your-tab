@@ -4,15 +4,19 @@
   </button>
 </template>
 
-<script>
-export default {
+<script lang="ts">
+import { defineComponent, type PropType } from "vue";
+export default defineComponent({
   name: "TheButton",
 
   // SEM DECLARAR, O VUE 3 TAMBÉM REPASSA O @click NATIVO E DISPARA DUAS VEZES
   emits: ["click"],
 
   props: {
-    type: { type: String, default: "button" },
+    type: {
+      type: String as PropType<"button" | "submit" | "reset">,
+      default: "button",
+    },
   },
 
   methods: {
@@ -20,7 +24,7 @@ export default {
       this.$emit("click");
     },
   },
-};
+});
 </script>
 
 <style lang="scss">

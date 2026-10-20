@@ -36,9 +36,11 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent } from "vue";
 import { mapActions } from "pinia";
 import { useSongStore } from "@/stores/song";
+import type { PartType } from "@/types/song";
 
 const pdfOptions = {
   margin: 0,
@@ -51,12 +53,13 @@ const pdfOptions = {
   pagebreak: { mode: ["avoid-all"] },
 };
 
-export default {
+export default defineComponent({
   name: "TheMenu",
 
   data() {
     return {
-      pdfFile: null,
+      // URL blob: DO PDF GERADO, MOSTRADO NA PRÉ-VISUALIZAÇÃO
+      pdfFile: null as string | null,
     };
   },
 
@@ -69,7 +72,7 @@ export default {
       }
     },
 
-    add(component) {
+    add(component: PartType) {
       this.addContent(component);
     },
 
@@ -77,11 +80,12 @@ export default {
       const cifra = document.getElementById("song");
       const pdf = document.getElementById("pdf-content");
 
+      if (!cifra || !pdf) return;
+
       pdf.innerHTML = cifra.innerHTML;
 
       const buttons = pdf.querySelectorAll("button");
       const spans = pdf.querySelectorAll("span");
-      const tuningBtn = pdf.querySelector("#changeTuningBtn");
 
       buttons.forEach((item) => {
         item.style.display = "none";
@@ -91,23 +95,21 @@ export default {
         item.style.border = "none";
       });
 
-      tuningBtn.style.display = "none";
-
       // CARREGA SÓ NO CLIQUE: html2pdf.js (html2canvas + jsPDF) É PESADO
       const { default: html2pdf } = await import("html2pdf.js");
 
       this.pdfFile = await html2pdf()
         .set(pdfOptions)
-        .from(this.$refs.pdfContent)
+        .from(this.$refs.pdfContent as HTMLElement)
         .output("bloburl");
     },
 
     closePreview() {
-      URL.revokeObjectURL(this.pdfFile);
+      if (this.pdfFile) URL.revokeObjectURL(this.pdfFile);
       this.pdfFile = null;
     },
   },
-};
+});
 </script>
 
 <style lang="scss">

@@ -25,7 +25,7 @@
         ref="tone"
         role="textbox"
         @keydown="validate"
-        @input="newTone($event.target.innerText)"
+        @input="saveTone"
         contenteditable
       ></span>
     </div>
@@ -57,13 +57,16 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent } from "vue";
 import { mapActions, mapState } from "pinia";
 import { useInstrumentStore } from "@/stores/instrument";
-import { useSongStore } from "@/stores/song";
+import { useSongStore, type SongField } from "@/stores/song";
 import Tuning from "@/components/tuning/index.vue";
 
-export default {
+type HeaderField = SongField | "tone";
+
+export default defineComponent({
   name: "TabHeader",
 
   components: {
@@ -85,15 +88,15 @@ export default {
   // CONTENTEDITABLE NÃO É REATIVO: ATUALIZA QUANDO O STORE MUDA POR FORA
   // (EX: NOVA MÚSICA). SE O TEXTO JÁ É O MESMO, NÃO MEXE PARA NÃO MOVER O CURSOR
   watch: {
-    title(value) {
+    title(value: string) {
       this.syncField("title", value);
     },
 
-    artist(value) {
+    artist(value: string) {
       this.syncField("artist", value);
     },
 
-    tone(value) {
+    tone(value: string) {
       this.syncField("tone", value);
     },
   },
@@ -111,23 +114,32 @@ export default {
     ...mapActions(useInstrumentStore, ["newTone"]),
     ...mapActions(useSongStore, ["setSongInfo"]),
 
-    syncField(ref, value) {
-      if (this.$refs[ref].innerText != value) this.$refs[ref].innerText = value;
+    syncField(ref: HeaderField, value: string) {
+      const element = this.$refs[ref] as HTMLElement;
+
+      if (element.innerText != value) element.innerText = value;
     },
 
-    saveField(field, event) {
-      this.setSongInfo({ field, value: event.target.innerText });
+    saveField(field: SongField, event: Event) {
+      this.setSongInfo({
+        field,
+        value: (event.target as HTMLElement).innerText,
+      });
     },
 
-    toggleModal(modal) {
+    saveTone(event: Event) {
+      this.newTone((event.target as HTMLElement).innerText);
+    },
+
+    toggleModal(modal: "showModalTuning") {
       this[modal] = !this[modal];
     },
 
-    validate(event) {
+    validate(event: KeyboardEvent) {
       if (event.key == "Enter") event.preventDefault();
     },
   },
-};
+});
 </script>
 
 <style lang="scss">

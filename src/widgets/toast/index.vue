@@ -10,14 +10,21 @@
   </transition>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent } from "vue";
 import { mapActions, mapState } from "pinia";
 import { useHistoryStore } from "@/stores/history";
 
 const DURATION = 6000;
 
-export default {
+export default defineComponent({
   name: "TheToast",
+
+  data() {
+    return {
+      timer: undefined as ReturnType<typeof setTimeout> | undefined,
+    };
+  },
 
   computed: {
     ...mapState(useHistoryStore, ["notice"]),
@@ -42,7 +49,7 @@ export default {
       this.historyUndo();
     },
   },
-};
+});
 </script>
 
 <style lang="scss">

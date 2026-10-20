@@ -12,10 +12,13 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent, type PropType } from "vue";
 import { mapActions } from "pinia";
 import { useSongStore } from "@/stores/song";
 import { getSelectionOffsets, setCaret } from "@/core/caret";
+import { partEmits, type FocusTarget } from "@/types/editor";
+import type { TabInfo } from "@/types/song";
 import {
   cursorToPosition,
   eraseBackward,
@@ -27,18 +30,19 @@ import {
   positionToCursor,
 } from "@/core/tab";
 
-function clean(text) {
+function clean(text: string): string {
   return text.replace(/^\n+|\n+$/g, "");
 }
 
-export default {
+export default defineComponent({
   name: "Tab",
 
-  emits: ["newTextField", "moveCursor"],
+  emits: partEmits,
 
   props: {
     partId: { type: String, required: true },
-    info: { type: Object, required: true },
+    // Readonly: A MÚSICA SÓ MUDA PELAS ACTIONS DO STORE
+    info: { type: Object as PropType<Readonly<TabInfo>>, required: true },
     songIndex: { type: Number, required: true },
   },
 
@@ -49,7 +53,7 @@ export default {
   // CONTENTEDITABLE NÃO É REATIVO: ATUALIZA QUANDO O STORE MUDA POR FORA
   // (EX: DESFAZER, TROCA DE AFINAÇÃO)
   watch: {
-    "info.text"(text) {
+    "info.text"(text: string) {
       if (clean(text) != this.text()) this.render(clean(text));
     },
   },
@@ -57,36 +61,40 @@ export default {
   methods: {
     ...mapActions(useSongStore, ["updatePart"]),
 
+    pre(): HTMLElement {
+      return this.$refs.pre as HTMLElement;
+    },
+
     // innerText: CONTA <br> COMO QUEBRA DE LINHA (ALGUNS TECLADOS E COLAGENS
     // NATIVAS INSEREM <br> EM VEZ DE "\n")
-    text() {
-      return this.$refs.pre.innerText;
+    text(): string {
+      return this.pre().innerText;
     },
 
-    render(text, position) {
-      this.$refs.pre.textContent = text;
+    render(text: string, position?: number) {
+      this.pre().textContent = text;
 
-      if (position != null) setCaret(this.$refs.pre, position);
+      if (position != null) setCaret(this.pre(), position);
     },
 
-    save(text) {
+    save(text: string) {
       this.updatePart({ id: this.partId, info: { text } });
     },
 
     sync() {
-      if (!this.$refs.pre) return;
+      if (!this.pre()) return;
 
       const text = this.text();
 
       // NORMALIZA PARA UM ÚNICO NÓ DE TEXTO, QUE É O QUE O CURSOR ESPERA
-      if (text != this.$refs.pre.textContent) this.render(text);
+      if (text != this.pre().textContent) this.render(text);
 
       this.save(text);
     },
 
     selection() {
       const text = this.text();
-      const offsets = getSelectionOffsets(this.$refs.pre) || {
+      const offsets = getSelectionOffsets(this.pre()) || {
         start: 0,
         end: 0,
       };
@@ -100,7 +108,7 @@ export default {
 
     // TODA EDIÇÃO PASSA POR AQUI: ESCREVER SOBRESCREVE O TRAÇO, APAGAR VOLTA
     // O TRAÇO. ASSIM AS CORDAS NUNCA DESALINHAM
-    edit(event) {
+    edit(event: InputEvent) {
       const { text, start, end, cursor } = this.selection();
       const hasRange = start != end;
       let result;
@@ -161,7 +169,7 @@ export default {
       this.save(result.text);
     },
 
-    change(event) {
+    change(event: KeyboardEvent) {
       if (event.key == "Enter") {
         this.$emit("newTextField", { index: this.songIndex });
 
@@ -189,18 +197,18 @@ export default {
     },
 
     // ENTRANDO PELAS SETAS: DE CIMA CAI NA PRIMEIRA CORDA, DE BAIXO NA ÚLTIMA
-    focusAt({ direction, column }) {
+    focusAt({ direction, column }: FocusTarget) {
       const text = this.text();
       const rows = text.split("\n");
       const line = direction == "down" ? 0 : rows.length - 1;
       const safeColumn = Math.max(column, firstColumn(rows[line]));
 
-      this.$el.focus();
+      (this.$el as HTMLElement).focus();
       setCaret(
-        this.$refs.pre,
+        this.pre(),
         cursorToPosition(text, { line, column: safeColumn })
       );
     },
   },
-};
+});
 </script>

@@ -6,8 +6,6 @@
     "types": ["vite/client"],
     "paths": {
       "@/*": ["./src/*"]
-    },
-    // MIGRAÇÃO GRADUAL: ARQUIVOS .js CONVIVEM COM .ts ATÉ SEREM CONVERTIDOS
-    "allowJs": true
+    }
   }
 }

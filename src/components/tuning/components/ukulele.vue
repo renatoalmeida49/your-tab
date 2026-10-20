@@ -11,21 +11,22 @@
   </form>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent } from "vue";
 import { mapActions, mapState } from "pinia";
 import { useInstrumentStore } from "@/stores/instrument";
 import { useSongStore } from "@/stores/song";
 
 const defaultTuning = ["A", "E", "C", "G"];
 
-export default {
+export default defineComponent({
   name: "Ukulele",
 
   emits: ["close"],
 
   data() {
     return {
-      tuningModel: [],
+      tuningModel: [] as string[],
     };
   },
 
@@ -61,7 +62,7 @@ export default {
       this.$emit("close");
     },
   },
-};
+});
 </script>
 
 <style lang="scss">

@@ -24,11 +24,12 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent } from "vue";
 import { mapActions } from "pinia";
 import { useSongStore } from "@/stores/song";
 
-export default {
+export default defineComponent({
   name: "SongContent",
 
   props: {
@@ -63,7 +64,7 @@ export default {
       this.showMoveCursor = !this.showMoveCursor;
     },
   },
-};
+});
 </script>
 
 <style lang="scss">

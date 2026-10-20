@@ -12,14 +12,15 @@
   </div>
 </template>
 
-<script>
-export default {
+<script lang="ts">
+import { defineComponent } from "vue";
+export default defineComponent({
   name: "Modal",
 
   emits: ["close"],
 
   methods: {
-    close(event) {
+    close(event: MouseEvent) {
       if (event.target === event.currentTarget) this.$emit("close");
     },
 
@@ -27,7 +28,7 @@ export default {
       this.$emit("close");
     },
   },
-};
+});
 </script>
 
 <style lang="scss">

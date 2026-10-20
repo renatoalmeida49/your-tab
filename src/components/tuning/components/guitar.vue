@@ -25,36 +25,41 @@
   </form>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent } from "vue";
 import { mapActions, mapState } from "pinia";
 import { useInstrumentStore } from "@/stores/instrument";
 import { useSongStore } from "@/stores/song";
 
-export default {
+const presets = {
+  defaultTuning: {
+    notes: ["e", "B", "G", "D", "A", "E"],
+  },
+  halfTuning: {
+    notes: ["eb", "Bb", "Gb", "Db", "Ab", "Eb"],
+  },
+  oneTune: {
+    notes: ["d", "A", "F", "C", "G", "D"],
+  },
+  dropDTuning: {
+    notes: ["e", "B", "G", "D", "A", "D"],
+  },
+  dropCTuning: {
+    notes: ["d", "A", "F", "C", "G", "C"],
+  },
+};
+
+type PresetKey = keyof typeof presets;
+
+export default defineComponent({
   name: "Guitar",
 
   emits: ["close"],
 
   data() {
     return {
-      tuningModel: [],
-      presets: {
-        defaultTuning: {
-          notes: ["e", "B", "G", "D", "A", "E"],
-        },
-        halfTuning: {
-          notes: ["eb", "Bb", "Gb", "Db", "Ab", "Eb"],
-        },
-        oneTune: {
-          notes: ["d", "A", "F", "C", "G", "D"],
-        },
-        dropDTuning: {
-          notes: ["e", "B", "G", "D", "A", "D"],
-        },
-        dropCTuning: {
-          notes: ["d", "A", "F", "C", "G", "C"],
-        },
-      },
+      tuningModel: [] as string[],
+      presets,
     };
   },
 
@@ -62,7 +67,7 @@ export default {
     if (this.instrument == "guitar") {
       this.tuningModel = [...this.tuning];
     } else {
-      this.tuningModel = [...this.presets.defaultTuning.notes];
+      this.tuningModel = [...presets.defaultTuning.notes];
     }
   },
 
@@ -86,15 +91,16 @@ export default {
       this.close();
     },
 
-    setTuning(key) {
-      this.tuningModel = [...this.presets[key].notes];
+    // v-for EM OBJETO ENTREGA A CHAVE COMO string
+    setTuning(key: string) {
+      this.tuningModel = [...presets[key as PresetKey].notes];
     },
 
     close() {
       this.$emit("close");
     },
   },
-};
+});
 </script>
 
 <style lang="scss">
