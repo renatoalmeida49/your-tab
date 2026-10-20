@@ -155,3 +155,62 @@ a {
   outline: 2px solid var(--color-accent);
   outline-offset: 2px;
 }
+
+// MENUS FLUTUANTES (reka-ui): IDIOMA, AÇÕES DA PARTE, ETC.
+.dropdown {
+  z-index: 1000;
+  min-width: 200px;
+  padding: var(--space-1);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lg);
+  animation: dropdown-in var(--duration-fast) ease-out;
+
+  &__item {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    height: 34px;
+    padding: 0 var(--space-6) 0 var(--space-2);
+    border-radius: var(--radius-sm);
+    font-size: var(--text-sm);
+    cursor: pointer;
+    user-select: none;
+    outline: none;
+
+    &[data-highlighted] {
+      background: var(--color-surface-hover);
+    }
+
+    &[data-disabled] {
+      opacity: 0.4;
+      cursor: default;
+    }
+
+    &--danger {
+      color: var(--color-danger);
+    }
+  }
+
+  &__indicator {
+    position: absolute;
+    right: var(--space-2);
+    display: inline-flex;
+    color: var(--color-accent);
+  }
+
+  &__separator {
+    height: 1px;
+    margin: var(--space-1) 0;
+    background: var(--color-border);
+  }
+}
+
+@keyframes dropdown-in {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+}

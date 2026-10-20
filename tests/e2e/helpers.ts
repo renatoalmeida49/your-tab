@@ -59,11 +59,23 @@ export function tuningLabel(page: Page): Locator {
 }
 
 export async function addFromMenu(page: Page, part: MenuPart): Promise<void> {
-  const position = { tab: 1, textField: 2, verse: 3 }[part];
+  await page.locator(`.app-bar__add-${part}`).click();
+}
 
-  await page
-    .locator(`.menu__buttons-song button:nth-child(${position})`)
-    .click();
+export async function chooseLanguage(
+  page: Page,
+  name: "English" | "Português (Brasil)"
+): Promise<void> {
+  await page.locator(".language-menu__trigger").click();
+  await page.locator(".language-menu__item", { hasText: name }).click();
+}
+
+// RESPONDE O DIÁLOGO DE CONFIRMAÇÃO DO APP (NÃO O window.confirm)
+export async function answerConfirm(page: Page, accept: boolean) {
+  const button = accept ? ".confirm__accept" : ".confirm__cancel";
+
+  await page.locator(button).click();
+  await expect(page.locator(".confirm")).toHaveCount(0);
 }
 
 export async function paste(locator: Locator, text: string): Promise<void> {

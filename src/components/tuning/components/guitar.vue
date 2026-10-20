@@ -1,18 +1,21 @@
 <template>
   <form @submit.prevent="submitTuning" class="guitar">
-    <div class="guitar__form-group">
-      <p>{{ $t("components.tuning.quickTuning") }}:</p>
+    <div class="guitar__form-group tuning__presets">
+      <p class="tuning__caption">{{ $t("components.tuning.quickTuning") }}</p>
 
       <TheButton
         v-for="(preset, key) in presets"
         :key="key"
+        variant="secondary"
+        size="sm"
         @click="setTuning(key)"
       >
         {{ $t(`components.tuning.presets.${key}`) }}
       </TheButton>
     </div>
 
-    <div class="guitar__form-group">
+    <p class="tuning__caption">{{ $t("components.tuning.strings") }}</p>
+    <div class="guitar__form-group tuning__strings">
       <input type="text" required v-model="tuningModel[0]" placeholder="e" />
       <input type="text" required v-model="tuningModel[1]" placeholder="B" />
       <input type="text" required v-model="tuningModel[2]" placeholder="G" />
@@ -21,7 +24,9 @@
       <input type="text" required v-model="tuningModel[5]" placeholder="E" />
     </div>
 
-    <TheButton type="submit">{{ $t("common.confirm") }}</TheButton>
+    <TheButton type="submit" class="tuning__submit">{{
+      $t("common.confirm")
+    }}</TheButton>
   </form>
 </template>
 
@@ -29,6 +34,7 @@
 import { defineComponent } from "vue";
 import { mapActions, mapState } from "pinia";
 import { useInstrumentStore } from "@/stores/instrument";
+import { useConfirmStore } from "@/stores/confirm";
 import { useSongStore } from "@/stores/song";
 
 const presets = {
@@ -79,10 +85,16 @@ export default defineComponent({
   methods: {
     ...mapActions(useInstrumentStore, ["applyTuning"]),
 
-    submitTuning() {
+    ...mapActions(useConfirmStore, ["ask"]),
+
+    async submitTuning() {
       const confirmed =
         !this.tabsLoseNotes(this.tuningModel.length) ||
-        window.confirm(this.$t("components.tuning.loseNotesConfirm"));
+        (await this.ask({
+          message: "components.tuning.loseNotesConfirm",
+          confirmLabel: "components.tuning.loseNotesConfirmAction",
+          danger: true,
+        }));
 
       if (!confirmed) return;
 
@@ -102,19 +114,3 @@ export default defineComponent({
   },
 });
 </script>
-
-<style lang="scss">
-.guitar {
-  text-align: center;
-
-  input {
-    width: 5ch;
-    text-align: center;
-    margin: 0 5px;
-  }
-
-  &__form-group {
-    margin-bottom: 20px;
-  }
-}
-</style>

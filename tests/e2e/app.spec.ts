@@ -1,29 +1,73 @@
-import { test, expect, addFromMenu, songParts } from "./helpers";
+import {
+  test,
+  expect,
+  addFromMenu,
+  chooseLanguage,
+  songParts,
+} from "./helpers";
 
 test.beforeEach(async ({ page }) => {
   await page.goto("/");
 });
 
 test.describe("página", () => {
-  test("seção de ajuda mostra títulos e lista", async ({ page }) => {
-    const help = page.locator("#help");
+  test("ajuda mostra atalhos, títulos e lista", async ({ page }) => {
+    const details = page.locator(".help__details");
 
-    await expect(help.locator("h2").first()).toHaveText(
+    await page.locator(".app-bar__help").click();
+
+    await expect(page.locator(".help__shortcut").first()).toContainText("/");
+    await expect(details.locator("h2").first()).toHaveText(
       "Feito para iniciantes e avançados"
     );
-    await expect(help.locator("li").first()).toContainText(
+    await expect(details.locator("li").first()).toContainText(
       "Funcionalidade de login"
     );
 
-    await page.locator('.links img[alt="English"]').click();
+    await page.keyboard.press("Escape");
+    await expect(page.locator(".help")).toHaveCount(0);
 
-    await expect(help.locator("h2").first()).toHaveText(
+    await chooseLanguage(page, "English");
+    await page.keyboard.press("?");
+
+    await expect(details.locator("h2").first()).toHaveText(
       "Made for beginners and advanced"
     );
   });
 
+  test("'?' dentro de um campo de texto não abre a ajuda", async ({ page }) => {
+    await addFromMenu(page, "textField");
+    await page.keyboard.type("Que?");
+
+    await expect(page.locator(".help")).toHaveCount(0);
+    expect(await songParts(page)).toEqual(["text:Que?"]);
+  });
+
+  test("música vazia mostra o estado inicial, que cria a primeira parte", async ({
+    page,
+  }) => {
+    await expect(page.locator(".empty-state")).toBeVisible();
+
+    await page.locator(".empty-state__option--verse").click();
+
+    await expect(page.locator(".empty-state")).toHaveCount(0);
+    expect(await songParts(page)).toEqual(["verse"]);
+  });
+
+  test("clicar abaixo da última parte cria um campo de texto", async ({
+    page,
+  }) => {
+    await addFromMenu(page, "verse");
+    await page.locator(".home__tail").click();
+
+    expect(await songParts(page)).toEqual(["verse", "text:"]);
+    await expect(page.locator(".text-field__input")).toBeFocused();
+  });
+
   test("bandeiras carregam as imagens", async ({ page }) => {
-    const flags = page.locator(".links img");
+    await page.locator(".language-menu__trigger").click();
+
+    const flags = page.locator(".language-menu__item img");
 
     await expect(flags).toHaveCount(2);
 
@@ -68,9 +112,9 @@ test.describe("PDF", () => {
     await page.keyboard.type("Minha Música");
     await addFromMenu(page, "tab");
 
-    await page.locator(".menu__buttons-downloads button").nth(1).click();
+    await page.locator(".app-bar__export").click();
 
-    const preview = page.locator(".menu__pdf-preview iframe");
+    const preview = page.locator(".app-bar__pdf-preview iframe");
     await expect(preview).toHaveAttribute("src", /^blob:/, { timeout: 15000 });
 
     const pdf = await preview.evaluate(async (iframe) => {
@@ -85,9 +129,9 @@ test.describe("PDF", () => {
     expect(pdf.header).toBe("%PDF-");
     expect(pdf.size).toBeGreaterThan(1000);
 
-    await page.locator(".menu__pdf-preview button").click();
+    await page.locator(".app-bar__pdf-preview button").click();
 
-    await expect(page.locator(".menu__pdf-preview")).toHaveCount(0);
+    await expect(page.locator(".app-bar__pdf-preview")).toHaveCount(0);
   });
 });
 
@@ -143,7 +187,7 @@ test.describe("compatibilidade", () => {
 test.describe("tema", () => {
   test("alterna sistema -> claro -> escuro e persiste", async ({ page }) => {
     const html = page.locator("html");
-    const toggle = page.locator(".theme-toggle");
+    const toggle = page.locator(".app-bar__theme");
 
     await expect(html).not.toHaveAttribute("data-theme");
 

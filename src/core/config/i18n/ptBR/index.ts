@@ -2,9 +2,9 @@ export const locale = {
   common: {
     confirm: "Confirmar",
     cancel: "Cancelar",
+    close: "Fechar",
   },
   subtitle: "Um construtor de cifras, tablaturas e anotações.",
-  help: "Saiba mais",
   details: [
     {
       title: "Feito para iniciantes e avançados",
@@ -37,8 +37,8 @@ export const locale = {
   ],
   components: {
     tabHeader: {
-      songName: "(Título)",
-      artistName: "(Artista)",
+      songName: "Título da música",
+      artistName: "Artista",
       tone: "Tom",
       tuning: "Afinação",
       tuningButton: "Mudar afinação",
@@ -59,6 +59,43 @@ export const locale = {
       downloadPdf: "Baixar PDF",
       newSong: "Nova música",
       newSongConfirm: "Começar uma nova música? A atual será apagada.",
+      newSongConfirmAction: "Apagar e começar",
+      add: "Adicionar parte",
+      undo: "Desfazer (Ctrl+Z)",
+      redo: "Refazer (Ctrl+Shift+Z)",
+      help: "Ajuda e atalhos (?)",
+      language: "Idioma",
+    },
+    confirm: {
+      title: "Tem certeza?",
+    },
+    help: {
+      title: "Ajuda e atalhos",
+      shortcutsTitle: "Atalhos",
+      shortcuts: [
+        {
+          keys: "/",
+          description:
+            "Num campo de texto, abre o seletor para inserir tab ou verso",
+        },
+        { keys: "Enter", description: "Cria um campo de texto abaixo" },
+        {
+          keys: "↑+↓",
+          description: "Move o cursor entre as partes, mantendo a coluna",
+        },
+        { keys: "Ctrl+Z", description: "Desfaz a última alteração" },
+        { keys: "Ctrl+Shift+Z", description: "Refaz a alteração desfeita" },
+        { keys: "?", description: "Abre esta ajuda" },
+      ],
+    },
+    emptyState: {
+      title: "Comece sua música",
+      description:
+        "Preencha o título e o artista acima e escolha a primeira parte.",
+      textHint: "Letra, seções e anotações",
+      verseHint: "Acordes alinhados com a letra",
+      tabHint: "Tablatura nas cordas do instrumento",
+      tip: "num campo de texto insere uma tab ou verso sem tirar a mão do teclado",
     },
     theme: {
       toggle: "Alternar tema",
@@ -75,6 +112,8 @@ export const locale = {
       bass: "Baixo",
       ukulele: "Ukulele",
       quickTuning: "Afinação rápida",
+      strings: "Cordas (da mais aguda para a mais grave)",
+      loseNotesConfirmAction: "Trocar afinação",
       loseNotesConfirm:
         "Algumas tabs têm notas em cordas que não existem na nova afinação. Essas notas serão apagadas. Continuar?",
       presets: {

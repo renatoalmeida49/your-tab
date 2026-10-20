@@ -1,5 +1,5 @@
 <template>
-  <div class="home" @click="newContent">
+  <div class="home">
     <div id="song" class="home__song">
       <TabHeader />
 
@@ -26,6 +26,11 @@
           ></component>
         </SongContent>
       </VueDraggable>
+
+      <EmptyState v-if="!song.length" @add="addContent" />
+
+      <!-- CLICAR ABAIXO DA ÚLTIMA PARTE CRIA UM CAMPO DE TEXTO -->
+      <div v-else class="home__tail" @click="newContent"></div>
     </div>
   </div>
 </template>
@@ -41,6 +46,7 @@ import type {
   NewTextFieldPayload,
 } from "@/types/editor";
 import { VueDraggable } from "vue-draggable-plus";
+import EmptyState from "@/components/empty-state/index.vue";
 import TabHeader from "@/components/tab-header/index.vue";
 import Tab from "@/components/tab/index.vue";
 import Verse from "@/components/verse/index.vue";
@@ -57,6 +63,7 @@ export default defineComponent({
   name: "Home",
 
   components: {
+    EmptyState,
     VueDraggable,
     TabHeader,
   },
@@ -117,18 +124,16 @@ export default defineComponent({
       });
     },
 
-    newContent(event: MouseEvent) {
-      if (event.target === event.currentTarget) {
-        const lastIndex = this.song.length - 1;
-        const last = this.song[lastIndex];
+    newContent() {
+      const lastIndex = this.song.length - 1;
+      const last = this.song[lastIndex];
 
-        if (last && last.type == "textField" && last.info.text == "") {
-          this.removeContent(lastIndex);
-          return;
-        }
-
-        this.addContent("textField");
+      if (last && last.type == "textField" && last.info.text == "") {
+        this.removeContent(lastIndex);
+        return;
       }
+
+      this.addContent("textField");
     },
   },
 });
@@ -136,12 +141,23 @@ export default defineComponent({
 
 <style lang="scss">
 .home {
-  min-height: calc(100vh - 167px);
-  padding: 0 60px;
-  position: relative;
+  &__song {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: var(--space-6) var(--space-7) var(--space-4);
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
 
-  @include tablet {
-    padding: 0;
+    @include tablet {
+      padding: var(--space-4) var(--space-3);
+    }
+  }
+
+  &__tail {
+    min-height: 120px;
+    cursor: text;
   }
 }
 </style>

@@ -1,11 +1,6 @@
 <template>
-  <div
-    class="song-content"
-    :style="propStyle"
-    @mouseenter="mouseOver"
-    @mouseleave="mouseOver"
-  >
-    <div class="song-content__buttons" :class="{ hidden: showMoveCursor }">
+  <div class="song-content" :style="propStyle">
+    <div class="song-content__buttons">
       <button
         class="song-content__remove"
         @click="remove"
@@ -38,12 +33,6 @@ export default defineComponent({
     type: { type: String, required: true },
   },
 
-  data() {
-    return {
-      showMoveCursor: true,
-    };
-  },
-
   computed: {
     propStyle() {
       return {
@@ -58,10 +47,6 @@ export default defineComponent({
 
     remove() {
       this.removePart(this.contentIndex);
-    },
-
-    mouseOver() {
-      this.showMoveCursor = !this.showMoveCursor;
     },
   },
 });
@@ -81,8 +66,12 @@ export default defineComponent({
     width: 20px;
     margin-right: 7px;
 
-    &.hidden {
-      visibility: hidden;
+    // SÓ APARECEM COM O MOUSE OU O FOCO NA PARTE
+    visibility: hidden;
+
+    .song-content:hover &,
+    .song-content:focus-within & {
+      visibility: visible;
     }
   }
 
