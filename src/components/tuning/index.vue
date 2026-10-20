@@ -1,29 +1,29 @@
 <template>
-  <div class="tunning">
+  <div class="tuning">
     <header>
-      <ul class="tunning__menu">
+      <ul class="tuning__menu">
         <li
           @click="newTab('Guitar')"
           :class="{ active: selectedComponent == 'Guitar' }"
         >
-          Violão/Guitarra
+          {{ $t("components.tuning.guitar") }}
         </li>
         <li
           @click="newTab('Ukulele')"
           :class="{ active: selectedComponent == 'Ukulele' }"
         >
-          Ukelele
+          {{ $t("components.tuning.ukulele") }}
         </li>
         <li
           @click="newTab('Bass')"
           :class="{ active: selectedComponent == 'Bass' }"
         >
-          Baixo
+          {{ $t("components.tuning.bass") }}
         </li>
       </ul>
     </header>
 
-    <section class="tunning__tabs">
+    <section class="tuning__tabs">
       <component :is="selectedComponent" @close="close" />
     </section>
   </div>
@@ -36,6 +36,8 @@ import Ukulele from "./components/ukulele.vue";
 
 export default {
   name: "Tuning",
+
+  emits: ["close"],
 
   components: {
     Bass,
@@ -55,14 +57,14 @@ export default {
     },
 
     close() {
-      this.$parent.$emit("close");
+      this.$emit("close");
     },
   },
 };
 </script>
 
 <style lang="scss">
-.tunning {
+.tuning {
   > header {
     padding-top: 20px;
   }

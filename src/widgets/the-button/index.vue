@@ -1,12 +1,19 @@
 <template>
-  <div class="the-button" @click="emitClick">
+  <button class="the-button" :type="type" @click="emitClick">
     <slot />
-  </div>
+  </button>
 </template>
 
 <script>
 export default {
   name: "TheButton",
+
+  // SEM DECLARAR, O VUE 3 TAMBÉM REPASSA O @click NATIVO E DISPARA DUAS VEZES
+  emits: ["click"],
+
+  props: {
+    type: { type: String, default: "button" },
+  },
 
   methods: {
     emitClick() {
@@ -20,6 +27,8 @@ export default {
 .the-button {
   background: $primary;
   display: inline-flex;
+  border: none;
+  font: inherit;
   padding: 5px 10px;
   color: $white;
   font-weight: 700;

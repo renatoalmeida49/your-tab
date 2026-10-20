@@ -5,21 +5,27 @@
       ref="input"
       role="textbox"
       contenteditable
+      spellcheck="false"
+      @input="sync"
       @blur="validate"
       @keydown="change"
       @focus="changePlaceholder"
-      :placeholder="$t(placeholder)"
+      :placeholder="placeholder && $t(placeholder)"
     ></div>
   </div>
 </template>
 
 <script>
 import { mapActions } from "vuex";
+import { focusAt, getSelectionOffsets } from "@/core/caret";
 
 export default {
   name: "Verse",
 
+  emits: ["newTextField", "moveCursor"],
+
   props: {
+    partId: { type: String, required: true },
     info: { type: Object, required: true },
     songIndex: { type: Number, required: true },
   },
@@ -34,12 +40,36 @@ export default {
     this.$refs.input.innerText = this.info.chords;
   },
 
-  methods: {
-    ...mapActions("songStructure", ["addContentBetweenParts"]),
+  // CONTENTEDITABLE NÃO É REATIVO: ATUALIZA QUANDO O STORE MUDA POR FORA
+  watch: {
+    "info.chords"(chords) {
+      if (chords != this.$refs.input.innerText) {
+        this.$refs.input.innerText = chords;
+      }
+    },
+  },
 
-    validate(event) {
+  methods: {
+    ...mapActions("songStructure", ["updatePart"]),
+
+    sync() {
+      if (!this.$refs.input) return;
+
+      this.updatePart({
+        id: this.partId,
+        info: { chords: this.$refs.input.innerText.replace(/\n$/, "") },
+      });
+    },
+
+    validate() {
       this.placeholder = "";
-      this.info.chords = event.target.innerText;
+      this.sync();
+    },
+
+    focusAt({ column }) {
+      const length = this.$refs.input.innerText.length;
+
+      focusAt(this.$refs.input, Math.min(column, length));
     },
 
     changePlaceholder() {
@@ -47,10 +77,19 @@ export default {
     },
 
     change(event) {
-      if (event.keyCode == 13) {
-        this.addContentBetweenParts({
-          component: "textField",
-          index: this.songIndex + 1,
+      if (event.key == "Enter") {
+        this.$emit("newTextField", { index: this.songIndex });
+
+        event.preventDefault();
+      }
+
+      if (event.key == "ArrowUp" || event.key == "ArrowDown") {
+        const offsets = getSelectionOffsets(this.$refs.input);
+
+        this.$emit("moveCursor", {
+          direction: event.key == "ArrowUp" ? "up" : "down",
+          index: this.songIndex,
+          column: offsets ? offsets.start : 0,
         });
 
         event.preventDefault();
@@ -66,22 +105,28 @@ export default {
   display: flex;
   align-items: center;
 
+  // MESMA FONTE MONOESPAÇADA E ESPAÇAMENTO DO TEXTO: CADA COLUNA DO ACORDE
+  // CAI EXATAMENTE SOBRE A MESMA COLUNA DA LETRA
   &__input {
     width: 100%;
     color: $primary;
-    font-family: "title";
+    font-family: monospace;
+    font-weight: 700;
+    padding: 3px;
+    border: 1px solid transparent;
+    white-space: pre-wrap;
+
+    &:focus {
+      outline: none;
+      border-color: $gray;
+    }
 
     &[placeholder]:empty:before {
       content: attr(placeholder);
-      color: $terciary;
+      color: $tertiary;
       opacity: 0.5;
       font-family: monospace;
     }
-  }
-
-  .red {
-    color: $primary;
-    font-family: "title";
   }
 }
 </style>

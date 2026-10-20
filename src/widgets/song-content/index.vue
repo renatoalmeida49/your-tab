@@ -52,10 +52,10 @@ export default {
   },
 
   methods: {
-    ...mapActions("songStructure", ["removeContent"]),
+    ...mapActions("songStructure", ["removePart"]),
 
     remove() {
-      this.removeContent(this.contentIndex);
+      this.removePart(this.contentIndex);
     },
 
     mouseOver() {
@@ -79,10 +79,6 @@ export default {
 
     &.hidden {
       visibility: hidden;
-    }
-
-    &.default {
-      visibility: inherit;
     }
   }
 

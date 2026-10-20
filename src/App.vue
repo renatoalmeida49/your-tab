@@ -1,11 +1,9 @@
 <template>
   <div id="app">
     <div class="container">
-      <h1>Cifra builder</h1>
+      <h1>Tab Builder</h1>
 
       <p>{{ $t("subtitle") }}</p>
-
-      <!-- <p>{{ $t("message") }}</p> -->
 
       <div class="links">
         <img
@@ -20,23 +18,26 @@
         <a href="#help">{{ $t("help") }}</a>
       </div>
 
-      <Menu />
+      <TheMenu />
+      <TheToast />
       <router-view />
 
       <section id="help">
-        <template v-for="(item, indexItem) in $t('details')">
-          <h2 :key="keyGenerator(indexItem)">{{ item.title }}</h2>
+        <!-- $t NÃO DEVOLVE ARRAYS NO VUE-I18N 9+: $tm PEGA A ESTRUTURA, $rt RENDERIZA -->
+        <template v-for="(item, indexItem) in $tm('details')" :key="indexItem">
+          <h2>{{ $rt(item.title) }}</h2>
 
-          <template v-if="Array.isArray(item.description)">
-            <ul :key="keyGenerator(indexItem)">
-              <template v-for="(subitem, indexSubitem) in item.description">
-                <li :key="keyGenerator(indexSubitem)">{{ subitem }}</li>
-              </template>
-            </ul>
-          </template>
-          <template v-else>
-            <p :key="keyGenerator(indexItem)">{{ item.description }}</p>
-          </template>
+          <ul v-if="Array.isArray(item.description)">
+            <li
+              v-for="(subitem, indexSubitem) in item.description"
+              :key="indexSubitem"
+            >
+              {{ $rt(subitem) }}
+            </li>
+          </ul>
+          <p v-else>
+            {{ $rt(item.description) }}
+          </p>
         </template>
       </section>
     </div>
@@ -44,6 +45,10 @@
 </template>
 
 <script>
+import { setLanguage } from "@/core/plugins/i18n";
+import brazilFlag from "@/assets/flags/brazil.png";
+import unitedStatesFlag from "@/assets/flags/united-states.png";
+
 export default {
   name: "App",
 
@@ -51,28 +56,45 @@ export default {
     return {
       languages: [
         {
-          icon: require("@/assets/flags/brazil.png"),
-          alt: "Idioma em português",
+          icon: brazilFlag,
+          alt: "Português (Brasil)",
           key: "ptBR",
         },
         {
-          icon: require("@/assets/flags/united-states.png"),
-          alt: "Idioma em inglês",
+          icon: unitedStatesFlag,
+          alt: "English",
           key: "enUS",
         },
       ],
     };
   },
 
+  mounted() {
+    window.addEventListener("keydown", this.handleShortcuts);
+  },
+
+  beforeUnmount() {
+    window.removeEventListener("keydown", this.handleShortcuts);
+  },
+
   methods: {
     changeLanguage(language) {
-      localStorage.setItem("lang", language);
-
-      document.location.reload();
+      setLanguage(language);
     },
 
-    keyGenerator(index) {
-      return index + 1 + (Math.random() * 100).toFixed(0);
+    // Ctrl/Cmd+Z DESFAZ, Ctrl/Cmd+Shift+Z OU Ctrl+Y REFAZ, NA MÚSICA INTEIRA.
+    // CAMPOS <input> (EX: AFINAÇÃO) MANTÊM O DESFAZER DO NAVEGADOR
+    handleShortcuts(event) {
+      if (!(event.ctrlKey || event.metaKey) || event.altKey) return;
+      if (["INPUT", "TEXTAREA"].includes(event.target.tagName)) return;
+
+      const key = event.key.toLowerCase();
+      const redo = (key == "z" && event.shiftKey) || key == "y";
+
+      if (key != "z" && !redo) return;
+
+      event.preventDefault();
+      this.$store.dispatch(redo ? "history/redo" : "history/undo");
     },
   },
 };
@@ -140,7 +162,6 @@ export default {
     }
 
     #help {
-      // text-align: center;
       margin: 20px 0;
 
       p {

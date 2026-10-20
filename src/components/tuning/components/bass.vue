@@ -1,14 +1,14 @@
 <template>
-  <form @submit.prevent="submitTunning" class="bass">
-    <div class="guitar__form-group">
-      <p>Afinação rápida:</p>
+  <form @submit.prevent="submitTuning" class="bass">
+    <div class="bass__form-group">
+      <p>{{ $t("components.tuning.quickTuning") }}:</p>
 
       <TheButton
-        v-for="(tunning, index) in tunnings"
-        :key="index"
-        @click="setTuning(index)"
+        v-for="(preset, key) in presets"
+        :key="key"
+        @click="setTuning(key)"
       >
-        {{ tunning.label }}
+        {{ $t(`components.tuning.presets.${key}`) }}
       </TheButton>
     </div>
 
@@ -43,7 +43,7 @@
       />
     </div>
 
-    <TheButton type="submit" @click="submitTunning">Confirmar</TheButton>
+    <TheButton type="submit">{{ $t("common.confirm") }}</TheButton>
   </form>
 </template>
 
@@ -53,58 +53,55 @@ import { mapGetters, mapActions } from "vuex";
 export default {
   name: "Bass",
 
+  emits: ["close"],
+
   data() {
     return {
       tuningModel: [],
-      tunnings: {
+      presets: {
         defaultTuning: {
-          label: "Padrão",
-          tunning: ["G", "D", "A", "E"],
+          notes: ["G", "D", "A", "E"],
         },
         halfTuning: {
-          label: "Meio tom",
-          tunning: ["Gb", "Db", "Ab", "Eb"],
+          notes: ["Gb", "Db", "Ab", "Eb"],
         },
         oneTune: {
-          label: "1 tom",
-          tunning: ["F", "E", "G", "D"],
+          notes: ["F", "C", "G", "D"],
         },
-        // dropDTuning: {
-        //   label: "Drop D",
-        //   tunning: ["G", "D", "A", "E"],
-        // },
-        // dropCTuning: {
-        //   label: "Drop C",
-        //   tunning: ["G", "D", "A", "E"],
-        // },
       },
     };
   },
 
   mounted() {
     if (this.instrument == "bass") {
-      this.$set(this, "tuningModel", Object.assign([], this.tuning));
+      this.tuningModel = [...this.tuning];
     } else {
-      this.tuningModel = this.tunnings.defaultTuning.tunning;
+      this.tuningModel = [...this.presets.defaultTuning.notes];
     }
   },
 
   computed: {
     ...mapGetters("instrument", ["tuning", "instrument"]),
+    ...mapGetters("songStructure", ["tabsLoseNotes"]),
   },
 
   methods: {
-    ...mapActions("instrument", ["newTuning", "newInstrument"]),
+    ...mapActions("instrument", ["applyTuning"]),
 
-    submitTunning() {
-      this.newInstrument("bass");
-      this.newTuning(this.tuningModel);
+    submitTuning() {
+      const confirmed =
+        !this.tabsLoseNotes(this.tuningModel.length) ||
+        window.confirm(this.$t("components.tuning.loseNotesConfirm"));
+
+      if (!confirmed) return;
+
+      this.applyTuning({ instrument: "bass", tuning: this.tuningModel });
 
       this.close();
     },
 
-    setTuning(tunning) {
-      this.tuningModel = this.tunnings[tunning].tunning;
+    setTuning(key) {
+      this.tuningModel = [...this.presets[key].notes];
     },
 
     close() {

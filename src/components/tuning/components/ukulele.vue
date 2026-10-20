@@ -1,13 +1,13 @@
 <template>
-  <form @submit.prevent="submitTunning" class="ukulele">
-    <div class="guitar__form-group">
-      <input type="text" required placeholder="A" value="A" />
-      <input type="text" required placeholder="E" value="E" />
-      <input type="text" required placeholder="C" value="C" />
-      <input type="text" required placeholder="G" value="G" />
+  <form @submit.prevent="submitTuning" class="ukulele">
+    <div class="ukulele__form-group">
+      <input type="text" required v-model="tuningModel[0]" placeholder="A" />
+      <input type="text" required v-model="tuningModel[1]" placeholder="E" />
+      <input type="text" required v-model="tuningModel[2]" placeholder="C" />
+      <input type="text" required v-model="tuningModel[3]" placeholder="G" />
     </div>
 
-    <TheButton type="submit" @click="submitTunning">Confirmar</TheButton>
+    <TheButton type="submit">{{ $t("common.confirm") }}</TheButton>
   </form>
 </template>
 
@@ -17,7 +17,9 @@ import { mapGetters, mapActions } from "vuex";
 const defaultTuning = ["A", "E", "C", "G"];
 
 export default {
-  name: "Ukelele",
+  name: "Ukulele",
+
+  emits: ["close"],
 
   data() {
     return {
@@ -27,22 +29,28 @@ export default {
 
   mounted() {
     if (this.instrument == "ukulele") {
-      this.$set(this, "tuningModel", Object.assign([], this.tuning));
+      this.tuningModel = [...this.tuning];
     } else {
-      this.tuningModel = defaultTuning;
+      this.tuningModel = [...defaultTuning];
     }
   },
 
   computed: {
     ...mapGetters("instrument", ["tuning", "instrument"]),
+    ...mapGetters("songStructure", ["tabsLoseNotes"]),
   },
 
   methods: {
-    ...mapActions("instrument", ["newTuning", "newInstrument"]),
+    ...mapActions("instrument", ["applyTuning"]),
 
-    submitTunning() {
-      this.newInstrument("ukulele");
-      this.newTuning(this.tuningModel);
+    submitTuning() {
+      const confirmed =
+        !this.tabsLoseNotes(this.tuningModel.length) ||
+        window.confirm(this.$t("components.tuning.loseNotesConfirm"));
+
+      if (!confirmed) return;
+
+      this.applyTuning({ instrument: "ukulele", tuning: this.tuningModel });
 
       this.close();
     },

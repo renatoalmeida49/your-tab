@@ -1,12 +1,15 @@
 export const locale = {
-  message: "Olá, mundo!",
+  common: {
+    confirm: "Confirmar",
+    cancel: "Cancelar",
+  },
   subtitle: "Um construtor de cifras, tablaturas e anotações.",
   help: "Saiba mais",
   details: [
     {
       title: "Feito para iniciantes e avançados",
       description:
-        "O Cifra Builder pode ser utilizado por todos os níveis de guitarristas, baixistas ou qualquer outro instumento de corda que você toque.",
+        "O Tab Builder pode ser utilizado por todos os níveis de guitarristas, baixistas ou qualquer outro instrumento de corda que você toque.",
     },
     {
       title: "Exporte em PDF",
@@ -17,7 +20,6 @@ export const locale = {
       title: "Futuras implementações",
       description: [
         "Funcionalidade de login, onde você poderá deixar suas tabs salvas e concluí-las em outra ocasião.",
-        "Multiplos idiomas",
         "Baixos e guitarras com mais cordas",
         "Outros instrumentos de corda",
         "Melhoria do uso de atalhos",
@@ -38,8 +40,8 @@ export const locale = {
       songName: "(Título)",
       artistName: "(Artista)",
       tone: "Tom",
-      tunning: "Afinação",
-      tunningButton: "Mudar afinação",
+      tuning: "Afinação",
+      tuningButton: "Mudar afinação",
     },
     textField: {
       placeholder: "Pressione '/' para inserir uma tablatura ou verso",
@@ -54,6 +56,28 @@ export const locale = {
       tab: "Tab",
       text: "Texto",
       verse: "Verso",
+      downloadPdf: "Baixar PDF",
+      newSong: "Nova música",
+      newSongConfirm: "Começar uma nova música? A atual será apagada.",
+    },
+    toast: {
+      partRemoved: "Parte removida",
+      undo: "Desfazer",
+    },
+    tuning: {
+      guitar: "Violão/Guitarra",
+      bass: "Baixo",
+      ukulele: "Ukulele",
+      quickTuning: "Afinação rápida",
+      loseNotesConfirm:
+        "Algumas tabs têm notas em cordas que não existem na nova afinação. Essas notas serão apagadas. Continuar?",
+      presets: {
+        defaultTuning: "Padrão",
+        halfTuning: "Meio tom",
+        oneTune: "1 tom",
+        dropDTuning: "Drop D",
+        dropCTuning: "Drop C",
+      },
     },
   },
 };

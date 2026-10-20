@@ -3,72 +3,80 @@
     <div id="song" class="home__song">
       <TabHeader />
 
-      <Draggable
-        :list="song"
-        @change="forceRender"
-        @remove="forceRender"
-        :key="render"
+      <VueDraggable
+        :model-value="song"
+        @update:model-value="setSong"
+        handle=".song-content__move"
       >
         <SongContent
           v-for="(part, index) in song"
-          :key="index"
+          :key="part.id"
           :contentIndex="index"
           :type="part.type"
           :showCloseButton="checkPart(part)"
         >
           <component
-            :is="part.component"
+            :is="componentFor(part.type)"
+            :ref="(component) => setPartRef(part.id, component)"
+            :partId="part.id"
             :info="part.info"
             :songIndex="index"
             @newTextField="newTextField"
             @moveCursor="moveCursor"
           ></component>
         </SongContent>
-      </Draggable>
+      </VueDraggable>
     </div>
   </div>
 </template>
 
 <script>
 import { mapGetters, mapActions } from "vuex";
-import Draggable from "vuedraggable";
-import TabHeader from "@/components/tab-header";
-import TextField from "@/components/text-field";
+import { VueDraggable } from "vue-draggable-plus";
+import TabHeader from "@/components/tab-header/index.vue";
+import Tab from "@/components/tab/index.vue";
+import Verse from "@/components/verse/index.vue";
+import TextField from "@/components/text-field/index.vue";
+
+// FORA DO data(): COMPONENTES NÃO DEVEM VIRAR OBJETOS REATIVOS NO VUE 3
+const componentList = {
+  tab: Tab,
+  verse: Verse,
+  textField: TextField,
+};
 
 export default {
   name: "Home",
 
   components: {
-    Draggable,
+    VueDraggable,
     TabHeader,
-    TextField,
   },
 
-  data() {
-    return {
-      render: 1,
-    };
-  },
-
-  watch: {
-    song() {
-      this.forceRender();
-    },
+  // REFERÊNCIAS AOS COMPONENTES DAS PARTES, PARA MOVER O CURSOR ENTRE ELAS
+  created() {
+    this.partRefs = {};
   },
 
   computed: {
-    ...mapGetters("songStructure", ["song", "focusTextField"]),
+    ...mapGetters("songStructure", ["song"]),
   },
 
   methods: {
     ...mapActions("songStructure", [
       "addContent",
-      "addTextFiled",
-      "focusTextFieldIndex",
+      "addContentBetweenParts",
+      "removeContent",
+      "setSong",
     ]),
 
-    forceRender() {
-      this.render++;
+    componentFor(type) {
+      return componentList[type];
+    },
+
+    setPartRef(id, component) {
+      if (component) this.partRefs[id] = component;
+      else delete this.partRefs[id];
     },
 
     checkPart(part) {
@@ -77,75 +85,34 @@ export default {
       return true;
     },
 
+    // SETAS PASSAM POR TODAS AS PARTES (TEXTO, VERSO E TAB), MANTENDO A COLUNA
     moveCursor(payload) {
-      let id = payload.id.split("-")[1];
+      const step = payload.direction == "up" ? -1 : 1;
+      const target = this.song[payload.index + step];
 
-      this.focusTextFieldIndex(id);
+      if (!target) return;
 
-      if (id == 0 && payload.direction == "up") {
-        return;
-      }
-
-      if (payload.direction == "up") {
-        id = id - 1;
-      }
-
-      if (payload.direction == "down") {
-        id = parseInt(id) + 1;
-      }
-
-      if (!document.getElementById(`input-${id}`)) return;
-
-      this.$nextTick(() => {
-        document.getElementById(`input-${id}`).focus();
-        // setTimeout(() => {
-        //   console.log(document.querySelector(`#input-${indexToFocus}`));
-        // }, 200);
+      this.partRefs[target.id].focusAt({
+        direction: payload.direction,
+        column: payload.column,
       });
-
-      this.focusTextFieldIndex(null);
     },
 
     newTextField(payload) {
-      this.focusTextFieldIndex(payload.index);
-
-      this.addTextFiled({
+      this.addContentBetweenParts({
+        component: "textField",
         index: payload.index + 1,
-        component: {
-          type: "textField",
-          component: TextField,
-          info: { text: "", type: "text" },
-        },
       });
-
-      // VERIFICA NO VUEX SE HÁ INDICE SALVO.
-      // SE HOUVER SETA O FOCUS PRA ELE
-      // SE NAO HOUVER, SETA ALEATORIO MESMO
-      if (this.focusTextField >= 0) {
-        const indexToFocus = this.focusTextField + 1;
-
-        this.$nextTick(() => {
-          document.getElementById(`input-${indexToFocus}`).focus();
-          // setTimeout(() => {
-          //   console.log(document.querySelector(`#input-${indexToFocus}`));
-          // }, 200);
-        });
-
-        this.focusTextFieldIndex(null);
-      }
-
-      this.forceRender();
     },
 
     newContent(event) {
       if (event.target === event.currentTarget) {
-        if (this.song.length > 0) {
-          if (this.song[this.song.length - 1].type == "textField") {
-            if (this.song[this.song.length - 1].info.text == "") {
-              this.song.pop();
-              return;
-            }
-          }
+        const lastIndex = this.song.length - 1;
+        const last = this.song[lastIndex];
+
+        if (last && last.type == "textField" && last.info.text == "") {
+          this.removeContent(lastIndex);
+          return;
         }
 
         this.addContent("textField");
@@ -156,10 +123,6 @@ export default {
 </script>
 
 <style lang="scss">
-#pdf-content {
-  margin: 40px;
-  font-family: monospace;
-}
 .home {
   min-height: calc(100vh - 167px);
   padding: 0 60px;

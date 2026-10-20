@@ -2,27 +2,26 @@
   <div class="text-field">
     <div
       class="text-field__input"
-      :contentIndex="songIndex"
       ref="input"
       :id="idInputTag"
+      spellcheck="false"
       @keydown="change"
+      @input="sync"
       @blur="validate"
       @focus="changePlaceholder"
       role="textbox"
       contenteditable
-      :placeholder="$t(placeholder)"
+      :placeholder="placeholder && $t(placeholder)"
     ></div>
 
-    <div
-      class="text-field__select"
-      :id="idSelecTag"
-      :class="{ show: showSelect }"
-    >
-      <div class="text-field__option" data-key="tab">
-        {{ $t("components.textField.selectTab") }}
-      </div>
-      <div class="text-field__option" data-key="verse">
-        {{ $t("components.textField.selectVerse") }}
+    <div class="text-field__select" :class="{ show: showSelect }">
+      <div
+        v-for="(option, index) in options"
+        :key="option.key"
+        class="text-field__option"
+        :class="{ show: index === selectedOption }"
+      >
+        {{ $t(option.label) }}
       </div>
     </div>
   </div>
@@ -30,11 +29,15 @@
 
 <script>
 import { mapActions, mapGetters } from "vuex";
+import { focusAt, getSelectionOffsets } from "@/core/caret";
 
 export default {
   name: "TextField",
 
+  emits: ["newTextField", "moveCursor"],
+
   props: {
+    partId: { type: String, required: true },
     info: { type: Object, required: true },
     songIndex: { type: Number, required: true },
   },
@@ -42,17 +45,21 @@ export default {
   data() {
     return {
       showSelect: false,
+      selectedOption: 0,
+      options: [
+        { key: "tab", label: "components.textField.selectTab" },
+        { key: "verse", label: "components.textField.selectVerse" },
+      ],
       placeholder: "",
     };
   },
 
   mounted() {
     this.$refs.input.innerText = this.info.text;
-    this.$refs.input.focus();
 
-    const target = document.querySelector(`#${this.idInputTag}`);
+    if (this.focusId == this.partId) this.$refs.input.focus();
 
-    target.addEventListener("paste", (event) => {
+    this.$refs.input.addEventListener("paste", (event) => {
       event.preventDefault();
       let paste = event.clipboardData.getData("text");
 
@@ -60,105 +67,105 @@ export default {
 
       array.map((line, index) => {
         if (index == 0) {
-          document.querySelector(`#${this.idInputTag}`).innerText = array[0];
+          this.$refs.input.innerText = line;
+          this.setText(line);
           return;
         }
 
         this.addContentBetweenParts({
           component: "textField",
           content: line,
-          index: this.songIndex + index + 1,
+          index: this.songIndex + index,
         });
       });
     });
   },
 
+  // CONTENTEDITABLE NÃO É REATIVO: ATUALIZA QUANDO O STORE MUDA POR FORA
+  watch: {
+    "info.text"(text) {
+      if (text != this.$refs.input.innerText) this.$refs.input.innerText = text;
+    },
+  },
+
   computed: {
-    ...mapGetters("instrument", ["tuning"]),
+    ...mapGetters("songStructure", ["focusId"]),
 
     idInputTag() {
-      return `input-${this.songIndex}`;
-    },
-
-    idSelecTag() {
-      return `select-${this.songIndex}`;
+      return `input-${this.partId}`;
     },
   },
 
   methods: {
     ...mapActions("songStructure", [
       "removeContent",
-      "focusTextFieldIndex",
-      "addContent",
       "addContentBetweenParts",
+      "updatePart",
     ]),
+
+    setText(text) {
+      this.updatePart({ id: this.partId, info: { text } });
+    },
+
+    sync() {
+      if (!this.$refs.input) return;
+
+      this.setText(this.$refs.input.innerText.replace(/\n$/, ""));
+    },
+
+    focusAt({ column }) {
+      const length = this.$refs.input.innerText.length;
+
+      focusAt(this.$refs.input, Math.min(column, length));
+    },
 
     remove() {
       this.removeContent(this.songIndex);
     },
 
-    addPart(part) {
-      console.log(part);
-    },
-
     change(event) {
       // MOSTRAR SELECT PARA ADICIONAR PARTE
-      if (event.keyCode == 191) {
-        if (event.shiftKey) return;
-
+      if (event.key == "/") {
         this.showSelect = true;
-
-        let i = 0; // iterate over children elements inside dropdown
-        const dropdown = document.querySelector(`#${this.idSelecTag}`);
-        dropdown.classList.toggle("show");
-        const childs = dropdown.children; // get all dropdown elements
-
-        // attach keyboard events
-        window.addEventListener("keydown", (event) => {
-          switch (event.code) {
-            case "ArrowDown":
-              for (let c of childs) c.classList.remove("show");
-              childs[Math.abs(i) % childs.length].classList.add("show");
-              i++;
-              break;
-            case "ArrowUp":
-              for (let c of childs) c.classList.remove("show");
-              childs[Math.abs(i) % childs.length].classList.add("show");
-              i--;
-              break;
-          }
-          if (event.isComposing || event.keyCode === 229) {
-            return;
-          }
-        });
+        this.selectedOption = 0;
 
         event.preventDefault();
       }
 
-      // CHECA O ID DO EVENT E MOVE ELE PRA CIMA OU BAIXO
-      if (event.keyCode == 38) {
-        if (!this.showSelect) {
-          this.moveCursor("up", event.target.id);
+      // ESC FECHA O SELECT
+      if (event.key == "Escape" && this.showSelect) {
+        this.showSelect = false;
+
+        event.preventDefault();
+      }
+
+      // NAVEGA NO SELECT OU MOVE O CURSOR PRA CIMA/BAIXO
+      if (event.key == "ArrowUp") {
+        if (this.showSelect) {
+          this.moveSelection(-1);
+        } else {
+          this.moveCursor("up");
         }
 
         event.preventDefault();
       }
 
-      if (event.keyCode == 40) {
-        if (!this.showSelect) {
-          this.moveCursor("down", event.target.id);
+      if (event.key == "ArrowDown") {
+        if (this.showSelect) {
+          this.moveSelection(1);
+        } else {
+          this.moveCursor("down");
         }
 
         event.preventDefault();
       }
 
       // ADICIONA NOVO TEXT FIELD
-      if (event.keyCode == 13) {
+      if (event.key == "Enter") {
         if (!this.showSelect) {
           this.$emit("newTextField", { index: this.songIndex });
         } else {
-          const partToAdd = document.querySelector(".text-field__option.show")
-            .dataset.key;
+          const partToAdd = this.options[this.selectedOption].key;
 
           const index =
             partToAdd == "verse" ? this.songIndex : this.songIndex + 1;
@@ -174,16 +181,26 @@ export default {
         event.preventDefault();
       }
 
-      this.info.text = event.target.innerText;
-
       // BACKSPACE OU DELETE
-      if (event.keyCode == 8 || event.keyCode == 46) {
+      if (event.key == "Backspace" || event.key == "Delete") {
         this.checkRemove();
       }
     },
 
-    moveCursor(direction, id) {
-      this.$emit("moveCursor", { direction: direction, id: id });
+    moveSelection(step) {
+      const total = this.options.length;
+
+      this.selectedOption = (this.selectedOption + step + total) % total;
+    },
+
+    moveCursor(direction) {
+      const offsets = getSelectionOffsets(this.$refs.input);
+
+      this.$emit("moveCursor", {
+        direction,
+        index: this.songIndex,
+        column: offsets ? offsets.start : 0,
+      });
     },
 
     checkRemove() {
@@ -196,9 +213,10 @@ export default {
       this.placeholder = "components.textField.placeholder";
     },
 
-    validate(event) {
+    validate() {
       this.placeholder = "";
-      this.info.text = event.target.innerText;
+      this.showSelect = false;
+      this.sync();
     },
   },
 };
@@ -215,21 +233,23 @@ export default {
     height: auto;
     padding: 3px;
     min-height: 30px;
+    border: 1px solid transparent;
+    white-space: pre-wrap;
 
+    // SÓ A COR MUDA NO FOCO: UMA BORDA NOVA EMPURRARIA O TEXTO 1px
     &:focus {
       outline: none;
-      border: 1px solid $gray;
+      border-color: $gray;
     }
 
     &[placeholder]:empty:before {
       content: attr(placeholder);
-      color: $terciary;
+      color: $tertiary;
       opacity: 0.5;
     }
   }
 
   &__select {
-    background: red;
     display: inline-flex;
     flex-direction: column;
     position: absolute;

@@ -1,11 +1,15 @@
-import Vue from "vue";
+import SongContent from "./song-content/index.vue";
+import TheMenu from "./menu/index.vue";
+import Modal from "./modal/index.vue";
+import TheButton from "./the-button/index.vue";
+import TheToast from "./toast/index.vue";
 
-import SongContent from "./song-content";
-import Menu from "./menu";
-import Modal from "./modal";
-import TheButton from "./the-button";
-
-Vue.component("SongContent", SongContent);
-Vue.component("Menu", Menu);
-Vue.component("Modal", Modal);
-Vue.component("TheButton", TheButton);
+export default {
+  install(app) {
+    app.component("SongContent", SongContent);
+    app.component("TheMenu", TheMenu);
+    app.component("Modal", Modal);
+    app.component("TheButton", TheButton);
+    app.component("TheToast", TheToast);
+  },
+};

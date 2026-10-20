@@ -1,19 +1,17 @@
-import Tab from "@/components/tab";
-import Verse from "@/components/verse";
-import TextField from "@/components/text-field";
-import string from "@/core/config/string";
-import store from "@/store";
+import { createTab } from "@/core/tab";
 
-const componentList = {
-  tab: Tab,
-  verse: Verse,
-  textField: TextField,
-};
+let lastId = 0;
 
-function getComponent(component, content = "") {
-  switch (component) {
+function createId() {
+  lastId++;
+
+  return `${Date.now().toString(36)}${lastId}`;
+}
+
+function getInfo(type, content = "", tuning) {
+  switch (type) {
     case "tab":
-      return defaultTab(content);
+      return defaultTab(tuning);
     case "verse":
       return defaultVerse(content);
     case "textField":
@@ -21,15 +19,9 @@ function getComponent(component, content = "") {
   }
 }
 
-function defaultTab() {
-  let tab = "";
-
-  store.state.instrument.tuning.map((tune) => {
-    tab += `${tune}|${string()}\n`;
-  });
-
+function defaultTab(tuning) {
   return {
-    text: tab,
+    text: createTab(tuning),
   };
 }
 
@@ -45,34 +37,55 @@ function defaultText(content) {
   };
 }
 
+function createPart(context, type, content) {
+  const part = {
+    id: createId(),
+    type,
+    info: getInfo(type, content, context.rootState.instrument.tuning),
+  };
+
+  if (type == "textField") context.commit("setFocusId", part.id);
+
+  return part;
+}
+
 const actions = {
   addContent(context, payload) {
-    context.commit("addContent", {
-      type: payload,
-      component: componentList[payload],
-      info: getComponent(payload),
-    });
+    context.commit("addContent", createPart(context, payload));
   },
 
   removeContent(context, payload) {
     context.commit("removeContent", payload);
   },
 
-  addTextFiled(context, payload) {
-    context.commit("addTextField", payload);
+  // REMOÇÃO PELO "X": AVISA E OFERECE DESFAZER
+  removePart(context, index) {
+    context.commit("removeContent", index);
+    context.dispatch("history/notify", "components.toast.partRemoved", {
+      root: true,
+    });
   },
 
-  focusTextFieldIndex(context, payload) {
-    context.commit("focusTextFieldIndex", payload);
+  setSong(context, payload) {
+    context.commit("setSong", payload);
+  },
+
+  updatePart(context, payload) {
+    context.commit("updatePart", payload);
+  },
+
+  newSong(context) {
+    context.commit("resetSong");
+    context.commit("instrument/newTone", "C", { root: true });
+  },
+
+  setSongInfo(context, payload) {
+    context.commit("setSongInfo", payload);
   },
 
   addContentBetweenParts(context, payload) {
     context.commit("addContentBetweenParts", {
-      component: {
-        type: payload.component,
-        component: componentList[payload.component],
-        info: getComponent(payload.component, payload.content),
-      },
+      part: createPart(context, payload.component, payload.content),
       index: payload.index,
     });
   },

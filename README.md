@@ -1,12 +1,12 @@
 # tab builder
 
-O Tab Builder foi criado para te ajudar a criar tabs e cifras das sua música. Você pode adicionar tab, versos, anotações e movê-las para outros lugares da música.
+O Tab Builder foi criado para te ajudar a criar tabs e cifras das suas músicas. Você pode adicionar tab, versos, anotações e movê-las para outros lugares da música.
 
-Ao final você pode gerar um PDF ou um TXT pronto para uso em sua pasta de músicas ou um meio eletrônico.
+Ao final você pode gerar um PDF pronto para uso em sua pasta de músicas ou um meio eletrônico.
 
 * Comece preenchendo os dados gerais da música, como o nome e artista
 * Em seguida comece a montar sua música
-* Ao final escolha um formato para geração da tab
+* Ao final gere o PDF da sua tab
 
 ## :clipboard: Sumário
 
@@ -51,8 +51,12 @@ Encontrei um site que oferecia justamente isso: criação de tab de forma simple
 ### Construção  
   
 - Frontend:  
-  - VueJs 
-  - VueHtml2Pdf
+  - Vue 3, Vuex 4, Vue Router e Vue I18n
+  - Vite
+  - html2pdf.js
+  - Vue Draggable Plus
+- Testes:
+  - Playwright
 
 ### O que aprendi
 
@@ -66,32 +70,52 @@ Há muitos recursos acessíveis pelo front e é possível construir muita coisa 
 ## :satellite: Futuras implementações
   
 :white_medium_square: Melhorar a tela inicial. Necessário deixar mais intuitiva e clara  
-:white_medium_square: Utilização da biblioteca i18n para multiplas linguagens   
+:white_check_mark: Utilização da biblioteca i18n para múltiplas linguagens   
 :white_medium_square: Rota 404  
 
 ## :arrow_forward: Como executar o projeto
 
-Certifique-se de ter instalado o NodeJs em sua máquina. Você pode digitar no seu terminal o comando: 
+O projeto precisa do NodeJs 22 ou superior. Se você usa o [nvm](https://github.com/nvm-sh/nvm), a versão já está definida no `.nvmrc`:
 ```
-node -v
+nvm use
 ```
-Após realizar o clone do repositório, navegue até a pasta raiz do proejto e no terminal execute o comando abaixo para as dependências serem instaladas:
 
+O gerenciador de pacotes é o Yarn 1 (definido em `packageManager` no `package.json`; com o [Corepack](https://nodejs.org/api/corepack.html) ativo a versão certa é usada automaticamente). Após realizar o clone do repositório, navegue até a pasta raiz do projeto e instale as dependências:
 ```
-npm install
-
-// ou usando yarn:
-
 yarn
 ```
   
 Com as dependências instaladas execute o comando seguinte para executar o projeto:
 ```
-npm run serve
-
-// ou usando yarn
-
 yarn serve
+```
+
+Outros comandos:
+```
+yarn build     // gera a versão de produção em dist/
+yarn preview   // serve localmente o build de produção
+yarn lint      // ESLint + Prettier
+```
+
+### Testes
+
+Os testes unitários (lógica da tab em `src/core`) usam o [Vitest](https://vitest.dev/):
+```
+yarn test:unit
+```
+
+Os testes E2E usam o [Playwright](https://playwright.dev/) e sobem o servidor de desenvolvimento sozinhos. Na primeira vez, instale o navegador:
+```
+npx playwright install chromium
+```
+
+Depois execute:
+```
+yarn test:e2e
+
+// para acompanhar no navegador:
+
+yarn test:e2e --ui
 ```
   
 ## :smile: Autor  

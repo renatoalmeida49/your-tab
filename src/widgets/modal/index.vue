@@ -5,7 +5,7 @@
         <slot />
 
         <footer>
-          <TheButton @click="closeClick">Cancelar</TheButton>
+          <TheButton @click="closeClick">{{ $t("common.cancel") }}</TheButton>
         </footer>
       </div>
     </div>
@@ -15,6 +15,8 @@
 <script>
 export default {
   name: "Modal",
+
+  emits: ["close"],
 
   methods: {
     close(event) {
