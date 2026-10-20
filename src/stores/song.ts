@@ -1,5 +1,6 @@
 import { defineStore } from "pinia";
 
+import { transposeChord, transposeText } from "@/core/chords";
 import { createTab, notesLostByRetune, retune } from "@/core/tab";
 import type {
   Part,
@@ -145,6 +146,19 @@ export const useSongStore = defineStore("song", {
           part.info.text = retune(cleanTab(part.info.text), tuning);
         }
       }
+    },
+
+    // ACORDES DOS VERSOS E TOM. AS TABS FICAM: SÃO POSIÇÕES NO BRAÇO
+    transpose(semitones: number) {
+      const instrument = useInstrumentStore();
+
+      for (const part of this.parts) {
+        if (part.type == "verse") {
+          part.info.chords = transposeText(part.info.chords, semitones);
+        }
+      }
+
+      instrument.newTone(transposeChord(instrument.tone.trim(), semitones));
     },
 
     newSong() {

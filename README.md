@@ -8,6 +8,16 @@ Ao final você pode gerar um PDF pronto para uso em sua pasta de músicas ou um 
 * Em seguida comece a montar sua música
 * Ao final gere o PDF da sua tab
 
+Recursos do editor:
+
+* Blocos de texto, verso (acordes alinhados com a letra) e tab, que podem ser inseridos, duplicados, movidos e removidos
+* `/` num campo de texto insere tab ou verso; `Ctrl+K` abre a paleta de comandos; `?` mostra a ajuda e os atalhos
+* Desfazer/refazer (`Ctrl+Z` / `Ctrl+Shift+Z`) na música inteira
+* Transposição de tom (acordes e tom) mantendo cada acorde na sua coluna
+* Modo palco: tela cheia, letra grande, tema escuro e rolagem automática
+* Tema claro, escuro ou do sistema
+* PDF igual à folha do editor, com pré-visualização e nome do arquivo
+
 ## :clipboard: Sumário
 
 - [Visão Geral](#visao-geral)
@@ -55,7 +65,10 @@ Encontrei um site que oferecia justamente isso: criação de tab de forma simple
   - Vite
   - html2pdf.js
   - Vue Draggable Plus
+  - Reka UI (diálogos e menus acessíveis) e ícones Lucide
+  - Inter e JetBrains Mono (@fontsource), design tokens em CSS custom properties
 - Testes:
+  - Vitest (núcleo: tab, acordes, PDF)
   - Playwright
 
 ### O que aprendi
@@ -69,7 +82,7 @@ Há muitos recursos acessíveis pelo front e é possível construir muita coisa 
 
 ## :satellite: Futuras implementações
   
-:white_medium_square: Melhorar a tela inicial. Necessário deixar mais intuitiva e clara  
+:white_check_mark: Melhorar a tela inicial. Necessário deixar mais intuitiva e clara  
 :white_check_mark: Utilização da biblioteca i18n para múltiplas linguagens   
 :white_medium_square: Rota 404  
 

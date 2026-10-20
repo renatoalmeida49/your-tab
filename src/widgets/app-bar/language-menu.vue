@@ -109,6 +109,10 @@ export default defineComponent({
   &__code {
     font-size: var(--text-xs);
     font-weight: 700;
+
+    @include tablet {
+      display: none;
+    }
   }
 
   &__item img {

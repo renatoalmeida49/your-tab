@@ -108,11 +108,11 @@
   }
 }
 
-:root[data-theme="dark"] {
+// TAMBÉM VALE PARA UM TRECHO: O PDF FORÇA O CLARO, O MODO PALCO O ESCURO
+[data-theme="dark"] {
   @include dark-tokens;
 }
 
-// UM TRECHO PODE FORÇAR O TEMA CLARO (EX: A FOLHA DO PDF)
 [data-theme="light"] {
   @include light-tokens;
 }

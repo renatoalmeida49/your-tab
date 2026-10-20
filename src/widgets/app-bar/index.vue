@@ -67,6 +67,17 @@
       <TheButton
         variant="ghost"
         icon
+        class="app-bar__palette"
+        :title="$t('components.menu.palette')"
+        :aria-label="$t('components.menu.palette')"
+        @click="setPaletteOpen(true)"
+      >
+        <Command :size="18" />
+      </TheButton>
+
+      <TheButton
+        variant="ghost"
+        icon
         class="app-bar__help"
         :title="$t('components.menu.help')"
         :aria-label="$t('components.menu.help')"
@@ -85,6 +96,15 @@
         <FilePlus2 :size="16" />
         <span class="app-bar__label">{{ $t("components.menu.newSong") }}</span>
       </TheButton>
+      <TheButton
+        variant="secondary"
+        class="app-bar__stage"
+        :title="$t('components.menu.stage')"
+        @click="setStageOpen(true)"
+      >
+        <MonitorPlay :size="16" />
+        <span class="app-bar__label">{{ $t("components.menu.stage") }}</span>
+      </TheButton>
       <TheButton class="app-bar__export" @click="setExportOpen(true)">
         <Download :size="16" />
         <span class="app-bar__label">
@@ -100,16 +120,18 @@ import { defineComponent } from "vue";
 import { mapActions, mapState } from "pinia";
 import {
   CircleHelp,
+  Command,
   Download,
   FilePlus2,
   Monitor,
+  MonitorPlay,
   Moon,
   Redo2,
   Sun,
   Undo2,
 } from "lucide-vue-next";
 import { partOptions } from "@/core/config/parts";
-import { useConfirmStore } from "@/stores/confirm";
+import { startNewSong } from "@/stores/commands";
 import { useHistoryStore } from "@/stores/history";
 import { useSongStore } from "@/stores/song";
 import { useThemeStore, type Theme } from "@/stores/theme";
@@ -129,9 +151,11 @@ export default defineComponent({
 
   components: {
     CircleHelp,
+    Command,
     Download,
     FilePlus2,
     LanguageMenu,
+    MonitorPlay,
     Redo2,
     TheLogo,
     Undo2,
@@ -156,21 +180,16 @@ export default defineComponent({
   },
 
   methods: {
-    ...mapActions(useSongStore, ["addContent", "newSong"]),
+    ...mapActions(useSongStore, ["addContent"]),
     ...mapActions(useHistoryStore, ["undo", "redo"]),
     ...mapActions(useThemeStore, ["cycleTheme"]),
-    ...mapActions(useUiStore, ["setHelpOpen", "setExportOpen"]),
-    ...mapActions(useConfirmStore, ["ask"]),
-
-    async startNewSong() {
-      const confirmed = await this.ask({
-        message: "components.menu.newSongConfirm",
-        confirmLabel: "components.menu.newSongConfirmAction",
-        danger: true,
-      });
-
-      if (confirmed) this.newSong();
-    },
+    ...mapActions(useUiStore, [
+      "setHelpOpen",
+      "setExportOpen",
+      "setStageOpen",
+      "setPaletteOpen",
+    ]),
+    startNewSong,
 
     add(component: PartType) {
       this.addContent(component);
@@ -219,7 +238,7 @@ export default defineComponent({
     color: var(--color-text-muted);
     font-size: var(--text-xs);
 
-    @media (max-width: 1100px) {
+    @media (max-width: 1400px) {
       display: none;
     }
   }
@@ -253,6 +272,14 @@ export default defineComponent({
     gap: var(--space-1);
   }
 
+  // NO CELULAR CABEM SÓ OS ÍCONES ESSENCIAIS (A PALETA É DE TECLADO)
+  &__divider,
+  &__palette.the-button {
+    @include tablet {
+      display: none;
+    }
+  }
+
   &__divider {
     width: 1px;
     height: 20px;
@@ -266,8 +293,22 @@ export default defineComponent({
     }
   }
 
-  &__new-song,
-  &__export {
+  // TELAS MÉDIAS: "NOVA MÚSICA" E "MODO PALCO" SÓ COM ÍCONE (TÊM title)
+  &__new-song.the-button,
+  &__stage.the-button {
+    @media (max-width: 1400px) {
+      padding: 0;
+      aspect-ratio: 1;
+
+      .app-bar__label {
+        display: none;
+      }
+    }
+  }
+
+  &__new-song.the-button,
+  &__stage.the-button,
+  &__export.the-button {
     @include tablet {
       padding: 0;
       aspect-ratio: 1;

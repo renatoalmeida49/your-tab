@@ -5,6 +5,8 @@ export const useUiStore = defineStore("ui", {
   state: () => ({
     helpOpen: false,
     exportOpen: false,
+    stageOpen: false,
+    paletteOpen: false,
   }),
 
   actions: {
@@ -14,6 +16,14 @@ export const useUiStore = defineStore("ui", {
 
     setExportOpen(open: boolean) {
       this.exportOpen = open;
+    },
+
+    setStageOpen(open: boolean) {
+      this.stageOpen = open;
+    },
+
+    setPaletteOpen(open: boolean) {
+      this.paletteOpen = open;
     },
   },
 });

@@ -10,6 +10,8 @@
     <TheConfirm />
     <TheHelp />
     <TheExport />
+    <TheStage />
+    <TheCommandPalette />
   </div>
 </template>
 
@@ -39,10 +41,18 @@ export default defineComponent({
 
   methods: {
     ...mapActions(useHistoryStore, ["undo", "redo"]),
-    ...mapActions(useUiStore, ["setHelpOpen"]),
+    ...mapActions(useUiStore, ["setHelpOpen", "setPaletteOpen"]),
 
     handleShortcuts(event: KeyboardEvent) {
       const target = event.target as HTMLElement;
+      const command = event.ctrlKey || event.metaKey;
+
+      // Ctrl/Cmd+K ABRE A PALETA DE COMANDOS, ATÉ DE DENTRO DE UM CAMPO
+      if (command && !event.altKey && event.key.toLowerCase() == "k") {
+        event.preventDefault();
+        this.setPaletteOpen(true);
+        return;
+      }
 
       // "?" FORA DE UM CAMPO ABRE A AJUDA
       if (event.key == "?" && !isEditable(target)) {

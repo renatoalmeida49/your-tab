@@ -20,17 +20,36 @@
     ></span>
 
     <div class="tab-header__meta">
-      <label class="chip">
+      <div class="chip tab-header__key">
         <span class="chip__label">{{ $t("components.tabHeader.tone") }}</span>
         <span
           class="chip__value tab-header__tone"
           ref="tone"
           role="textbox"
+          :aria-label="$t('components.tabHeader.tone')"
           @keydown="validate"
           @input="saveTone"
           contenteditable
         ></span>
-      </label>
+        <span class="chip__steps" data-pdf-hide>
+          <button
+            class="chip__step tab-header__transpose-down"
+            :title="$t('components.tabHeader.transposeDown')"
+            :aria-label="$t('components.tabHeader.transposeDown')"
+            @click="transpose(-1)"
+          >
+            <Minus :size="12" />
+          </button>
+          <button
+            class="chip__step tab-header__transpose-up"
+            :title="$t('components.tabHeader.transposeUp')"
+            :aria-label="$t('components.tabHeader.transposeUp')"
+            @click="transpose(1)"
+          >
+            <Plus :size="12" />
+          </button>
+        </span>
+      </div>
 
       <button
         id="changeTuningBtn"
@@ -63,7 +82,7 @@ import { mapActions, mapState } from "pinia";
 import { useInstrumentStore } from "@/stores/instrument";
 import { useSongStore, type SongField } from "@/stores/song";
 import Tuning from "@/components/tuning/index.vue";
-import { Pencil } from "lucide-vue-next";
+import { Minus, Pencil, Plus } from "lucide-vue-next";
 
 type HeaderField = SongField | "tone";
 
@@ -71,7 +90,9 @@ export default defineComponent({
   name: "TabHeader",
 
   components: {
+    Minus,
     Pencil,
+    Plus,
     Tuning,
   },
 
@@ -114,7 +135,7 @@ export default defineComponent({
 
   methods: {
     ...mapActions(useInstrumentStore, ["newTone"]),
-    ...mapActions(useSongStore, ["setSongInfo"]),
+    ...mapActions(useSongStore, ["setSongInfo", "transpose"]),
 
     syncField(ref: HeaderField, value: string) {
       const element = this.$refs[ref] as HTMLElement;
@@ -232,6 +253,30 @@ export default defineComponent({
 
   &__icon {
     color: var(--color-text-muted);
+  }
+
+  &__steps {
+    display: inline-flex;
+    gap: 2px;
+    margin-right: calc(-1 * var(--space-2));
+  }
+
+  &__step {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    border: none;
+    border-radius: var(--radius-full);
+    background: none;
+    color: var(--color-text-muted);
+    cursor: pointer;
+
+    &:hover {
+      background: var(--color-surface-hover);
+      color: var(--color-text);
+    }
   }
 }
 </style>
