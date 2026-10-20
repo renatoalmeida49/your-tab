@@ -26,3 +26,6 @@ pnpm-debug.log*
 /test-results/
 /playwright-report/
 /playwright/.cache/
+
+# O projeto usa Yarn 1 (yarn.lock); npm geraria um segundo lockfile
+package-lock.json
