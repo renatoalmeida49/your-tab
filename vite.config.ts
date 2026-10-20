@@ -28,7 +28,7 @@ export default defineConfig({
 
   test: {
     // OS E2E (tests/e2e) RODAM NO PLAYWRIGHT
-    include: ["src/**/*.spec.js"],
+    include: ["src/**/*.spec.{js,ts}"],
   },
 
   define: {

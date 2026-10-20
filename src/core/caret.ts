@@ -1,6 +1,11 @@
 // CURSOR EM ELEMENTOS CONTENTEDITABLE, COMO POSIÇÃO NO TEXTO DO ELEMENTO
 
-function offsetOf(element, node, offset) {
+export interface SelectionOffsets {
+  start: number;
+  end: number;
+}
+
+function offsetOf(element: Node, node: Node, offset: number): number {
   const range = document.createRange();
 
   range.selectNodeContents(element);
@@ -9,10 +14,12 @@ function offsetOf(element, node, offset) {
   return range.toString().length;
 }
 
-export function getSelectionOffsets(element) {
+export function getSelectionOffsets(
+  element: HTMLElement
+): SelectionOffsets | null {
   const selection = window.getSelection();
 
-  if (!selection.rangeCount) return null;
+  if (!selection || !selection.rangeCount) return null;
 
   const range = selection.getRangeAt(0);
 
@@ -24,16 +31,16 @@ export function getSelectionOffsets(element) {
   };
 }
 
-export function setCaret(element, offset) {
+export function setCaret(element: HTMLElement, offset: number): void {
   const range = document.createRange();
   const walker = document.createTreeWalker(element, NodeFilter.SHOW_TEXT);
   let remaining = offset;
-  let node;
+  let node: Text | null;
 
   range.selectNodeContents(element);
   range.collapse(false);
 
-  while ((node = walker.nextNode())) {
+  while ((node = walker.nextNode() as Text | null)) {
     if (remaining <= node.length) {
       range.setStart(node, remaining);
       range.collapse(true);
@@ -44,11 +51,14 @@ export function setCaret(element, offset) {
   }
 
   const selection = window.getSelection();
+
+  if (!selection) return;
+
   selection.removeAllRanges();
   selection.addRange(range);
 }
 
-export function focusAt(element, offset) {
+export function focusAt(element: HTMLElement, offset: number): void {
   element.focus();
   setCaret(element, offset);
 }

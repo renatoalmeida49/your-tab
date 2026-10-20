@@ -1,4 +1,6 @@
-export const locale = {
+import type { MessageSchema } from "../ptBR";
+
+export const locale: MessageSchema = {
   common: {
     confirm: "Confirm",
     cancel: "Cancel",

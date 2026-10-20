@@ -19,13 +19,13 @@ describe("createTab", () => {
   it("cria uma corda por nota da afinação", () => {
     const rows = createTab(["G", "D", "A", "E"]).split("\n");
 
-    expect(rows.map((row) => row.slice(0, 2))).toEqual([
+    expect(rows.map((row: string) => row.slice(0, 2))).toEqual([
       "G|",
       "D|",
       "A|",
       "E|",
     ]);
-    expect(new Set(rows.map((row) => row.length)).size).toBe(1);
+    expect(new Set(rows.map((row: string) => row.length)).size).toBe(1);
   });
 
   it("alinha rótulos de tamanhos diferentes", () => {
@@ -132,7 +132,7 @@ describe("retune", () => {
   it("menos cordas: remove as do topo (agudas)", () => {
     const result = retune(guitar, ["G", "D", "A", "E"]).split("\n");
 
-    expect(result.map((row) => row.slice(0, 2))).toEqual([
+    expect(result.map((row: string) => row.slice(0, 2))).toEqual([
       "G|",
       "D|",
       "A|",

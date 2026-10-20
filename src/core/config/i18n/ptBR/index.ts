@@ -81,3 +81,6 @@ export const locale = {
     },
   },
 };
+
+// O PORTUGUÊS É A REFERÊNCIA: OS OUTROS IDIOMAS PRECISAM TER AS MESMAS CHAVES
+export type MessageSchema = typeof locale;
