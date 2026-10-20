@@ -47,8 +47,15 @@ export const locale: MessageSchema = {
     },
     textField: {
       placeholder: "Press '/' to insert a tab or verse",
-      selectTab: "Tab",
-      selectVerse: "Verse",
+      insert: "Insert",
+    },
+    songContent: {
+      insertBelow: "Insert below",
+      actions: "Drag to move or click for more actions",
+      duplicate: "Duplicate",
+      moveUp: "Move up",
+      moveDown: "Move down",
+      remove: "Remove",
     },
     verse: {
       placeholder: "Enter the chords here. Press 'enter' for new text field",

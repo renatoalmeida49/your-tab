@@ -14,14 +14,34 @@
       :placeholder="placeholder && $t(placeholder)"
     ></div>
 
-    <div class="text-field__select" :class="{ show: showSelect }">
+    <!-- mousedown.prevent: CLICAR NA OPÇÃO NÃO TIRA O FOCO DO CAMPO (O blur
+         FECHARIA O SELETOR ANTES DO CLIQUE) -->
+    <div
+      class="text-field__select"
+      :class="{ show: showSelect }"
+      role="listbox"
+      data-pdf-hide
+    >
+      <p class="text-field__select-title">
+        {{ $t("components.textField.insert") }}
+      </p>
       <div
         v-for="(option, index) in options"
-        :key="option.key"
+        :key="option.type"
         class="text-field__option"
         :class="{ show: index === selectedOption }"
+        role="option"
+        :aria-selected="index === selectedOption"
+        @mouseenter="selectedOption = index"
+        @mousedown.prevent="insertOption(index)"
       >
-        {{ $t(option.label) }}
+        <span class="text-field__option-icon">
+          <component :is="option.icon" :size="16" />
+        </span>
+        <span>
+          <strong>{{ $t(option.label) }}</strong>
+          <small>{{ $t(option.hint) }}</small>
+        </span>
       </div>
     </div>
   </div>
@@ -32,14 +52,14 @@ import { defineComponent, type PropType } from "vue";
 import { mapActions, mapState } from "pinia";
 import { useSongStore } from "@/stores/song";
 import { focusAt, getSelectionOffsets } from "@/core/caret";
+import { partOptions } from "@/core/config/parts";
 import { partEmits, type Direction, type FocusTarget } from "@/types/editor";
-import type { PartType, TextInfo } from "@/types/song";
+import type { TextInfo } from "@/types/song";
 
 // PARTES QUE O "/" OFERECE PARA INSERIR
-const options: { key: PartType; label: string }[] = [
-  { key: "tab", label: "components.textField.selectTab" },
-  { key: "verse", label: "components.textField.selectVerse" },
-];
+const options = ["tab", "verse"].map((type) =>
+  partOptions.find((option) => option.type == type)!
+);
 
 export default defineComponent({
   name: "TextField",
@@ -177,17 +197,7 @@ export default defineComponent({
         if (!this.showSelect) {
           this.$emit("newTextField", { index: this.songIndex });
         } else {
-          const partToAdd = this.options[this.selectedOption].key;
-
-          const index =
-            partToAdd == "verse" ? this.songIndex : this.songIndex + 1;
-
-          this.addContentBetweenParts({
-            component: partToAdd,
-            index: index,
-          });
-
-          this.showSelect = false;
+          this.insertOption(this.selectedOption);
         }
 
         event.preventDefault();
@@ -197,6 +207,18 @@ export default defineComponent({
       if (event.key == "Backspace" || event.key == "Delete") {
         this.checkRemove();
       }
+    },
+
+    // O VERSO (ACORDES) ENTRA ACIMA DA LETRA; A TAB, ABAIXO
+    insertOption(index: number) {
+      const partToAdd = this.options[index].type;
+
+      this.addContentBetweenParts({
+        component: partToAdd,
+        index: partToAdd == "verse" ? this.songIndex : this.songIndex + 1,
+      });
+
+      this.showSelect = false;
     },
 
     moveSelection(step: number) {
@@ -246,6 +268,7 @@ export default defineComponent({
     padding: 3px;
     min-height: 30px;
     border: 1px solid transparent;
+    border-radius: var(--radius-sm);
     white-space: pre-wrap;
     font-family: var(--font-mono);
     font-size: var(--text-mono);
@@ -265,25 +288,73 @@ export default defineComponent({
   }
 
   &__select {
-    display: inline-flex;
+    display: flex;
     flex-direction: column;
     position: absolute;
-    z-index: 3;
+    z-index: 30;
+    min-width: 260px;
+    margin-top: var(--space-1);
+    padding: var(--space-1);
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-lg);
+    font-family: var(--font-ui);
     visibility: hidden;
 
     &.show {
       visibility: inherit;
+      animation: dropdown-in var(--duration-fast) ease-out;
     }
   }
 
+  &__select-title {
+    padding: var(--space-1) var(--space-2);
+    color: var(--color-text-subtle);
+    font-size: var(--text-xs);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+
   &__option {
-    background: var(--color-surface-hover);
-    padding: 5px 10px;
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    padding: var(--space-2);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+
+    strong,
+    small {
+      display: block;
+      line-height: 1.3;
+    }
+
+    strong {
+      font-size: var(--text-sm);
+    }
+
+    small {
+      color: var(--color-text-muted);
+      font-size: var(--text-xs);
+    }
 
     &.show {
-      background: var(--color-accent);
-      color: var(--color-accent-contrast);
+      background: var(--color-surface-hover);
     }
+  }
+
+  &__option-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    background: var(--color-surface);
+    color: var(--color-accent);
   }
 }
 </style>

@@ -119,16 +119,14 @@ import {
   CircleHelp,
   Download,
   FilePlus2,
-  Guitar,
   Monitor,
   Moon,
-  Music,
   Redo2,
   Sun,
-  Type,
   Undo2,
   X,
 } from "lucide-vue-next";
+import { partOptions } from "@/core/config/parts";
 import { useConfirmStore } from "@/stores/confirm";
 import { useHistoryStore } from "@/stores/history";
 import { useSongStore } from "@/stores/song";
@@ -148,13 +146,6 @@ const pdfOptions = {
   // NÃO CORTA UMA PARTE DA MÚSICA ENTRE DUAS PÁGINAS
   pagebreak: { mode: ["avoid-all"] },
 };
-
-// FORA DO data(): COMPONENTES NÃO DEVEM VIRAR OBJETOS REATIVOS NO VUE 3
-const parts: { type: PartType; label: string; icon: unknown }[] = [
-  { type: "textField", label: "components.menu.text", icon: Type },
-  { type: "verse", label: "components.menu.verse", icon: Music },
-  { type: "tab", label: "components.menu.tab", icon: Guitar },
-];
 
 const themeIcons: Record<Theme, unknown> = {
   system: Monitor,
@@ -178,7 +169,7 @@ export default defineComponent({
 
   data() {
     return {
-      parts,
+      parts: partOptions,
       // URL blob: DO PDF GERADO, MOSTRADO NA PRÉ-VISUALIZAÇÃO
       pdfFile: null as string | null,
     };

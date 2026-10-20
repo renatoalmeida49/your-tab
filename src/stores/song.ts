@@ -97,6 +97,29 @@ export const useSongStore = defineStore("song", {
       useHistoryStore().notify("components.toast.partRemoved");
     },
 
+    // CÓPIA LOGO ABAIXO DA ORIGINAL, COM ID NOVO
+    duplicatePart(index: number) {
+      const part = this.parts[index];
+
+      if (!part) return;
+
+      this.parts.splice(index + 1, 0, {
+        ...part,
+        id: createId(),
+        info: { ...part.info },
+      } as Part);
+    },
+
+    // step -1 SOBE, 1 DESCE. NAS PONTAS NÃO FAZ NADA
+    movePart(payload: { index: number; step: -1 | 1 }) {
+      const target = payload.index + payload.step;
+
+      if (target < 0 || target >= this.parts.length) return;
+
+      const [part] = this.parts.splice(payload.index, 1);
+      this.parts.splice(target, 0, part);
+    },
+
     setSong(parts: Part[]) {
       this.parts = parts;
     },

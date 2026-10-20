@@ -28,34 +28,8 @@
 
 <script lang="ts">
 import { defineComponent } from "vue";
-import { Guitar, Music, Type } from "lucide-vue-next";
+import { partOptions } from "@/core/config/parts";
 import type { PartType } from "@/types/song";
-
-const options: {
-  type: PartType;
-  label: string;
-  hint: string;
-  icon: unknown;
-}[] = [
-  {
-    type: "textField",
-    label: "components.menu.text",
-    hint: "components.emptyState.textHint",
-    icon: Type,
-  },
-  {
-    type: "verse",
-    label: "components.menu.verse",
-    hint: "components.emptyState.verseHint",
-    icon: Music,
-  },
-  {
-    type: "tab",
-    label: "components.menu.tab",
-    hint: "components.emptyState.tabHint",
-    icon: Guitar,
-  },
-];
 
 export default defineComponent({
   name: "EmptyState",
@@ -66,7 +40,7 @@ export default defineComponent({
 
   data() {
     return {
-      options,
+      options: partOptions,
     };
   },
 });

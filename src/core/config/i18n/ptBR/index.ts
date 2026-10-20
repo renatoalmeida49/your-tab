@@ -45,8 +45,15 @@ export const locale = {
     },
     textField: {
       placeholder: "Pressione '/' para inserir uma tablatura ou verso",
-      selectTab: "Tab",
-      selectVerse: "Verso",
+      insert: "Inserir",
+    },
+    songContent: {
+      insertBelow: "Inserir abaixo",
+      actions: "Arraste para mover ou clique para mais ações",
+      duplicate: "Duplicar",
+      moveUp: "Mover para cima",
+      moveDown: "Mover para baixo",
+      remove: "Remover",
     },
     verse: {
       placeholder:

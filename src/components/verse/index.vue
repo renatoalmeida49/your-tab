@@ -126,6 +126,7 @@ export default defineComponent({
     font-weight: 700;
     padding: 3px;
     border: 1px solid transparent;
+    border-radius: var(--radius-sm);
     white-space: pre-wrap;
 
     &:focus {

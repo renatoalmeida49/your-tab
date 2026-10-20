@@ -12,8 +12,8 @@
           v-for="(part, index) in song"
           :key="part.id"
           :contentIndex="index"
+          :isLast="index == song.length - 1"
           :type="part.type"
-          :showCloseButton="checkPart(part)"
         >
           <component
             :is="componentFor(part.type)"
@@ -39,7 +39,7 @@
 import { defineComponent, markRaw } from "vue";
 import { mapActions, mapState } from "pinia";
 import { useSongStore } from "@/stores/song";
-import type { Part, PartType } from "@/types/song";
+import type { PartType } from "@/types/song";
 import type {
   FocusablePart,
   MoveCursorPayload,
@@ -98,12 +98,6 @@ export default defineComponent({
       };
     },
 
-    checkPart(part: Part) {
-      if (part.type == "textField") return false;
-
-      return true;
-    },
-
     // SETAS PASSAM POR TODAS AS PARTES (TEXTO, VERSO E TAB), MANTENDO A COLUNA
     moveCursor(payload: MoveCursorPayload) {
       const step = payload.direction == "up" ? -1 : 1;
@@ -141,21 +135,32 @@ export default defineComponent({
 
 <style lang="scss">
 .home {
+  // A FOLHA: MESMA LARGURA E MARGENS DA PÁGINA DO PDF
   &__song {
-    max-width: 960px;
+    --gutter: 56px;
+
+    display: flex;
+    flex-direction: column;
+    max-width: 800px;
+    min-height: 1131px; // PROPORÇÃO A4
     margin: 0 auto;
-    padding: var(--space-6) var(--space-7) var(--space-4);
+    padding: var(--space-7) 64px;
     background: var(--color-surface);
     border: 1px solid var(--color-border);
-    border-radius: var(--radius-lg);
-    box-shadow: var(--shadow-sm);
+    border-radius: var(--radius-sm);
+    box-shadow: var(--shadow-md);
 
     @include tablet {
-      padding: var(--space-4) var(--space-3);
+      --gutter: 32px;
+
+      min-height: 0;
+      padding: var(--space-5) var(--space-3) var(--space-5) 36px;
     }
   }
 
+  // OCUPA O RESTO DA FOLHA
   &__tail {
+    flex: 1;
     min-height: 120px;
     cursor: text;
   }

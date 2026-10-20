@@ -22,7 +22,8 @@ async function removeFirstPart(page: Page) {
   const part = page.locator("#song .song-content").first();
 
   await part.hover();
-  await part.locator(".song-content__remove").click();
+  await part.locator(".song-content__move").click();
+  await page.locator(".song-content__remove").click();
 }
 
 test.describe("remover parte", () => {
