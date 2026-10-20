@@ -106,6 +106,14 @@ export const locale: MessageSchema = {
       error: "Could not generate the PDF. Please try again.",
       fileName: "File name",
       download: "Download PDF",
+      size: "Text size",
+      sizes: { small: "S", medium: "M", large: "L" },
+      sizeNames: { small: "Small", medium: "Medium", large: "Large" },
+      fitToPage: "Fit to one page",
+      fitted: "Scaled down to {percent}% to fit on one page.",
+      notFitted: "Doesn't fit on one page even at {percent}%.",
+      manyPages:
+        "The PDF takes more than one page. Check “Fit to one page” to try to fit it on one.",
     },
     confirm: {
       title: "Are you sure?",

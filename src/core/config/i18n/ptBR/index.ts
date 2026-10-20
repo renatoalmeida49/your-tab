@@ -105,6 +105,14 @@ export const locale = {
       error: "Não foi possível gerar o PDF. Tente novamente.",
       fileName: "Nome do arquivo",
       download: "Baixar PDF",
+      size: "Tamanho do texto",
+      sizes: { small: "P", medium: "M", large: "G" },
+      sizeNames: { small: "Pequeno", medium: "Médio", large: "Grande" },
+      fitToPage: "Ajustar a uma página",
+      fitted: "Reduzido para {percent}% para caber em uma folha.",
+      notFitted: "Não coube em uma folha nem reduzindo para {percent}%.",
+      manyPages:
+        "O PDF ocupa mais de uma folha. Marque “Ajustar a uma página” para tentar caber em uma.",
     },
     confirm: {
       title: "Tem certeza?",

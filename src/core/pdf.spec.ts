@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { pdfFileName } from "./pdf";
+import { MIN_SCALE, pdfFileName, scaleSteps } from "./pdf";
 
 describe("pdfFileName", () => {
   it("junta título e artista", () => {
@@ -21,5 +21,20 @@ describe("pdfFileName", () => {
     expect(pdfFileName('AC/DC: "Back in Black"?', "")).toBe(
       "ACDC Back in Black"
     );
+  });
+});
+
+describe("scaleSteps", () => {
+  it("vai do tamanho escolhido até o mínimo, de 5 em 5%", () => {
+    expect(scaleSteps(1)).toEqual([1, 0.95, 0.9, 0.85, 0.8, 0.75, 0.7]);
+  });
+
+  it("começa no tamanho escolhido, mesmo acima de 100%", () => {
+    expect(scaleSteps(1.15)[0]).toBe(1.15);
+    expect(scaleSteps(1.15).at(-1)).toBeGreaterThanOrEqual(MIN_SCALE);
+  });
+
+  it("no mínimo, só ele mesmo", () => {
+    expect(scaleSteps(MIN_SCALE)).toEqual([MIN_SCALE]);
   });
 });
