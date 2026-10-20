@@ -222,6 +222,7 @@ export default defineComponent({
   border: 1px solid var(--color-border);
   border-radius: var(--radius-full);
   font-size: var(--text-sm);
+  white-space: nowrap;
   cursor: text;
 
   &:focus-within {
@@ -249,6 +250,11 @@ export default defineComponent({
   &__hint {
     color: var(--color-text-subtle);
     font-size: var(--text-xs);
+
+    // NO CELULAR NÃO CABE: O CHIP QUEBRARIA A AFINAÇÃO NO MEIO
+    @include tablet {
+      display: none;
+    }
   }
 
   &__icon {
