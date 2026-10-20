@@ -51,7 +51,7 @@ Encontrei um site que oferecia justamente isso: criação de tab de forma simple
 ### Construção  
   
 - Frontend:  
-  - Vue 3, Vuex 4, Vue Router e Vue I18n
+  - Vue 3 com TypeScript, Pinia, Vue Router e Vue I18n
   - Vite
   - html2pdf.js
   - Vue Draggable Plus
@@ -94,6 +94,7 @@ Outros comandos:
 ```
 yarn build     // gera a versão de produção em dist/
 yarn preview   // serve localmente o build de produção
+yarn typecheck // checagem de tipos (vue-tsc); o build também roda
 yarn lint      // ESLint + Prettier
 ```
 
