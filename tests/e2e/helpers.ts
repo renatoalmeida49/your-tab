@@ -8,6 +8,10 @@ import {
 // FALHA O TESTE SE HOUVER ERRO NO CONSOLE OU WARNING DO VUE/VUE-I18N
 const frameworkWarning = /^\[(Vue warn|intlify)\]/;
 
+// O SCRIPT DE ANÚNCIOS (index.html) LOGA ERROS QUE NÃO SÃO DO APP E VARIAM
+// A CADA EXECUÇÃO (EX: CSP DE IFRAMES DO GOOGLE)
+const thirdParty = /googlesyndication|doubleclick|google\.com/;
+
 export const test = base.extend({
   page: async ({ page }, use) => {
     const errors: string[] = [];
@@ -18,7 +22,11 @@ export const test = base.extend({
       const isWarning =
         message.type() == "warning" && frameworkWarning.test(message.text());
 
-      if (isError || isWarning) errors.push(message.text());
+      const isThirdParty =
+        thirdParty.test(message.location().url) ||
+        thirdParty.test(message.text());
+
+      if ((isError || isWarning) && !isThirdParty) errors.push(message.text());
     });
 
     await use(page);
