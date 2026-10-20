@@ -17,7 +17,7 @@
         >
           <component
             :is="componentFor(part.type)"
-            :ref="(component) => setPartRef(part.id, component)"
+            :ref="partRef(part.id)"
             :partId="part.id"
             :info="part.info"
             :songIndex="index"
@@ -30,8 +30,16 @@
   </div>
 </template>
 
-<script>
-import { mapGetters, mapActions } from "vuex";
+<script lang="ts">
+import { defineComponent, markRaw } from "vue";
+import { mapActions, mapState } from "pinia";
+import { useSongStore } from "@/stores/song";
+import type { Part, PartType } from "@/types/song";
+import type {
+  FocusablePart,
+  MoveCursorPayload,
+  NewTextFieldPayload,
+} from "@/types/editor";
 import { VueDraggable } from "vue-draggable-plus";
 import TabHeader from "@/components/tab-header/index.vue";
 import Tab from "@/components/tab/index.vue";
@@ -39,13 +47,13 @@ import Verse from "@/components/verse/index.vue";
 import TextField from "@/components/text-field/index.vue";
 
 // FORA DO data(): COMPONENTES NÃO DEVEM VIRAR OBJETOS REATIVOS NO VUE 3
-const componentList = {
+const componentList: Record<PartType, unknown> = {
   tab: Tab,
   verse: Verse,
   textField: TextField,
 };
 
-export default {
+export default defineComponent({
   name: "Home",
 
   components: {
@@ -53,40 +61,44 @@ export default {
     TabHeader,
   },
 
-  // REFERÊNCIAS AOS COMPONENTES DAS PARTES, PARA MOVER O CURSOR ENTRE ELAS
-  created() {
-    this.partRefs = {};
+  data() {
+    return {
+      // REFERÊNCIAS AOS COMPONENTES DAS PARTES, PARA MOVER O CURSOR ENTRE ELAS
+      partRefs: markRaw({}) as Record<string, FocusablePart>,
+    };
   },
 
   computed: {
-    ...mapGetters("songStructure", ["song"]),
+    ...mapState(useSongStore, { song: "parts" }),
   },
 
   methods: {
-    ...mapActions("songStructure", [
+    ...mapActions(useSongStore, [
       "addContent",
       "addContentBetweenParts",
       "removeContent",
       "setSong",
     ]),
 
-    componentFor(type) {
+    componentFor(type: PartType) {
       return componentList[type];
     },
 
-    setPartRef(id, component) {
-      if (component) this.partRefs[id] = component;
-      else delete this.partRefs[id];
+    partRef(id: string) {
+      return (component: unknown) => {
+        if (component) this.partRefs[id] = component as FocusablePart;
+        else delete this.partRefs[id];
+      };
     },
 
-    checkPart(part) {
+    checkPart(part: Part) {
       if (part.type == "textField") return false;
 
       return true;
     },
 
     // SETAS PASSAM POR TODAS AS PARTES (TEXTO, VERSO E TAB), MANTENDO A COLUNA
-    moveCursor(payload) {
+    moveCursor(payload: MoveCursorPayload) {
       const step = payload.direction == "up" ? -1 : 1;
       const target = this.song[payload.index + step];
 
@@ -98,14 +110,14 @@ export default {
       });
     },
 
-    newTextField(payload) {
+    newTextField(payload: NewTextFieldPayload) {
       this.addContentBetweenParts({
         component: "textField",
         index: payload.index + 1,
       });
     },
 
-    newContent(event) {
+    newContent(event: MouseEvent) {
       if (event.target === event.currentTarget) {
         const lastIndex = this.song.length - 1;
         const last = this.song[lastIndex];
@@ -119,7 +131,7 @@ export default {
       }
     },
   },
-};
+});
 </script>
 
 <style lang="scss">

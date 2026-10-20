@@ -44,12 +44,15 @@
   </div>
 </template>
 
-<script>
-import { setLanguage } from "@/core/plugins/i18n";
+<script lang="ts">
+import { defineComponent } from "vue";
+import { mapActions } from "pinia";
+import { setLanguage, type Language } from "@/core/plugins/i18n";
+import { useHistoryStore } from "@/stores/history";
 import brazilFlag from "@/assets/flags/brazil.png";
 import unitedStatesFlag from "@/assets/flags/united-states.png";
 
-export default {
+export default defineComponent({
   name: "App",
 
   data() {
@@ -58,12 +61,12 @@ export default {
         {
           icon: brazilFlag,
           alt: "Português (Brasil)",
-          key: "ptBR",
+          key: "ptBR" as Language,
         },
         {
           icon: unitedStatesFlag,
           alt: "English",
-          key: "enUS",
+          key: "enUS" as Language,
         },
       ],
     };
@@ -78,15 +81,19 @@ export default {
   },
 
   methods: {
-    changeLanguage(language) {
+    ...mapActions(useHistoryStore, ["undo", "redo"]),
+
+    changeLanguage(language: Language) {
       setLanguage(language);
     },
 
     // Ctrl/Cmd+Z DESFAZ, Ctrl/Cmd+Shift+Z OU Ctrl+Y REFAZ, NA MÚSICA INTEIRA.
     // CAMPOS <input> (EX: AFINAÇÃO) MANTÊM O DESFAZER DO NAVEGADOR
-    handleShortcuts(event) {
+    handleShortcuts(event: KeyboardEvent) {
       if (!(event.ctrlKey || event.metaKey) || event.altKey) return;
-      if (["INPUT", "TEXTAREA"].includes(event.target.tagName)) return;
+      const target = event.target as HTMLElement;
+
+      if (["INPUT", "TEXTAREA"].includes(target.tagName)) return;
 
       const key = event.key.toLowerCase();
       const redo = (key == "z" && event.shiftKey) || key == "y";
@@ -94,10 +101,11 @@ export default {
       if (key != "z" && !redo) return;
 
       event.preventDefault();
-      this.$store.dispatch(redo ? "history/redo" : "history/undo");
+      if (redo) this.redo();
+      else this.undo();
     },
   },
-};
+});
 </script>
 
 <style lang="scss">

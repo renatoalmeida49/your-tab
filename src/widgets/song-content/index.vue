@@ -24,10 +24,12 @@
   </div>
 </template>
 
-<script>
-import { mapActions } from "vuex";
+<script lang="ts">
+import { defineComponent } from "vue";
+import { mapActions } from "pinia";
+import { useSongStore } from "@/stores/song";
 
-export default {
+export default defineComponent({
   name: "SongContent",
 
   props: {
@@ -52,7 +54,7 @@ export default {
   },
 
   methods: {
-    ...mapActions("songStructure", ["removePart"]),
+    ...mapActions(useSongStore, ["removePart"]),
 
     remove() {
       this.removePart(this.contentIndex);
@@ -62,7 +64,7 @@ export default {
       this.showMoveCursor = !this.showMoveCursor;
     },
   },
-};
+});
 </script>
 
 <style lang="scss">

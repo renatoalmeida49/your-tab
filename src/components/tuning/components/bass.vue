@@ -13,62 +13,45 @@
     </div>
 
     <div class="bass__form-group">
-      <input
-        type="text"
-        required
-        v-model="tuningModel[0]"
-        placeholder="G"
-        value="G"
-      />
-      <input
-        type="text"
-        required
-        v-model="tuningModel[1]"
-        placeholder="D"
-        value="D"
-      />
-      <input
-        type="text"
-        required
-        v-model="tuningModel[2]"
-        placeholder="A"
-        value="A"
-      />
-      <input
-        type="text"
-        required
-        v-model="tuningModel[3]"
-        placeholder="E"
-        value="E"
-      />
+      <input type="text" required v-model="tuningModel[0]" placeholder="G" />
+      <input type="text" required v-model="tuningModel[1]" placeholder="D" />
+      <input type="text" required v-model="tuningModel[2]" placeholder="A" />
+      <input type="text" required v-model="tuningModel[3]" placeholder="E" />
     </div>
 
     <TheButton type="submit">{{ $t("common.confirm") }}</TheButton>
   </form>
 </template>
 
-<script>
-import { mapGetters, mapActions } from "vuex";
+<script lang="ts">
+import { defineComponent } from "vue";
+import { mapActions, mapState } from "pinia";
+import { useInstrumentStore } from "@/stores/instrument";
+import { useSongStore } from "@/stores/song";
 
-export default {
+const presets = {
+  defaultTuning: {
+    notes: ["G", "D", "A", "E"],
+  },
+  halfTuning: {
+    notes: ["Gb", "Db", "Ab", "Eb"],
+  },
+  oneTune: {
+    notes: ["F", "C", "G", "D"],
+  },
+};
+
+type PresetKey = keyof typeof presets;
+
+export default defineComponent({
   name: "Bass",
 
   emits: ["close"],
 
   data() {
     return {
-      tuningModel: [],
-      presets: {
-        defaultTuning: {
-          notes: ["G", "D", "A", "E"],
-        },
-        halfTuning: {
-          notes: ["Gb", "Db", "Ab", "Eb"],
-        },
-        oneTune: {
-          notes: ["F", "C", "G", "D"],
-        },
-      },
+      tuningModel: [] as string[],
+      presets,
     };
   },
 
@@ -76,17 +59,17 @@ export default {
     if (this.instrument == "bass") {
       this.tuningModel = [...this.tuning];
     } else {
-      this.tuningModel = [...this.presets.defaultTuning.notes];
+      this.tuningModel = [...presets.defaultTuning.notes];
     }
   },
 
   computed: {
-    ...mapGetters("instrument", ["tuning", "instrument"]),
-    ...mapGetters("songStructure", ["tabsLoseNotes"]),
+    ...mapState(useInstrumentStore, ["tuning", "instrument"]),
+    ...mapState(useSongStore, ["tabsLoseNotes"]),
   },
 
   methods: {
-    ...mapActions("instrument", ["applyTuning"]),
+    ...mapActions(useInstrumentStore, ["applyTuning"]),
 
     submitTuning() {
       const confirmed =
@@ -100,15 +83,16 @@ export default {
       this.close();
     },
 
-    setTuning(key) {
-      this.tuningModel = [...this.presets[key].notes];
+    // v-for EM OBJETO ENTREGA A CHAVE COMO string
+    setTuning(key: string) {
+      this.tuningModel = [...presets[key as PresetKey].notes];
     },
 
     close() {
       this.$emit("close");
     },
   },
-};
+});
 </script>
 
 <style lang="scss">

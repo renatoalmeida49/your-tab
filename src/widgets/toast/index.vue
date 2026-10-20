@@ -10,16 +10,24 @@
   </transition>
 </template>
 
-<script>
-import { mapActions, mapGetters } from "vuex";
+<script lang="ts">
+import { defineComponent } from "vue";
+import { mapActions, mapState } from "pinia";
+import { useHistoryStore } from "@/stores/history";
 
 const DURATION = 6000;
 
-export default {
+export default defineComponent({
   name: "TheToast",
 
+  data() {
+    return {
+      timer: undefined as ReturnType<typeof setTimeout> | undefined,
+    };
+  },
+
   computed: {
-    ...mapGetters("history", ["notice"]),
+    ...mapState(useHistoryStore, ["notice"]),
   },
 
   watch: {
@@ -35,13 +43,13 @@ export default {
   },
 
   methods: {
-    ...mapActions("history", { historyUndo: "undo", notify: "notify" }),
+    ...mapActions(useHistoryStore, { historyUndo: "undo", notify: "notify" }),
 
     undo() {
       this.historyUndo();
     },
   },
-};
+});
 </script>
 
 <style lang="scss">
