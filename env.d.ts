@@ -5,6 +5,7 @@ declare module "html2pdf.js" {
   interface Html2Pdf {
     set(options: Record<string, unknown>): Html2Pdf;
     from(element: HTMLElement): Html2Pdf;
+    from(canvas: HTMLCanvasElement, type: "canvas"): Html2Pdf;
     output(type: "blob"): Promise<Blob>;
   }
 

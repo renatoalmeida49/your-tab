@@ -22,6 +22,39 @@
         </p>
       </div>
 
+      <!-- MUDAM A FOLHA ANTES DE VIRAR PDF. AS FERRAMENTAS DA BARRA DO
+           VISUALIZADOR (FONTE, DESENHO...) SÃO DO NAVEGADOR E SÓ ANOTAM -->
+      <div class="export__options">
+        <fieldset class="export__sizes">
+          <legend>{{ $t("components.export.size") }}</legend>
+
+          <label
+            v-for="size in sizes"
+            :key="size"
+            class="export__size"
+            :title="$t(`components.export.sizeNames.${size}`)"
+          >
+            <input
+              v-model="options.size"
+              type="radio"
+              name="export-size"
+              :value="size"
+              :aria-label="$t(`components.export.sizeNames.${size}`)"
+            />
+            <span aria-hidden="true">
+              {{ $t(`components.export.sizes.${size}`) }}
+            </span>
+          </label>
+        </fieldset>
+
+        <label class="export__fit">
+          <input v-model="options.fitToPage" type="checkbox" />
+          {{ $t("components.export.fitToPage") }}
+        </label>
+      </div>
+
+      <p v-if="note" class="export__note">{{ note }}</p>
+
       <form class="export__form" @submit.prevent="download">
         <label class="export__field">
           <span>{{ $t("components.export.fileName") }}</span>
@@ -44,7 +77,14 @@
 import { defineComponent } from "vue";
 import { mapActions, mapState } from "pinia";
 import { Download, LoaderCircle } from "lucide-vue-next";
-import { pdfFileName, sheetToPdf } from "@/core/pdf";
+import {
+  MIN_SCALE,
+  PDF_SIZES,
+  pdfFileName,
+  sheetToPdf,
+  type PdfOptions,
+  type PdfSize,
+} from "@/core/pdf";
 import { useSongStore } from "@/stores/song";
 import { useUiStore } from "@/stores/ui";
 
@@ -62,18 +102,58 @@ export default defineComponent({
       pdfUrl: null as string | null,
       failed: false,
       fileName: "",
+      // FICAM ENTRE UMA EXPORTAÇÃO E OUTRA
+      options: { size: "medium", fitToPage: false } as PdfOptions,
+      sizes: Object.keys(PDF_SIZES) as PdfSize[],
+      // RESULTADO DA ÚLTIMA GERAÇÃO, PARA O AVISO ABAIXO DA PRÉVIA
+      scale: 1,
+      onePage: true,
+      // SÓ A GERAÇÃO MAIS RECENTE VALE (AS OPÇÕES MUDAM NO MEIO DE OUTRA)
+      generation: 0,
     };
   },
 
   computed: {
     ...mapState(useUiStore, ["exportOpen"]),
     ...mapState(useSongStore, ["title", "artist"]),
+
+    note(): string {
+      if (!this.pdfUrl) return "";
+
+      const percent = Math.round(this.scale * 100);
+
+      if (this.options.fitToPage && !this.onePage) {
+        return this.$t("components.export.notFitted", {
+          percent: Math.round(MIN_SCALE * 100),
+        });
+      }
+
+      if (this.options.fitToPage && this.scale < PDF_SIZES[this.options.size]) {
+        return this.$t("components.export.fitted", { percent });
+      }
+
+      if (!this.onePage) return this.$t("components.export.manyPages");
+
+      return "";
+    },
   },
 
   watch: {
     exportOpen(open: boolean) {
-      if (open) this.generate();
-      else this.release();
+      if (open) {
+        this.fileName = pdfFileName(this.title, this.artist);
+        this.generate();
+      } else {
+        this.generation++;
+        this.release();
+      }
+    },
+
+    options: {
+      deep: true,
+      handler() {
+        if (this.exportOpen) this.generate();
+      },
     },
   },
 
@@ -86,19 +166,24 @@ export default defineComponent({
 
     async generate() {
       const sheet = document.getElementById("song");
+      const generation = ++this.generation;
 
-      this.fileName = pdfFileName(this.title, this.artist);
+      this.release();
       this.failed = false;
 
       if (!sheet) return;
 
       try {
-        const pdf = await sheetToPdf(sheet);
+        const result = await sheetToPdf(sheet, { ...this.options });
 
-        // FECHOU ANTES DE TERMINAR: DESCARTA
-        if (this.exportOpen) this.pdfUrl = URL.createObjectURL(pdf);
+        // FECHOU OU MUDOU AS OPÇÕES ANTES DE TERMINAR: DESCARTA
+        if (generation != this.generation) return;
+
+        this.pdfUrl = URL.createObjectURL(result.pdf);
+        this.scale = result.scale;
+        this.onePage = result.onePage;
       } catch {
-        this.failed = true;
+        if (generation == this.generation) this.failed = true;
       }
     },
 
@@ -160,6 +245,86 @@ export default defineComponent({
 
   &__spinner {
     animation: export-spin 0.9s linear infinite;
+  }
+
+  &__options {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: var(--space-3) var(--space-5);
+    margin-bottom: calc(-1 * var(--space-2));
+  }
+
+  &__sizes {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    margin: 0;
+    padding: 0;
+    border: none;
+
+    legend {
+      float: left;
+      margin-right: var(--space-1);
+      color: var(--color-text-muted);
+      font-size: var(--text-xs);
+      font-weight: 600;
+    }
+  }
+
+  // RÁDIOS COM CARA DE BOTÕES AGRUPADOS (P | M | G)
+  &__size {
+    position: relative;
+
+    input {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      margin: 0;
+      cursor: pointer;
+    }
+
+    span {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px;
+      height: 28px;
+      border: 1px solid var(--color-border-strong);
+      border-radius: var(--radius-sm);
+      background: var(--color-surface);
+      color: var(--color-text-muted);
+      font-size: var(--text-sm);
+      font-weight: 600;
+    }
+
+    input:checked + span {
+      background: var(--color-accent);
+      border-color: var(--color-accent);
+      color: var(--color-accent-contrast);
+    }
+
+    input:focus-visible + span {
+      box-shadow: 0 0 0 3px var(--color-accent-soft);
+    }
+  }
+
+  &__fit {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-size: var(--text-sm);
+    cursor: pointer;
+
+    input {
+      accent-color: var(--color-accent);
+    }
+  }
+
+  &__note {
+    margin: calc(-1 * var(--space-2)) 0 0;
+    color: var(--color-text-muted);
+    font-size: var(--text-xs);
   }
 
   &__form {
