@@ -85,30 +85,13 @@
         <FilePlus2 :size="16" />
         <span class="app-bar__label">{{ $t("components.menu.newSong") }}</span>
       </TheButton>
-      <TheButton class="app-bar__export" @click="generateReport">
+      <TheButton class="app-bar__export" @click="setExportOpen(true)">
         <Download :size="16" />
         <span class="app-bar__label">
           {{ $t("components.menu.downloadPdf") }}
         </span>
       </TheButton>
     </div>
-
-    <!-- LAYOUT FORA DA TELA, COM A LARGURA FIXA USADA PARA GERAR O PDF -->
-    <section class="app-bar__pdf-layout">
-      <div class="app-bar__pdf-page" ref="pdfContent">
-        <div id="pdf-content"></div>
-      </div>
-    </section>
-
-    <transition name="app-bar__fade">
-      <section class="app-bar__pdf-preview" v-if="pdfFile">
-        <button :aria-label="$t('common.close')" @click="closePreview">
-          <X :size="18" />
-        </button>
-
-        <iframe :src="pdfFile" width="100%" height="100%" />
-      </section>
-    </transition>
   </header>
 </template>
 
@@ -124,7 +107,6 @@ import {
   Redo2,
   Sun,
   Undo2,
-  X,
 } from "lucide-vue-next";
 import { partOptions } from "@/core/config/parts";
 import { useConfirmStore } from "@/stores/confirm";
@@ -135,17 +117,6 @@ import { useUiStore } from "@/stores/ui";
 import type { PartType } from "@/types/song";
 import LanguageMenu from "./language-menu.vue";
 import TheLogo from "./logo.vue";
-
-const pdfOptions = {
-  margin: 0,
-  filename: "tab-pdf.pdf",
-  image: { type: "jpeg", quality: 0.98 },
-  enableLinks: false,
-  html2canvas: { scale: 2, useCORS: true },
-  jsPDF: { unit: "in", format: "a4", orientation: "portrait" },
-  // NÃO CORTA UMA PARTE DA MÚSICA ENTRE DUAS PÁGINAS
-  pagebreak: { mode: ["avoid-all"] },
-};
 
 const themeIcons: Record<Theme, unknown> = {
   system: Monitor,
@@ -164,14 +135,11 @@ export default defineComponent({
     Redo2,
     TheLogo,
     Undo2,
-    X,
   },
 
   data() {
     return {
       parts: partOptions,
-      // URL blob: DO PDF GERADO, MOSTRADO NA PRÉ-VISUALIZAÇÃO
-      pdfFile: null as string | null,
     };
   },
 
@@ -191,7 +159,7 @@ export default defineComponent({
     ...mapActions(useSongStore, ["addContent", "newSong"]),
     ...mapActions(useHistoryStore, ["undo", "redo"]),
     ...mapActions(useThemeStore, ["cycleTheme"]),
-    ...mapActions(useUiStore, ["setHelpOpen"]),
+    ...mapActions(useUiStore, ["setHelpOpen", "setExportOpen"]),
     ...mapActions(useConfirmStore, ["ask"]),
 
     async startNewSong() {
@@ -206,39 +174,6 @@ export default defineComponent({
 
     add(component: PartType) {
       this.addContent(component);
-    },
-
-    async generateReport() {
-      const cifra = document.getElementById("song");
-      const pdf = document.getElementById("pdf-content");
-
-      if (!cifra || !pdf) return;
-
-      pdf.innerHTML = cifra.innerHTML;
-
-      const buttons = pdf.querySelectorAll("button");
-      const spans = pdf.querySelectorAll("span");
-
-      buttons.forEach((item) => {
-        item.style.display = "none";
-      });
-
-      spans.forEach((item) => {
-        item.style.border = "none";
-      });
-
-      // CARREGA SÓ NO CLIQUE: html2pdf.js (html2canvas + jsPDF) É PESADO
-      const { default: html2pdf } = await import("html2pdf.js");
-
-      this.pdfFile = await html2pdf()
-        .set(pdfOptions)
-        .from(this.$refs.pdfContent as HTMLElement)
-        .output("bloburl");
-    },
-
-    closePreview() {
-      if (this.pdfFile) URL.revokeObjectURL(this.pdfFile);
-      this.pdfFile = null;
     },
   },
 });
@@ -338,72 +273,5 @@ export default defineComponent({
       aspect-ratio: 1;
     }
   }
-}
-
-#pdf-content {
-  margin: 40px;
-}
-
-.app-bar__pdf-layout {
-  position: fixed;
-  top: 0;
-  left: -100vw;
-  z-index: -9999;
-}
-
-.app-bar__pdf-page {
-  width: 800px;
-  background: var(--color-surface);
-  color: var(--color-text);
-}
-
-.app-bar__pdf-preview {
-  position: fixed;
-  width: 65%;
-  min-width: 600px;
-  height: 80vh;
-  top: 100px;
-  left: 50%;
-  z-index: 9999;
-  transform: translateX(-50%);
-  border-radius: var(--radius-md);
-  box-shadow: var(--shadow-lg);
-
-  @include tablet {
-    width: 95%;
-    min-width: 0;
-  }
-
-  button {
-    position: absolute;
-    top: -16px;
-    left: -16px;
-    width: 34px;
-    height: 34px;
-    background: var(--color-inverse);
-    border: 0;
-    box-shadow: var(--shadow-md);
-    border-radius: 50%;
-    color: var(--color-inverse-text);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-  }
-
-  iframe {
-    border: 0;
-    border-radius: var(--radius-md);
-  }
-}
-
-.app-bar__fade-enter-active,
-.app-bar__fade-leave-active {
-  transition: opacity 0.3s ease-in;
-}
-
-.app-bar__fade-enter-from,
-.app-bar__fade-leave-to {
-  opacity: 0;
 }
 </style>

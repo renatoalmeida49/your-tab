@@ -63,7 +63,7 @@ export const locale = {
       tab: "Tab",
       text: "Texto",
       verse: "Verso",
-      downloadPdf: "Baixar PDF",
+      downloadPdf: "Exportar PDF",
       newSong: "Nova música",
       newSongConfirm: "Começar uma nova música? A atual será apagada.",
       newSongConfirmAction: "Apagar e começar",
@@ -72,6 +72,14 @@ export const locale = {
       redo: "Refazer (Ctrl+Shift+Z)",
       help: "Ajuda e atalhos (?)",
       language: "Idioma",
+    },
+    export: {
+      title: "Exportar PDF",
+      preview: "Pré-visualização do PDF",
+      generating: "Gerando o PDF…",
+      error: "Não foi possível gerar o PDF. Tente novamente.",
+      fileName: "Nome do arquivo",
+      download: "Baixar PDF",
     },
     confirm: {
       title: "Tem certeza?",

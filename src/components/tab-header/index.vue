@@ -43,7 +43,7 @@
         <span class="chip__hint tab-header__instrument">
           {{ $t(`components.tuning.${instrument}`) }}
         </span>
-        <Pencil :size="14" class="chip__icon" />
+        <Pencil :size="14" class="chip__icon" data-pdf-hide />
       </button>
     </div>
 

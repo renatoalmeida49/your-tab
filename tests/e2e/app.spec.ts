@@ -107,14 +107,18 @@ test.describe("arrastar partes", () => {
 });
 
 test.describe("PDF", () => {
-  test("gera a pré-visualização e fecha", async ({ page }) => {
+  test("pré-visualiza, baixa com o nome da música e fecha", async ({
+    page,
+  }) => {
     await page.locator(".tab-header__title").click();
     await page.keyboard.type("Minha Música");
+    await page.locator(".tab-header__artist").click();
+    await page.keyboard.type("AC/DC");
     await addFromMenu(page, "tab");
 
     await page.locator(".app-bar__export").click();
 
-    const preview = page.locator(".app-bar__pdf-preview iframe");
+    const preview = page.locator(".export__preview iframe");
     await expect(preview).toHaveAttribute("src", /^blob:/, { timeout: 15000 });
 
     const pdf = await preview.evaluate(async (iframe) => {
@@ -129,9 +133,19 @@ test.describe("PDF", () => {
     expect(pdf.header).toBe("%PDF-");
     expect(pdf.size).toBeGreaterThan(1000);
 
-    await page.locator(".app-bar__pdf-preview button").click();
+    // A CÓPIA USADA PARA O PDF NÃO FICA NA PÁGINA
+    await expect(page.locator(".pdf-export-host")).toHaveCount(0);
 
-    await expect(page.locator(".app-bar__pdf-preview")).toHaveCount(0);
+    const fileName = page.locator(".export__input input");
+    await expect(fileName).toHaveValue("Minha Música - ACDC");
+    await fileName.fill("Ensaio");
+
+    const download = page.waitForEvent("download");
+    await page.locator(".export__download").click();
+    expect((await download).suggestedFilename()).toBe("Ensaio.pdf");
+
+    await page.keyboard.press("Escape");
+    await expect(page.locator(".export")).toHaveCount(0);
   });
 });
 

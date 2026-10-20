@@ -4,11 +4,16 @@ import { defineStore } from "pinia";
 export const useUiStore = defineStore("ui", {
   state: () => ({
     helpOpen: false,
+    exportOpen: false,
   }),
 
   actions: {
     setHelpOpen(open: boolean) {
       this.helpOpen = open;
+    },
+
+    setExportOpen(open: boolean) {
+      this.exportOpen = open;
     },
   },
 });

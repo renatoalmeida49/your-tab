@@ -9,6 +9,7 @@
     <TheToast />
     <TheConfirm />
     <TheHelp />
+    <TheExport />
   </div>
 </template>
 

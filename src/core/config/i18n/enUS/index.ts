@@ -64,7 +64,7 @@ export const locale: MessageSchema = {
       tab: "Tab",
       text: "Text",
       verse: "Verse",
-      downloadPdf: "Download PDF",
+      downloadPdf: "Export PDF",
       newSong: "New song",
       newSongConfirm: "Start a new song? The current one will be erased.",
       newSongConfirmAction: "Erase and start",
@@ -73,6 +73,14 @@ export const locale: MessageSchema = {
       redo: "Redo (Ctrl+Shift+Z)",
       help: "Help and shortcuts (?)",
       language: "Language",
+    },
+    export: {
+      title: "Export PDF",
+      preview: "PDF preview",
+      generating: "Generating the PDF…",
+      error: "Could not generate the PDF. Please try again.",
+      fileName: "File name",
+      download: "Download PDF",
     },
     confirm: {
       title: "Are you sure?",
