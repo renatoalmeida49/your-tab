@@ -61,6 +61,12 @@ export const locale: MessageSchema = {
       newSong: "New song",
       newSongConfirm: "Start a new song? The current one will be erased.",
     },
+    theme: {
+      toggle: "Toggle theme",
+      system: "System theme",
+      light: "Light theme",
+      dark: "Dark theme",
+    },
     toast: {
       partRemoved: "Part removed",
       undo: "Undo",

@@ -16,6 +16,15 @@
         />
 
         <a href="#help">{{ $t("help") }}</a>
+
+        <button
+          class="theme-toggle"
+          :title="$t(`components.theme.${theme}`)"
+          :aria-label="$t('components.theme.toggle')"
+          @click="cycleTheme"
+        >
+          <component :is="themeIcon" :size="18" />
+        </button>
       </div>
 
       <TheMenu />
@@ -46,9 +55,11 @@
 
 <script lang="ts">
 import { defineComponent } from "vue";
-import { mapActions } from "pinia";
+import { mapActions, mapState } from "pinia";
+import { Monitor, Moon, Sun } from "lucide-vue-next";
 import { setLanguage, type Language } from "@/core/plugins/i18n";
 import { useHistoryStore } from "@/stores/history";
+import { useThemeStore, type Theme } from "@/stores/theme";
 import brazilFlag from "@/assets/flags/brazil.png";
 import unitedStatesFlag from "@/assets/flags/united-states.png";
 
@@ -72,6 +83,20 @@ export default defineComponent({
     };
   },
 
+  computed: {
+    ...mapState(useThemeStore, ["theme"]),
+
+    themeIcon() {
+      const icons: Record<Theme, unknown> = {
+        system: Monitor,
+        light: Sun,
+        dark: Moon,
+      };
+
+      return icons[this.theme];
+    },
+  },
+
   mounted() {
     window.addEventListener("keydown", this.handleShortcuts);
   },
@@ -82,6 +107,7 @@ export default defineComponent({
 
   methods: {
     ...mapActions(useHistoryStore, ["undo", "redo"]),
+    ...mapActions(useThemeStore, ["cycleTheme"]),
 
     changeLanguage(language: Language) {
       setLanguage(language);
@@ -109,23 +135,15 @@ export default defineComponent({
 </script>
 
 <style lang="scss">
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
 #app {
-  background: $gray;
   min-height: 100vh;
-  font-family: monospace;
 
   .container {
     width: 100%;
     max-width: 1240px;
     padding: 0 40px;
     margin: auto;
-    background: $white;
+    background: var(--color-surface);
     position: relative;
 
     @include tablet {
@@ -134,7 +152,6 @@ export default defineComponent({
 
     > h1 {
       text-align: center;
-      background: $white;
       padding: 20px 0;
       padding-bottom: 0;
       margin-bottom: 20px;
@@ -166,6 +183,21 @@ export default defineComponent({
       a {
         display: block;
         text-align: center;
+      }
+
+      .theme-toggle {
+        display: inline-flex;
+        padding: var(--space-1);
+        border: none;
+        border-radius: var(--radius-sm);
+        background: none;
+        color: var(--color-text-muted);
+        cursor: pointer;
+
+        &:hover {
+          background: var(--color-surface-hover);
+          color: var(--color-text);
+        }
       }
     }
 

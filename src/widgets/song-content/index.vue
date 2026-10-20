@@ -73,6 +73,8 @@ export default defineComponent({
   position: relative;
 
   &__buttons {
+    // NÃO ENCOLHE: O TEXTO DE TODAS AS PARTES COMEÇA NA MESMA COLUNA
+    flex: none;
     display: flex;
     justify-content: flex-end;
     gap: 2px;
@@ -87,7 +89,7 @@ export default defineComponent({
   &__line {
     width: 80%;
     height: 2px;
-    background: rgba(0, 0, 0, 0.5);
+    background: var(--color-text-subtle);
     margin: 3px 0;
     border-radius: 6px;
   }
@@ -96,10 +98,10 @@ export default defineComponent({
     height: 100%;
     width: 10px;
     cursor: move;
-    border: 1px solid rgba(0, 0, 0, 0.5);
+    border: 1px solid var(--color-border-strong);
     border-radius: 6px;
     padding: 1px;
-    background: rgb(247, 243, 243);
+    background: var(--color-surface-muted);
   }
 
   &__remove {
@@ -107,11 +109,11 @@ export default defineComponent({
     background: none;
     border: none;
     cursor: pointer;
-    color: red;
+    color: var(--color-danger);
     transition: all 0.2s;
 
     &:hover {
-      color: rgb(182, 77, 77);
+      color: var(--color-accent-hover);
     }
   }
 }

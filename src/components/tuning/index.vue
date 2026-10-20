@@ -74,7 +74,7 @@ export default defineComponent({
 
   &__tabs {
     padding: 20px;
-    border: 1px solid black;
+    border: 1px solid var(--color-border);
     border-top: none;
     padding-top: 30px;
   }
@@ -87,11 +87,11 @@ export default defineComponent({
       cursor: pointer;
       text-align: center;
       padding: 10px;
-      border-bottom: 1px solid black;
+      border-bottom: 1px solid var(--color-border);
       flex: 1;
 
       &.active {
-        border: 1px solid black;
+        border: 1px solid var(--color-border);
         border-bottom: none;
       }
     }

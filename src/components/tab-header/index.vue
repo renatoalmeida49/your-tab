@@ -36,10 +36,9 @@
           {{ getTuning }}
         </span>
         <TheButton id="changeTuningBtn" @click="toggleModal('showModalTuning')">
-          <img
-            src="@/assets/icons/edit.png"
-            :alt="$t('components.tabHeader.tuningButton')"
-            height="14px"
+          <Pencil
+            :size="14"
+            :aria-label="$t('components.tabHeader.tuningButton')"
           />
         </TheButton>
       </div>
@@ -63,6 +62,7 @@ import { mapActions, mapState } from "pinia";
 import { useInstrumentStore } from "@/stores/instrument";
 import { useSongStore, type SongField } from "@/stores/song";
 import Tuning from "@/components/tuning/index.vue";
+import { Pencil } from "lucide-vue-next";
 
 type HeaderField = SongField | "tone";
 
@@ -70,6 +70,7 @@ export default defineComponent({
   name: "TabHeader",
 
   components: {
+    Pencil,
     Tuning,
   },
 
@@ -149,42 +150,41 @@ export default defineComponent({
 
   &__title {
     display: block;
-    color: $primary;
+    color: var(--color-accent);
     font-size: 2rem;
-    font-family: "title";
+    font-weight: 700;
     cursor: text;
 
     &[placeholder]:empty:before {
       content: attr(placeholder);
-      color: $primary;
-      opacity: 0.5;
+      color: var(--color-accent);
+      opacity: 0.4;
     }
   }
 
   &__artist {
     display: block;
-    color: $tertiary;
+    color: var(--color-text);
     font-size: 1.5rem;
     cursor: text;
 
     &[placeholder]:empty:before {
       content: attr(placeholder);
-      color: $tertiary;
-      opacity: 0.5;
+      color: var(--color-text-subtle);
     }
   }
 
   &__tone {
     display: inline-block;
     width: 100px;
-    color: $primary;
-    font-family: "title";
+    color: var(--color-accent);
+    font-weight: 700;
     margin-right: 10px;
   }
 
   &__tuning {
-    color: $primary;
-    font-family: "title";
+    color: var(--color-accent);
+    font-weight: 700;
     margin-right: 10px;
   }
 }

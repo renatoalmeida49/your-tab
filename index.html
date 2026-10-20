@@ -10,6 +10,15 @@
     <meta name="keywords" content="Cifra, Tablatura, Tab">
     <link rel="icon" href="/favicon.ico">
     <title>Tab Builder | Construa cifras completas</title>
+    <script>
+      // APLICA O TEMA SALVO ANTES DO PRIMEIRO PAINT (SEM PISCAR CLARO)
+      try {
+        var theme = localStorage.getItem("theme");
+        if (theme == "light" || theme == "dark") {
+          document.documentElement.dataset.theme = theme;
+        }
+      } catch (e) {}
+    </script>
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2770198339787114"
      crossorigin="anonymous"></script>
   </head>

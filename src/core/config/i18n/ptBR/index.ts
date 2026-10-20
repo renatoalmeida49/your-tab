@@ -60,6 +60,12 @@ export const locale = {
       newSong: "Nova música",
       newSongConfirm: "Começar uma nova música? A atual será apagada.",
     },
+    theme: {
+      toggle: "Alternar tema",
+      system: "Tema do sistema",
+      light: "Tema claro",
+      dark: "Tema escuro",
+    },
     toast: {
       partRemoved: "Parte removida",
       undo: "Desfazer",

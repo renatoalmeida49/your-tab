@@ -139,3 +139,29 @@ test.describe("compatibilidade", () => {
     await context.close();
   });
 });
+
+test.describe("tema", () => {
+  test("alterna sistema -> claro -> escuro e persiste", async ({ page }) => {
+    const html = page.locator("html");
+    const toggle = page.locator(".theme-toggle");
+
+    await expect(html).not.toHaveAttribute("data-theme");
+
+    await toggle.click();
+    await expect(html).toHaveAttribute("data-theme", "light");
+
+    await toggle.click();
+    await expect(html).toHaveAttribute("data-theme", "dark");
+
+    await page.reload();
+    await expect(html).toHaveAttribute("data-theme", "dark");
+
+    const background = await page
+      .locator("body")
+      .evaluate((body) => getComputedStyle(body).backgroundColor);
+    expect(background).toBe("rgb(18, 16, 16)");
+
+    await toggle.click();
+    await expect(html).not.toHaveAttribute("data-theme");
+  });
+});

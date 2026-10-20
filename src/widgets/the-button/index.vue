@@ -29,12 +29,12 @@ export default defineComponent({
 
 <style lang="scss">
 .the-button {
-  background: $primary;
+  background: var(--color-accent);
   display: inline-flex;
   border: none;
   font: inherit;
   padding: 5px 10px;
-  color: $white;
+  color: var(--color-accent-contrast);
   font-weight: 700;
   margin: 2px 5px;
   border-radius: 16px;

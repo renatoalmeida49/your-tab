@@ -247,17 +247,20 @@ export default defineComponent({
     min-height: 30px;
     border: 1px solid transparent;
     white-space: pre-wrap;
+    font-family: var(--font-mono);
+    font-size: var(--text-mono);
+    // SEM LIGADURAS: "|-" E "--" PRECISAM APARECER COMO DIGITADOS
+    font-variant-ligatures: none;
 
     // SÓ A COR MUDA NO FOCO: UMA BORDA NOVA EMPURRARIA O TEXTO 1px
     &:focus {
       outline: none;
-      border-color: $gray;
+      border-color: var(--color-border);
     }
 
     &[placeholder]:empty:before {
       content: attr(placeholder);
-      color: $tertiary;
-      opacity: 0.5;
+      color: var(--color-text-subtle);
     }
   }
 
@@ -274,11 +277,12 @@ export default defineComponent({
   }
 
   &__option {
-    background: #cacaca;
+    background: var(--color-surface-hover);
     padding: 5px 10px;
 
     &.show {
-      background: #cf4c4c;
+      background: var(--color-accent);
+      color: var(--color-accent-contrast);
     }
   }
 }

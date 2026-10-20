@@ -5,7 +5,9 @@ import { createStores, setupStores } from "./stores";
 import i18n from "./core/plugins/i18n";
 import widgets from "./widgets";
 
-import "./assets/scss/_fonts.scss";
+import "@fontsource-variable/inter";
+import "@fontsource-variable/jetbrains-mono";
+import "./assets/scss/theme.scss";
 
 const app = createApp(App)
   .use(router)

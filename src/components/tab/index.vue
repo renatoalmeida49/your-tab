@@ -212,3 +212,20 @@ export default defineComponent({
   },
 });
 </script>
+
+<style lang="scss">
+.tab {
+  width: 100%;
+
+  &:focus {
+    outline: none;
+  }
+
+  pre {
+    font-family: var(--font-mono);
+    font-size: var(--text-mono);
+    // SEM LIGADURAS: "|-" E "--" PRECISAM APARECER COMO DIGITADOS
+    font-variant-ligatures: none;
+  }
+}
+</style>

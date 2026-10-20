@@ -63,15 +63,15 @@ export default defineComponent({
   align-items: center;
   gap: 16px;
   padding: 10px 16px;
-  background: $tertiary;
-  color: $white;
+  background: var(--color-inverse);
+  color: var(--color-inverse-text);
   border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.33);
+  box-shadow: var(--shadow-lg);
 
   &__undo {
     background: none;
     border: none;
-    color: $secondary;
+    color: var(--color-highlight);
     font: inherit;
     font-weight: 700;
     cursor: pointer;

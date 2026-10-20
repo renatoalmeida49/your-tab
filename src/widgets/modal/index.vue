@@ -39,7 +39,7 @@ export default defineComponent({
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.5);
+  background-color: var(--color-overlay);
   display: table;
   transition: opacity 0.3s ease;
 
@@ -52,11 +52,10 @@ export default defineComponent({
     max-width: 450px;
     margin: 0px auto;
     padding: 20px 30px;
-    background-color: #fff;
+    background-color: var(--color-surface);
     border-radius: 2px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.33);
+    box-shadow: var(--shadow-lg);
     transition: all 0.3s ease;
-    font-family: Helvetica, Arial, sans-serif;
   }
 
   footer {

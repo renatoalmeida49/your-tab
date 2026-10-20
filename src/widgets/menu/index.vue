@@ -12,10 +12,7 @@
         {{ $t("components.menu.newSong") }}
       </button>
       <button @click="generateReport">
-        <img
-          src="@/assets/icons/download.png"
-          :alt="$t('components.menu.downloadPdf')"
-        />
+        <Download :size="18" :aria-label="$t('components.menu.downloadPdf')" />
       </button>
     </div>
 
@@ -41,6 +38,7 @@ import { defineComponent } from "vue";
 import { mapActions } from "pinia";
 import { useSongStore } from "@/stores/song";
 import type { PartType } from "@/types/song";
+import { Download } from "lucide-vue-next";
 
 const pdfOptions = {
   margin: 0,
@@ -55,6 +53,10 @@ const pdfOptions = {
 
 export default defineComponent({
   name: "TheMenu",
+
+  components: {
+    Download,
+  },
 
   data() {
     return {
@@ -115,7 +117,6 @@ export default defineComponent({
 <style lang="scss">
 #pdf-content {
   margin: 40px;
-  font-family: monospace;
 }
 
 .menu__pdf-layout {
@@ -127,7 +128,8 @@ export default defineComponent({
 
 .menu__pdf-page {
   width: 800px;
-  background: $white;
+  background: var(--color-surface);
+  color: var(--color-text);
 }
 
 .menu__pdf-preview {
@@ -153,11 +155,11 @@ export default defineComponent({
     left: -15px;
     width: 35px;
     height: 35px;
-    background: #555;
+    background: var(--color-inverse);
     border: 0;
     box-shadow: 0px 0px 10px #00000048;
     border-radius: 50%;
-    color: $white;
+    color: var(--color-inverse-text);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -197,10 +199,10 @@ export default defineComponent({
         width: 100%;
         max-width: 150px;
         border: none;
-        background: $primary;
-        color: $secondary;
+        background: var(--color-accent);
+        color: var(--color-highlight);
         padding: 8px 20px;
-        font-family: "title";
+        font-weight: 700;
         box-shadow: 0px 1px 6px 0px rgb(0 0 0 / 50%);
 
         &:first-child {
@@ -224,10 +226,10 @@ export default defineComponent({
         width: 100%;
         max-width: 130px;
         border: none;
-        background: $secondary;
-        color: $primary;
+        background: var(--color-highlight);
+        color: var(--color-accent);
         padding: 8px 20px;
-        font-family: "title";
+        font-weight: 700;
         box-shadow: 0px 1px 6px 0px rgb(0 0 0 / 50%);
         border-radius: 0 0 20px 20px;
       }

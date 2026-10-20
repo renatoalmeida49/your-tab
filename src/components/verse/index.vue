@@ -118,8 +118,11 @@ export default defineComponent({
   // CAI EXATAMENTE SOBRE A MESMA COLUNA DA LETRA
   &__input {
     width: 100%;
-    color: $primary;
-    font-family: monospace;
+    color: var(--color-accent);
+    font-family: var(--font-mono);
+    font-size: var(--text-mono);
+    // SEM LIGADURAS: "|-" E "--" PRECISAM APARECER COMO DIGITADOS
+    font-variant-ligatures: none;
     font-weight: 700;
     padding: 3px;
     border: 1px solid transparent;
@@ -127,14 +130,13 @@ export default defineComponent({
 
     &:focus {
       outline: none;
-      border-color: $gray;
+      border-color: var(--color-border);
     }
 
     &[placeholder]:empty:before {
       content: attr(placeholder);
-      color: $tertiary;
-      opacity: 0.5;
-      font-family: monospace;
+      color: var(--color-text-subtle);
+      font-weight: 400;
     }
   }
 }
