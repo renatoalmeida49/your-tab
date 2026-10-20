@@ -18,41 +18,60 @@
       contenteditable
       :placeholder="$t('components.tabHeader.artistName')"
     ></span>
-    <div>
-      <span>{{ $t("components.tabHeader.tone") }}: </span>
-      <span
-        class="tab-header__tone"
-        ref="tone"
-        role="textbox"
-        @keydown="validate"
-        @input="saveTone"
-        contenteditable
-      ></span>
-    </div>
-    <div>
-      <div>
-        <span>{{ $t("components.tabHeader.tuning") }}: </span>
-        <span class="tab-header__tuning">
-          {{ getTuning }}
+
+    <div class="tab-header__meta">
+      <div class="chip tab-header__key">
+        <span class="chip__label">{{ $t("components.tabHeader.tone") }}</span>
+        <span
+          class="chip__value tab-header__tone"
+          ref="tone"
+          role="textbox"
+          :aria-label="$t('components.tabHeader.tone')"
+          @keydown="validate"
+          @input="saveTone"
+          contenteditable
+        ></span>
+        <span class="chip__steps" data-pdf-hide>
+          <button
+            class="chip__step tab-header__transpose-down"
+            :title="$t('components.tabHeader.transposeDown')"
+            :aria-label="$t('components.tabHeader.transposeDown')"
+            @click="transpose(-1)"
+          >
+            <Minus :size="12" />
+          </button>
+          <button
+            class="chip__step tab-header__transpose-up"
+            :title="$t('components.tabHeader.transposeUp')"
+            :aria-label="$t('components.tabHeader.transposeUp')"
+            @click="transpose(1)"
+          >
+            <Plus :size="12" />
+          </button>
         </span>
-        <TheButton id="changeTuningBtn" @click="toggleModal('showModalTuning')">
-          <img
-            src="@/assets/icons/edit.png"
-            :alt="$t('components.tabHeader.tuningButton')"
-            height="14px"
-          />
-        </TheButton>
       </div>
+
+      <button
+        id="changeTuningBtn"
+        class="chip chip--button"
+        :title="$t('components.tabHeader.tuningButton')"
+        @click="toggleModal('showModalTuning')"
+      >
+        <span class="chip__label">{{ $t("components.tabHeader.tuning") }}</span>
+        <span class="chip__value tab-header__tuning">{{ getTuning }}</span>
+        <span class="chip__hint tab-header__instrument">
+          {{ $t(`components.tuning.${instrument}`) }}
+        </span>
+        <Pencil :size="14" class="chip__icon" data-pdf-hide />
+      </button>
     </div>
 
-    <Modal v-if="showModalTuning" @close="toggleModal('showModalTuning')">
-      <div class="tab-header__modalTuning">
-        <header>
-          <h3>{{ $t("components.tabHeader.tuningButton") }}</h3>
-        </header>
-
-        <Tuning @close="toggleModal('showModalTuning')" />
-      </div>
+    <Modal
+      v-if="showModalTuning"
+      :title="$t('components.tabHeader.tuningButton')"
+      @close="toggleModal('showModalTuning')"
+    >
+      <Tuning @close="toggleModal('showModalTuning')" />
     </Modal>
   </div>
 </template>
@@ -63,6 +82,7 @@ import { mapActions, mapState } from "pinia";
 import { useInstrumentStore } from "@/stores/instrument";
 import { useSongStore, type SongField } from "@/stores/song";
 import Tuning from "@/components/tuning/index.vue";
+import { Minus, Pencil, Plus } from "lucide-vue-next";
 
 type HeaderField = SongField | "tone";
 
@@ -70,6 +90,9 @@ export default defineComponent({
   name: "TabHeader",
 
   components: {
+    Minus,
+    Pencil,
+    Plus,
     Tuning,
   },
 
@@ -102,7 +125,7 @@ export default defineComponent({
   },
 
   computed: {
-    ...mapState(useInstrumentStore, ["tuning", "tone"]),
+    ...mapState(useInstrumentStore, ["tuning", "tone", "instrument"]),
     ...mapState(useSongStore, ["title", "artist"]),
 
     getTuning() {
@@ -112,7 +135,7 @@ export default defineComponent({
 
   methods: {
     ...mapActions(useInstrumentStore, ["newTone"]),
-    ...mapActions(useSongStore, ["setSongInfo"]),
+    ...mapActions(useSongStore, ["setSongInfo", "transpose"]),
 
     syncField(ref: HeaderField, value: string) {
       const element = this.$refs[ref] as HTMLElement;
@@ -145,47 +168,115 @@ export default defineComponent({
 <style lang="scss">
 .tab-header {
   width: 100%;
-  padding: 20px 27px;
+  padding-bottom: var(--space-5);
+  margin-bottom: var(--space-4);
+  border-bottom: 1px solid var(--color-border);
+
+  [contenteditable]:focus {
+    outline: none;
+  }
 
   &__title {
     display: block;
-    color: $primary;
-    font-size: 2rem;
-    font-family: "title";
+    color: var(--color-text);
+    font-size: var(--text-2xl);
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    line-height: 1.2;
     cursor: text;
 
     &[placeholder]:empty:before {
       content: attr(placeholder);
-      color: $primary;
-      opacity: 0.5;
+      color: var(--color-text-subtle);
     }
   }
 
   &__artist {
     display: block;
-    color: $tertiary;
-    font-size: 1.5rem;
+    margin-top: var(--space-1);
+    color: var(--color-text-muted);
+    font-size: var(--text-lg);
     cursor: text;
 
     &[placeholder]:empty:before {
       content: attr(placeholder);
-      color: $tertiary;
-      opacity: 0.5;
+      color: var(--color-text-subtle);
     }
   }
 
-  &__tone {
-    display: inline-block;
-    width: 100px;
-    color: $primary;
-    font-family: "title";
-    margin-right: 10px;
+  &__meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    margin-top: var(--space-4);
+  }
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  height: 32px;
+  padding: 0 var(--space-3);
+  background: var(--color-surface-muted);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-full);
+  font-size: var(--text-sm);
+  cursor: text;
+
+  &:focus-within {
+    border-color: var(--color-accent);
   }
 
-  &__tuning {
-    color: $primary;
-    font-family: "title";
-    margin-right: 10px;
+  &--button {
+    cursor: pointer;
+
+    &:hover {
+      background: var(--color-surface-hover);
+    }
+  }
+
+  &__label {
+    color: var(--color-text-muted);
+  }
+
+  &__value {
+    min-width: 1ch;
+    color: var(--color-accent);
+    font-weight: 700;
+  }
+
+  &__hint {
+    color: var(--color-text-subtle);
+    font-size: var(--text-xs);
+  }
+
+  &__icon {
+    color: var(--color-text-muted);
+  }
+
+  &__steps {
+    display: inline-flex;
+    gap: 2px;
+    margin-right: calc(-1 * var(--space-2));
+  }
+
+  &__step {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    border: none;
+    border-radius: var(--radius-full);
+    background: none;
+    color: var(--color-text-muted);
+    cursor: pointer;
+
+    &:hover {
+      background: var(--color-surface-hover);
+      color: var(--color-text);
+    }
   }
 }
 </style>

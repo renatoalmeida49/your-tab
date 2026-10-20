@@ -3,6 +3,7 @@ import {
   test,
   expect,
   addFromMenu,
+  answerConfirm,
   placeCaret,
   tabLines,
   tuningLabel,
@@ -116,16 +117,11 @@ test.describe("tabs acompanham a afinação", () => {
     await placeCaret(page, 5, 2);
     await page.keyboard.type("3");
 
-    let asked = false;
-    page.on("dialog", (dialog) => {
-      asked = true;
-      dialog.accept();
-    });
-
     await page.locator("#changeTuningBtn").click();
     await chooseBass(page);
 
-    expect(asked).toBe(false);
+    await expect(page.locator(".modal")).toHaveCount(0);
+    await expect(page.locator(".confirm")).toHaveCount(0);
     expect((await tabLines(page))[3].startsWith("E|3")).toBe(true);
   });
 
@@ -135,9 +131,9 @@ test.describe("tabs acompanham a afinação", () => {
     await placeCaret(page, 0, 2);
     await page.keyboard.type("0");
 
-    page.once("dialog", (dialog) => dialog.dismiss());
     await page.locator("#changeTuningBtn").click();
     await chooseBass(page);
+    await answerConfirm(page, false);
 
     await expect(page.locator(".modal")).toBeVisible();
     await expect(tuningLabel(page)).toHaveText("e - B - G - D - A - E");
@@ -150,9 +146,9 @@ test.describe("tabs acompanham a afinação", () => {
     await placeCaret(page, 0, 2);
     await page.keyboard.type("0");
 
-    page.once("dialog", (dialog) => dialog.accept());
     await page.locator("#changeTuningBtn").click();
     await chooseBass(page);
+    await answerConfirm(page, true);
 
     await expect(tuningLabel(page)).toHaveText("G - D - A - E");
     expect(await tabLines(page)).toHaveLength(4);

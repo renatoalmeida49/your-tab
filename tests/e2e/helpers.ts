@@ -8,6 +8,10 @@ import {
 // FALHA O TESTE SE HOUVER ERRO NO CONSOLE OU WARNING DO VUE/VUE-I18N
 const frameworkWarning = /^\[(Vue warn|intlify)\]/;
 
+// O SCRIPT DE ANÚNCIOS (index.html) LOGA ERROS QUE NÃO SÃO DO APP E VARIAM
+// A CADA EXECUÇÃO (EX: CSP DE IFRAMES DO GOOGLE)
+const thirdParty = /googlesyndication|doubleclick|google\.com/;
+
 export const test = base.extend({
   page: async ({ page }, use) => {
     const errors: string[] = [];
@@ -18,7 +22,11 @@ export const test = base.extend({
       const isWarning =
         message.type() == "warning" && frameworkWarning.test(message.text());
 
-      if (isError || isWarning) errors.push(message.text());
+      const isThirdParty =
+        thirdParty.test(message.location().url) ||
+        thirdParty.test(message.text());
+
+      if ((isError || isWarning) && !isThirdParty) errors.push(message.text());
     });
 
     await use(page);
@@ -59,11 +67,23 @@ export function tuningLabel(page: Page): Locator {
 }
 
 export async function addFromMenu(page: Page, part: MenuPart): Promise<void> {
-  const position = { tab: 1, textField: 2, verse: 3 }[part];
+  await page.locator(`.app-bar__add-${part}`).click();
+}
 
-  await page
-    .locator(`.menu__buttons-song button:nth-child(${position})`)
-    .click();
+export async function chooseLanguage(
+  page: Page,
+  name: "English" | "Português (Brasil)"
+): Promise<void> {
+  await page.locator(".language-menu__trigger").click();
+  await page.locator(".language-menu__item", { hasText: name }).click();
+}
+
+// RESPONDE O DIÁLOGO DE CONFIRMAÇÃO DO APP (NÃO O window.confirm)
+export async function answerConfirm(page: Page, accept: boolean) {
+  const button = accept ? ".confirm__accept" : ".confirm__cancel";
+
+  await page.locator(button).click();
+  await expect(page.locator(".confirm")).toHaveCount(0);
 }
 
 export async function paste(locator: Locator, text: string): Promise<void> {

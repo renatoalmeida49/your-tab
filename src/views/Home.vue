@@ -1,5 +1,5 @@
 <template>
-  <div class="home" @click="newContent">
+  <div class="home">
     <div id="song" class="home__song">
       <TabHeader />
 
@@ -12,8 +12,8 @@
           v-for="(part, index) in song"
           :key="part.id"
           :contentIndex="index"
+          :isLast="index == song.length - 1"
           :type="part.type"
-          :showCloseButton="checkPart(part)"
         >
           <component
             :is="componentFor(part.type)"
@@ -26,6 +26,11 @@
           ></component>
         </SongContent>
       </VueDraggable>
+
+      <EmptyState v-if="!song.length" @add="addContent" />
+
+      <!-- CLICAR ABAIXO DA ÚLTIMA PARTE CRIA UM CAMPO DE TEXTO -->
+      <div v-else class="home__tail" @click="newContent"></div>
     </div>
   </div>
 </template>
@@ -34,13 +39,14 @@
 import { defineComponent, markRaw } from "vue";
 import { mapActions, mapState } from "pinia";
 import { useSongStore } from "@/stores/song";
-import type { Part, PartType } from "@/types/song";
+import type { PartType } from "@/types/song";
 import type {
   FocusablePart,
   MoveCursorPayload,
   NewTextFieldPayload,
 } from "@/types/editor";
 import { VueDraggable } from "vue-draggable-plus";
+import EmptyState from "@/components/empty-state/index.vue";
 import TabHeader from "@/components/tab-header/index.vue";
 import Tab from "@/components/tab/index.vue";
 import Verse from "@/components/verse/index.vue";
@@ -57,6 +63,7 @@ export default defineComponent({
   name: "Home",
 
   components: {
+    EmptyState,
     VueDraggable,
     TabHeader,
   },
@@ -91,12 +98,6 @@ export default defineComponent({
       };
     },
 
-    checkPart(part: Part) {
-      if (part.type == "textField") return false;
-
-      return true;
-    },
-
     // SETAS PASSAM POR TODAS AS PARTES (TEXTO, VERSO E TAB), MANTENDO A COLUNA
     moveCursor(payload: MoveCursorPayload) {
       const step = payload.direction == "up" ? -1 : 1;
@@ -117,18 +118,16 @@ export default defineComponent({
       });
     },
 
-    newContent(event: MouseEvent) {
-      if (event.target === event.currentTarget) {
-        const lastIndex = this.song.length - 1;
-        const last = this.song[lastIndex];
+    newContent() {
+      const lastIndex = this.song.length - 1;
+      const last = this.song[lastIndex];
 
-        if (last && last.type == "textField" && last.info.text == "") {
-          this.removeContent(lastIndex);
-          return;
-        }
-
-        this.addContent("textField");
+      if (last && last.type == "textField" && last.info.text == "") {
+        this.removeContent(lastIndex);
+        return;
       }
+
+      this.addContent("textField");
     },
   },
 });
@@ -136,12 +135,34 @@ export default defineComponent({
 
 <style lang="scss">
 .home {
-  min-height: calc(100vh - 167px);
-  padding: 0 60px;
-  position: relative;
+  // A FOLHA: MESMA LARGURA E MARGENS DA PÁGINA DO PDF
+  &__song {
+    --gutter: 56px;
 
-  @include tablet {
-    padding: 0;
+    display: flex;
+    flex-direction: column;
+    max-width: 800px;
+    min-height: 1131px; // PROPORÇÃO A4
+    margin: 0 auto;
+    padding: var(--space-7) 64px;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    box-shadow: var(--shadow-md);
+
+    @include tablet {
+      --gutter: 32px;
+
+      min-height: 0;
+      padding: var(--space-5) var(--space-3) var(--space-5) 36px;
+    }
+  }
+
+  // OCUPA O RESTO DA FOLHA
+  &__tail {
+    flex: 1;
+    min-height: 120px;
+    cursor: text;
   }
 }
 </style>

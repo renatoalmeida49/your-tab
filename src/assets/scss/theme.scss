@@ -1,0 +1,216 @@
+// DESIGN TOKENS E ESTILOS BASE. GERA CSS: IMPORTADO UMA VEZ SÓ, NO main.ts
+// (O index.scss, INJETADO EM CADA COMPONENTE, SÓ TEM VARIÁVEIS E MIXINS)
+
+@mixin light-tokens {
+  color-scheme: light;
+
+  --color-bg: #f5f2ee;
+  --color-surface: #ffffff;
+  --color-surface-muted: #faf8f5;
+  --color-surface-hover: #f1ede8;
+  --color-border: #e8e2da;
+  --color-border-strong: #d6cdc2;
+
+  --color-text: #231a16;
+  --color-text-muted: #6b5f57;
+  --color-text-subtle: #a1958c;
+
+  --color-accent: #941b0c;
+  --color-accent-hover: #7a1509;
+  --color-accent-contrast: #ffffff;
+  --color-accent-soft: #f8e8e5;
+
+  --color-highlight: #f6aa1c;
+  --color-highlight-soft: #fdf2dc;
+  --color-highlight-text: #7a4a00;
+
+  --color-danger: #c0362c;
+  --color-inverse: #2a211d;
+  --color-inverse-text: #f6f1ec;
+  --color-overlay: rgb(35 26 22 / 45%);
+
+  --shadow-sm: 0 1px 2px rgb(35 26 22 / 8%);
+  --shadow-md: 0 4px 12px rgb(35 26 22 / 10%), 0 1px 3px rgb(35 26 22 / 8%);
+  --shadow-lg: 0 16px 40px rgb(35 26 22 / 16%), 0 2px 8px rgb(35 26 22 / 8%);
+}
+
+@mixin dark-tokens {
+  color-scheme: dark;
+
+  --color-bg: #121010;
+  --color-surface: #1c1917;
+  --color-surface-muted: #221e1b;
+  --color-surface-hover: #2a2522;
+  --color-border: #332c28;
+  --color-border-strong: #463d37;
+
+  --color-text: #f2ece7;
+  --color-text-muted: #b5a99f;
+  --color-text-subtle: #7f736b;
+
+  --color-accent: #ea6a55;
+  --color-accent-hover: #f08471;
+  --color-accent-contrast: #1c0b07;
+  --color-accent-soft: #3a1f1a;
+
+  --color-highlight: #f6b84a;
+  --color-highlight-soft: #3a2c13;
+  --color-highlight-text: #f7c873;
+
+  --color-danger: #f07167;
+  --color-inverse: #f2ece7;
+  --color-inverse-text: #1c1917;
+  --color-overlay: rgb(0 0 0 / 60%);
+
+  --shadow-sm: 0 1px 2px rgb(0 0 0 / 40%);
+  --shadow-md: 0 4px 12px rgb(0 0 0 / 45%);
+  --shadow-lg: 0 16px 40px rgb(0 0 0 / 55%);
+}
+
+:root {
+  --font-ui: "Inter Variable", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono:
+    "JetBrains Mono Variable", ui-monospace, "SFMono-Regular", Menlo, monospace;
+
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-md: 1rem;
+  --text-lg: 1.25rem;
+  --text-xl: 1.5rem;
+  --text-2xl: 2rem;
+  // TAB, VERSO E TEXTO: MESMO TAMANHO PARA AS COLUNAS BATEREM
+  --text-mono: 0.875rem;
+
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 48px;
+  --space-8: 64px;
+
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --radius-full: 999px;
+
+  --duration-fast: 120ms;
+  --duration-normal: 200ms;
+
+  @include light-tokens;
+}
+
+// TEMA DO SISTEMA, A MENOS QUE O USUÁRIO TENHA ESCOLHIDO UM (data-theme)
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    @include dark-tokens;
+  }
+}
+
+// TAMBÉM VALE PARA UM TRECHO: O PDF FORÇA O CLARO, O MODO PALCO O ESCURO
+[data-theme="dark"] {
+  @include dark-tokens;
+}
+
+[data-theme="light"] {
+  @include light-tokens;
+}
+
+*,
+*::before,
+*::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-ui);
+  font-size: var(--text-md);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+  color: inherit;
+}
+
+a {
+  color: var(--color-accent);
+}
+
+::selection {
+  background: var(--color-highlight-soft);
+  color: var(--color-text);
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+// MENUS FLUTUANTES (reka-ui): IDIOMA, AÇÕES DA PARTE, ETC.
+.dropdown {
+  z-index: 1000;
+  min-width: 200px;
+  padding: var(--space-1);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lg);
+  animation: dropdown-in var(--duration-fast) ease-out;
+
+  &__item {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    height: 34px;
+    padding: 0 var(--space-6) 0 var(--space-2);
+    border-radius: var(--radius-sm);
+    font-size: var(--text-sm);
+    cursor: pointer;
+    user-select: none;
+    outline: none;
+
+    &[data-highlighted] {
+      background: var(--color-surface-hover);
+    }
+
+    &[data-disabled] {
+      opacity: 0.4;
+      cursor: default;
+    }
+
+    &--danger {
+      color: var(--color-danger);
+    }
+  }
+
+  &__indicator {
+    position: absolute;
+    right: var(--space-2);
+    display: inline-flex;
+    color: var(--color-accent);
+  }
+
+  &__separator {
+    height: 1px;
+    margin: var(--space-1) 0;
+    background: var(--color-border);
+  }
+}
+
+@keyframes dropdown-in {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+}

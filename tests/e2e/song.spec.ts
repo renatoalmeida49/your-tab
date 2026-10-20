@@ -2,6 +2,8 @@ import {
   test,
   expect,
   addFromMenu,
+  answerConfirm,
+  chooseLanguage,
   partSelect,
   paste,
   songParts,
@@ -117,9 +119,9 @@ test.describe("idioma", () => {
     await addFromMenu(page, "textField");
     await page.keyboard.type("minha letra");
 
-    await page.locator('.links img[alt="English"]').click();
+    await chooseLanguage(page, "English");
 
-    await expect(page.locator("#app .container > p")).toHaveText(
+    await expect(page.locator(".app-bar__tagline")).toHaveText(
       "A chord sheet, tablature and annotation builder."
     );
     expect(await songParts(page)).toEqual(["text:minha letra"]);
@@ -128,7 +130,7 @@ test.describe("idioma", () => {
 
 test.describe("idioma inglês", () => {
   test.beforeEach(async ({ page }) => {
-    await page.locator('.links img[alt="English"]').click();
+    await chooseLanguage(page, "English");
   });
 
   test("traduz o modal de afinação e o atributo lang", async ({ page }) => {
@@ -153,7 +155,7 @@ test.describe("idioma inglês", () => {
     await page.reload();
 
     await expect(page.locator("html")).toHaveAttribute("lang", "en-US");
-    await expect(page.locator(".menu__new-song")).toHaveText("New song");
+    await expect(page.locator(".app-bar__new-song")).toHaveText("New song");
   });
 });
 
@@ -220,8 +222,8 @@ test.describe("nova música", () => {
   test("confirmar apaga a música e o cabeçalho, mantendo a afinação", async ({
     page,
   }) => {
-    page.once("dialog", (dialog) => dialog.accept());
-    await page.locator(".menu__new-song").click();
+    await page.locator(".app-bar__new-song").click();
+    await answerConfirm(page, true);
 
     expect(await songParts(page)).toEqual([]);
     await expect(page.locator(".tab-header__title")).toHaveText("");
@@ -237,8 +239,8 @@ test.describe("nova música", () => {
   });
 
   test("cancelar mantém tudo", async ({ page }) => {
-    page.once("dialog", (dialog) => dialog.dismiss());
-    await page.locator(".menu__new-song").click();
+    await page.locator(".app-bar__new-song").click();
+    await answerConfirm(page, false);
 
     expect(await songParts(page)).toEqual(["text:letra antiga", "tab"]);
     await expect(page.locator(".tab-header__title")).toHaveText("Antiga");

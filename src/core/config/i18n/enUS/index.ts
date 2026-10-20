@@ -4,9 +4,9 @@ export const locale: MessageSchema = {
   common: {
     confirm: "Confirm",
     cancel: "Cancel",
+    close: "Close",
   },
   subtitle: "A chord sheet, tablature and annotation builder.",
-  help: "Read more",
   details: [
     {
       title: "Made for beginners and advanced",
@@ -39,16 +39,25 @@ export const locale: MessageSchema = {
   ],
   components: {
     tabHeader: {
-      songName: "(Name)",
-      artistName: "(Artist)",
+      songName: "Song title",
+      artistName: "Artist",
       tone: "Key",
       tuning: "Tuning",
+      transposeDown: "Transpose down a half step",
+      transposeUp: "Transpose up a half step",
       tuningButton: "Change Tuning",
     },
     textField: {
       placeholder: "Press '/' to insert a tab or verse",
-      selectTab: "Tab",
-      selectVerse: "Verse",
+      insert: "Insert",
+    },
+    songContent: {
+      insertBelow: "Insert below",
+      actions: "Drag to move or click for more actions",
+      duplicate: "Duplicate",
+      moveUp: "Move up",
+      moveDown: "Move down",
+      remove: "Remove",
     },
     verse: {
       placeholder: "Enter the chords here. Press 'enter' for new text field",
@@ -57,9 +66,84 @@ export const locale: MessageSchema = {
       tab: "Tab",
       text: "Text",
       verse: "Verse",
-      downloadPdf: "Download PDF",
+      downloadPdf: "Export PDF",
       newSong: "New song",
       newSongConfirm: "Start a new song? The current one will be erased.",
+      newSongConfirmAction: "Erase and start",
+      add: "Add part",
+      undo: "Undo (Ctrl+Z)",
+      redo: "Redo (Ctrl+Shift+Z)",
+      help: "Help and shortcuts (?)",
+      language: "Language",
+      stage: "Stage mode",
+      palette: "Commands (Ctrl+K)",
+    },
+    palette: {
+      title: "Command palette",
+      placeholder: "Type a command…",
+      empty: "No commands found",
+      add: "Add",
+      undo: "Undo",
+      redo: "Redo",
+    },
+    stage: {
+      title: "Stage mode",
+      untitled: "Untitled",
+      empty: "The song is still empty.",
+      controls: "Stage mode controls",
+      back: "Back to editor",
+      smaller: "Smaller text (-)",
+      bigger: "Bigger text (+)",
+      slower: "Scroll slower",
+      faster: "Scroll faster",
+      play: "Auto-scroll (Space)",
+      pause: "Pause scrolling (Space)",
+    },
+    export: {
+      title: "Export PDF",
+      preview: "PDF preview",
+      generating: "Generating the PDF…",
+      error: "Could not generate the PDF. Please try again.",
+      fileName: "File name",
+      download: "Download PDF",
+    },
+    confirm: {
+      title: "Are you sure?",
+    },
+    help: {
+      title: "Help and shortcuts",
+      shortcutsTitle: "Shortcuts",
+      shortcuts: [
+        {
+          keys: "/",
+          description:
+            "In a text field, opens the picker to insert a tab or verse",
+        },
+        { keys: "Enter", description: "Creates a text field below" },
+        {
+          keys: "↑+↓",
+          description: "Moves the cursor between parts, keeping the column",
+        },
+        { keys: "Ctrl+Z", description: "Undoes the last change" },
+        { keys: "Ctrl+Shift+Z", description: "Redoes the undone change" },
+        { keys: "Ctrl+K", description: "Opens the command palette" },
+        { keys: "?", description: "Opens this help" },
+      ],
+    },
+    emptyState: {
+      title: "Start your song",
+      description:
+        "Fill in the title and artist above and pick the first part.",
+      textHint: "Lyrics, sections and notes",
+      verseHint: "Chords aligned with the lyrics",
+      tabHint: "Tablature on the instrument strings",
+      tip: "in a text field inserts a tab or verse without leaving the keyboard",
+    },
+    theme: {
+      toggle: "Toggle theme",
+      system: "System theme",
+      light: "Light theme",
+      dark: "Dark theme",
     },
     toast: {
       partRemoved: "Part removed",
@@ -70,6 +154,8 @@ export const locale: MessageSchema = {
       bass: "Bass",
       ukulele: "Ukulele",
       quickTuning: "Quick tuning",
+      strings: "Strings (highest to lowest)",
+      loseNotesConfirmAction: "Change tuning",
       loseNotesConfirm:
         "Some tabs have notes on strings that don't exist in the new tuning. Those notes will be erased. Continue?",
       presets: {
