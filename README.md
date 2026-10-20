@@ -47,10 +47,29 @@ Encontrei um site que oferecia justamente isso: criação de tab de forma simple
   
 ### Prints  
   
-![](./src/assets/screenshots/lanterna-dos-afogados.jpeg)  
-![](./src/assets/screenshots/lanterna-dos-afogados-pdf.jpeg)  
-![](./src/assets/screenshots/zombie.jpeg)  
-![](./src/assets/screenshots/zombie-pdf.jpeg)  
+Editor, com os botões de um bloco (`+` para inserir, `⋮⋮` para arrastar ou abrir as ações):
+
+![Editor no tema claro](./src/assets/screenshots/editor.jpeg)
+
+Tema escuro, tab de baixo e o seletor aberto com `/`:
+
+![Editor no tema escuro com o seletor de partes](./src/assets/screenshots/editor-escuro.jpeg)
+
+PDF gerado, igual à folha do editor:
+
+![PDF exportado](./src/assets/screenshots/pdf.jpeg)
+
+Modo palco, com transposição, tamanho da letra e rolagem automática:
+
+![Modo palco](./src/assets/screenshots/modo-palco.jpeg)
+
+Paleta de comandos (`Ctrl+K`):
+
+![Paleta de comandos](./src/assets/screenshots/paleta.jpeg)
+
+No celular:
+
+<img src="./src/assets/screenshots/celular.jpeg" alt="Editor no celular" width="300">
     
 ### Links
  
