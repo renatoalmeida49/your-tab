@@ -1,8 +1,8 @@
-const { defineConfig, devices } = require("@playwright/test");
+import { defineConfig, devices } from "@playwright/test";
 
 const PORT = 8099;
 
-module.exports = defineConfig({
+export default defineConfig({
   testDir: "./tests/e2e",
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
