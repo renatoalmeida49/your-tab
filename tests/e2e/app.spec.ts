@@ -28,7 +28,11 @@ test.describe("página", () => {
     await expect(flags).toHaveCount(2);
 
     for (const flag of await flags.all()) {
-      expect(await flag.evaluate((img) => img.naturalWidth)).toBeGreaterThan(0);
+      const width = await flag.evaluate(
+        (img) => (img as HTMLImageElement).naturalWidth
+      );
+
+      expect(width).toBeGreaterThan(0);
     }
   });
 });
@@ -70,7 +74,8 @@ test.describe("PDF", () => {
     await expect(preview).toHaveAttribute("src", /^blob:/, { timeout: 15000 });
 
     const pdf = await preview.evaluate(async (iframe) => {
-      const blob = await (await fetch(iframe.src)).blob();
+      const src = (iframe as HTMLIFrameElement).src;
+      const blob = await (await fetch(src)).blob();
       const header = await blob.slice(0, 5).text();
 
       return { type: blob.type, header, size: blob.size };

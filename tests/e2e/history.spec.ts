@@ -1,3 +1,4 @@
+import type { Page } from "@playwright/test";
 import {
   test,
   expect,
@@ -17,7 +18,7 @@ test.beforeEach(async ({ page }) => {
   await page.goto("/");
 });
 
-async function removeFirstPart(page) {
+async function removeFirstPart(page: Page) {
   const part = page.locator("#song .song-content").first();
 
   await part.hover();

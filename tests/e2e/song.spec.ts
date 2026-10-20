@@ -182,7 +182,8 @@ test.describe("persistência", () => {
 
     const tab = page.locator(".tab");
     await tab.evaluate((element) => {
-      element.querySelector("pre").innerText = "B|--3--\nE|-----";
+      (element.querySelector("pre") as HTMLPreElement).innerText =
+        "B|--3--\nE|-----";
     });
     await tab.focus();
     await tab.blur();

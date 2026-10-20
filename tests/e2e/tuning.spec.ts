@@ -1,3 +1,4 @@
+import type { Page } from "@playwright/test";
 import {
   test,
   expect,
@@ -12,15 +13,17 @@ test.beforeEach(async ({ page }) => {
   await page.locator("#changeTuningBtn").click();
 });
 
-function openInstrument(page, name) {
+type Form = "guitar" | "bass" | "ukulele";
+
+function openInstrument(page: Page, name: string) {
   return page.locator(".tuning__menu li", { hasText: name }).click();
 }
 
-function presets(page, form) {
+function presets(page: Page, form: Form) {
   return page.locator(`.${form} .the-button:not([type=submit])`);
 }
 
-function confirm(page, form) {
+function confirm(page: Page, form: Form) {
   return page.locator(`.${form} button[type=submit]`).click();
 }
 
@@ -83,7 +86,7 @@ test("nova tab usa a afinação atual e ela persiste", async ({ page }) => {
 });
 
 test.describe("tabs acompanham a afinação", () => {
-  async function chooseBass(page) {
+  async function chooseBass(page: Page) {
     await openInstrument(page, "Baixo");
     await confirm(page, "bass");
   }

@@ -1,12 +1,16 @@
-import { test as base, expect } from "@playwright/test";
+import {
+  test as base,
+  expect,
+  type Locator,
+  type Page,
+} from "@playwright/test";
 
-// FALHA O TESTE SE HOUVER ERRO NO CONSOLE OU WARNING DO VUE/VUE-I18N,
-// INCLUINDO MUTAÇÕES FORA DE MUTATION (STORE EM STRICT MODE NO DEV)
+// FALHA O TESTE SE HOUVER ERRO NO CONSOLE OU WARNING DO VUE/VUE-I18N
 const frameworkWarning = /^\[(Vue warn|intlify)\]/;
 
 export const test = base.extend({
   page: async ({ page }, use) => {
-    const errors = [];
+    const errors: string[] = [];
 
     page.on("pageerror", (error) => errors.push(error.message));
     page.on("console", (message) => {
@@ -25,11 +29,13 @@ export const test = base.extend({
 
 export { expect };
 
+export type MenuPart = "tab" | "textField" | "verse";
+
 // RESUMO DA MÚSICA NA TELA: "text:<conteúdo>", "tab" OU "verse"
-export function songParts(page) {
+export function songParts(page: Page): Promise<string[]> {
   return page.locator("#song .song-content").evaluateAll((parts) =>
     parts.map((part) => {
-      const textField = part.querySelector(".text-field__input");
+      const textField = part.querySelector<HTMLElement>(".text-field__input");
 
       if (textField) return `text:${textField.innerText}`;
       if (part.querySelector(".tab")) return "tab";
@@ -40,19 +46,19 @@ export function songParts(page) {
   );
 }
 
-export function textFields(page) {
+export function textFields(page: Page): Locator {
   return page.locator(".text-field__input");
 }
 
-export function partSelect(page) {
+export function partSelect(page: Page): Locator {
   return page.locator(".text-field__select.show");
 }
 
-export function tuningLabel(page) {
+export function tuningLabel(page: Page): Locator {
   return page.locator(".tab-header__tuning");
 }
 
-export async function addFromMenu(page, part) {
+export async function addFromMenu(page: Page, part: MenuPart): Promise<void> {
   const position = { tab: 1, textField: 2, verse: 3 }[part];
 
   await page
@@ -60,7 +66,7 @@ export async function addFromMenu(page, part) {
     .click();
 }
 
-export async function paste(locator, text) {
+export async function paste(locator: Locator, text: string): Promise<void> {
   await locator.evaluate((element, content) => {
     const data = new DataTransfer();
     data.setData("text", content);
@@ -75,33 +81,40 @@ export async function paste(locator, text) {
   }, text);
 }
 
-export function tabLines(page, index = 0) {
+export function tabLines(page: Page, index = 0): Promise<string[]> {
   return page
     .locator(".tab pre")
     .nth(index)
-    .evaluate((pre) => pre.innerText.split("\n"));
+    .evaluate((pre) => (pre as HTMLElement).innerText.split("\n"));
 }
 
 // POSICIONA O CURSOR NA CORDA `line`, COLUNA `column` DA TAB
-export async function placeCaret(page, line, column, index = 0) {
+export async function placeCaret(
+  page: Page,
+  line: number,
+  column: number,
+  index = 0
+): Promise<void> {
   await page
     .locator(".tab")
     .nth(index)
     .evaluate(
       (tab, [line, column]) => {
-        const pre = tab.querySelector("pre");
-        const rows = pre.textContent.split("\n");
+        const pre = tab.querySelector("pre") as HTMLPreElement;
+        const text = pre.firstChild as Text;
+        const rows = (pre.textContent ?? "").split("\n");
         const offset =
           rows
             .slice(0, line)
             .reduce((total, row) => total + row.length + 1, 0) + column;
         const range = document.createRange();
+        const selection = window.getSelection() as Selection;
 
-        tab.focus();
-        range.setStart(pre.firstChild, offset);
+        (tab as HTMLElement).focus();
+        range.setStart(text, offset);
         range.collapse(true);
-        window.getSelection().removeAllRanges();
-        window.getSelection().addRange(range);
+        selection.removeAllRanges();
+        selection.addRange(range);
       },
       [line, column]
     );

@@ -1,3 +1,4 @@
+import type { Page } from "@playwright/test";
 import {
   test,
   expect,
@@ -13,10 +14,10 @@ test.beforeEach(async ({ page }) => {
 });
 
 // LINHA E COLUNA DO CURSOR DENTRO DA TAB FOCADA
-function caretInTab(page) {
+function caretInTab(page: Page) {
   return page.evaluate(() => {
-    const pre = document.activeElement.querySelector("pre");
-    const range = window.getSelection().getRangeAt(0);
+    const pre = document.activeElement?.querySelector("pre") as HTMLPreElement;
+    const range = (window.getSelection() as Selection).getRangeAt(0);
     const before = document.createRange();
 
     before.selectNodeContents(pre);
@@ -150,16 +151,17 @@ test.describe("verso: acordes alinhados com a letra", () => {
       await page.locator(focus).click();
 
       const [chordX, lyricX] = await page.evaluate(() => {
-        const xOf = (element, column) => {
+        const xOf = (element: Element, column: number) => {
           const range = document.createRange();
-          range.setStart(element.firstChild, column);
-          range.setEnd(element.firstChild, column + 1);
+          const text = element.firstChild as Text;
+          range.setStart(text, column);
+          range.setEnd(text, column + 1);
           return range.getBoundingClientRect().left;
         };
 
         return [
-          xOf(document.querySelector(".verse__input"), 8),
-          xOf(document.querySelector(".text-field__input"), 8),
+          xOf(document.querySelector(".verse__input") as Element, 8),
+          xOf(document.querySelector(".text-field__input") as Element, 8),
         ];
       });
 
