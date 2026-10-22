@@ -1,0 +1,90 @@
+name: Deploy (production)
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch: {}
+
+concurrency:
+  group: your-tab-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  # 1) Valida backend e frontend (roda em PR e em push)
+  backend:
+    name: API (typecheck + testes)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: backend/.nvmrc
+          cache: yarn
+          cache-dependency-path: backend/yarn.lock
+      - run: yarn install --frozen-lockfile
+      - run: yarn typecheck
+      - run: yarn test
+
+  frontend:
+    name: Editor (testes + build)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: frontend/.nvmrc
+          cache: yarn
+          cache-dependency-path: frontend/yarn.lock
+      - run: yarn install --frozen-lockfile
+      - run: yarn test:unit
+      - run: yarn build
+
+  # 2) Só na main: entra na VPS e roda o scripts/deploy.sh (git pull + compose up)
+  deploy:
+    name: Pull + redeploy na VPS
+    needs: [backend, frontend]
+    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    concurrency:
+      group: your-tab-deploy
+      cancel-in-progress: false
+    steps:
+      - name: Conferir secrets
+        env:
+          VPS_HOST_C: ${{ secrets.VPS_HOST }}
+          VPS_USER_C: ${{ secrets.VPS_USER }}
+          VPS_SSH_KEY_C: ${{ secrets.VPS_SSH_KEY }}
+        run: |
+          missing=""
+          [ -z "$VPS_HOST_C" ] && missing="$missing VPS_HOST"
+          [ -z "$VPS_USER_C" ] && missing="$missing VPS_USER"
+          [ -z "$VPS_SSH_KEY_C" ] && missing="$missing VPS_SSH_KEY"
+          if [ -n "$missing" ]; then
+            echo "::error::Secrets ausentes:$missing. Configure em Settings → Secrets and variables → Actions."
+            exit 1
+          fi
+
+      - name: Deploy por SSH
+        env:
+          SSH_KEY: ${{ secrets.VPS_SSH_KEY }}
+          VPS_HOST: ${{ secrets.VPS_HOST }}
+          VPS_USER: ${{ secrets.VPS_USER }}
+          VPS_PORT: ${{ secrets.VPS_PORT || '22' }}
+          VPS_APP_DIR: ${{ secrets.VPS_APP_DIR || '/opt/your-tab' }}
+        run: |
+          set -euo pipefail
+          mkdir -p ~/.ssh
+          printf '%s\n' "$SSH_KEY" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          ssh -o StrictHostKeyChecking=accept-new -i ~/.ssh/deploy_key -p "$VPS_PORT" \
+            "$VPS_USER@$VPS_HOST" "cd '$VPS_APP_DIR' && ./scripts/deploy.sh"

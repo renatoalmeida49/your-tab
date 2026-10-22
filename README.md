@@ -101,7 +101,8 @@ No celular:
   - MongoDB (driver oficial) e validação com Zod
   - Login com Google (ID token validado no servidor) e sessão em cookie `httpOnly`
 - Infraestrutura:
-  - Docker e Docker Compose (MongoDB e API)
+  - Docker e Docker Compose (MongoDB, API e Nginx)
+  - VPS com Caddy compartilhado (HTTPS automático) e deploy pelo GitHub Actions
 - Testes:
   - Vitest (núcleo do editor; API inteira com MongoDB em memória)
   - Playwright (E2E com uma API falsa, sem depender do backend)
@@ -112,7 +113,9 @@ A arquitetura, o modelo de dados, os endpoints e as regras de acesso estão no [
 your-tab/
 ├── frontend/            o editor (Vue 3 + Vite)
 ├── backend/             a API (Fastify + MongoDB)
-├── docker-compose.yml   MongoDB + API
+├── docker-compose.yml   produção: MongoDB + API + Nginx
+├── scripts/deploy.sh    atualiza a VPS
+├── DEPLOY.md            como publicar na VPS
 └── SDD.md               documento de design
 ```
 
@@ -181,7 +184,7 @@ yarn start     // roda o build (produção)
 yarn typecheck // checagem de tipos
 ```
 
-Com Docker, o `docker-compose.yml` na raiz sobe o MongoDB e a API juntos (`docker compose up -d`), usando o mesmo `backend/.env`.
+O `docker-compose.yml` da raiz é o de produção (VPS, atrás do Caddy compartilhado); para publicar, veja o [DEPLOY.md](./DEPLOY.md).
 
 ### Frontend
 
