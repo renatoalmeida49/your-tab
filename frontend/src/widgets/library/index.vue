@@ -33,15 +33,41 @@
 
       <template v-else>
         <TabsContent value="ciphers" class="library__panel">
-          <label v-if="ciphers.length" class="library__search">
-            <SearchIcon :size="16" />
-            <input
-              v-model="query"
-              type="search"
-              :placeholder="$t('components.library.search')"
-              :aria-label="$t('components.library.search')"
-            />
-          </label>
+          <div class="library__toolbar">
+            <label v-if="ciphers.length" class="library__search">
+              <SearchIcon :size="16" />
+              <input
+                v-model="query"
+                type="search"
+                :placeholder="$t('components.library.search')"
+                :aria-label="$t('components.library.search')"
+              />
+            </label>
+
+            <TheButton
+              size="sm"
+              variant="secondary"
+              class="library__import"
+              :disabled="transferring"
+              :title="$t('components.songFile.importHint')"
+              @click="importFiles"
+            >
+              <Upload :size="16" />
+              {{ $t("components.songFile.import") }}
+            </TheButton>
+            <TheButton
+              v-if="ciphers.length"
+              size="sm"
+              variant="secondary"
+              class="library__export"
+              :disabled="transferring"
+              :title="$t('components.songFile.exportAllHint')"
+              @click="exportAll"
+            >
+              <Download :size="16" />
+              {{ $t("components.songFile.exportAll") }}
+            </TheButton>
+          </div>
 
           <p v-if="!ciphers.length" class="library__status">
             {{ $t("components.library.empty") }}
@@ -282,6 +308,7 @@ import {
 import {
   ChevronDown,
   ChevronUp,
+  Download,
   ListMusic,
   ListPlus,
   Music,
@@ -289,8 +316,11 @@ import {
   Plus,
   Search,
   Trash2,
+  Upload,
   X,
 } from "lucide-vue-next";
+import { pickFiles } from "@/core/files";
+import { readSongFiles, SONG_FILE_ACCEPT } from "@/stores/commands";
 import { useLibraryStore } from "@/stores/library";
 import { useUiStore } from "@/stores/ui";
 import type { CipherSummary, Playlist } from "@/types/library";
@@ -309,6 +339,7 @@ export default defineComponent({
   components: {
     ChevronDown,
     ChevronUp,
+    Download,
     DropdownMenuContent,
     DropdownMenuItem,
     DropdownMenuLabel,
@@ -326,6 +357,7 @@ export default defineComponent({
     TabsRoot,
     TabsTrigger,
     Trash2,
+    Upload,
     X,
   },
 
@@ -347,6 +379,7 @@ export default defineComponent({
       "cipherId",
       "loading",
       "loadFailed",
+      "transferring",
     ]),
 
     filtered(): CipherSummary[] {
@@ -382,7 +415,20 @@ export default defineComponent({
       "removeFromPlaylist",
       "moveInPlaylist",
       "deletePlaylist",
+      "exportAll",
+      "importSongs",
     ]),
+
+    // UM OU MAIS ARQUIVOS .json; TODAS AS MÚSICAS DELES ENTRAM NO ACERVO
+    async importFiles() {
+      const files = await pickFiles({
+        accept: SONG_FILE_ACCEPT,
+        multiple: true,
+      });
+      const songs = files.length ? await readSongFiles(files) : null;
+
+      if (songs) await this.importSongs(songs);
+    },
 
     cipherById(id: string): CipherSummary | undefined {
       return this.ciphers.find((cipher) => cipher.id == id);
@@ -533,7 +579,20 @@ export default defineComponent({
     }
   }
 
+  &__toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: var(--space-2);
+
+    @include tablet {
+      flex-wrap: wrap;
+    }
+  }
+
   &__search {
+    flex: 1;
+    min-width: 200px;
     display: flex;
     align-items: center;
     gap: var(--space-2);

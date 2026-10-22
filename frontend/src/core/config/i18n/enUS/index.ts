@@ -73,7 +73,7 @@ export const locale: MessageSchema = {
       tab: "Tab",
       text: "Text",
       verse: "Verse",
-      downloadPdf: "Export PDF",
+      export: "Export",
       newSong: "New song",
       newSongConfirm: "Start a new song? The current one will be erased.",
       newSongConfirmAction: "Erase and start",
@@ -151,6 +151,29 @@ export const locale: MessageSchema = {
         generic: "Something went wrong. Please try again.",
       },
     },
+    songFile: {
+      downloadFile: "Download song file (.json)",
+      downloadHint:
+        "To open it on another computer or import it into another account's library.",
+      openFile: "Open song file (.json)",
+      openConfirm:
+        "Open the file? Unsaved changes to the current song will be lost.",
+      openConfirmAction: "Open anyway",
+      opened: "Song opened from file",
+      openedFirst:
+        "The file has {count} songs: the first one was opened. To bring them all, use “Import” in the library",
+      import: "Import",
+      importHint: "Adds the songs from .json files to the library",
+      imported: "Songs imported into the library: {count}",
+      exportAll: "Export all",
+      exportAllHint: "Downloads every song in the library as a .json file",
+      errors: {
+        invalid: "Invalid file: it isn't a Tab Builder song file",
+        newer:
+          "File made by a newer version of Tab Builder. Reload the page and try again",
+        empty: "The file has no songs",
+      },
+    },
     palette: {
       title: "Command palette",
       placeholder: "Type a command…",
@@ -159,6 +182,7 @@ export const locale: MessageSchema = {
       undo: "Undo",
       redo: "Redo",
       save: "Save to library",
+      export: "Export song (PDF or .json)",
       library: "Open my library",
       login: "Sign in with Google",
       logout: "Sign out",
@@ -177,7 +201,7 @@ export const locale: MessageSchema = {
       pause: "Pause scrolling (Space)",
     },
     export: {
-      title: "Export PDF",
+      title: "Export song",
       preview: "PDF preview",
       generating: "Generating the PDF…",
       error: "Could not generate the PDF. Please try again.",
@@ -252,6 +276,8 @@ export const locale: MessageSchema = {
       verseHint: "Chords aligned with the lyrics",
       tabHint: "Tablature on the instrument strings",
       pasteTip: "pastes a song copied from another site, with tabs and chords",
+      openFile: "Open song file (.json)",
+      openFileHint: "A song exported by Tab Builder itself",
       tip: "in a text field inserts a tab or verse without leaving the keyboard",
     },
     theme: {

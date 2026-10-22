@@ -19,6 +19,15 @@
       </button>
     </div>
 
+    <!-- MÚSICA EXPORTADA PELO PRÓPRIO TAB BUILDER (EX: DE OUTRO COMPUTADOR) -->
+    <button class="empty-state__open-file" @click="openSongFile">
+      <FolderOpen :size="18" />
+      <span>
+        <strong>{{ $t("components.emptyState.openFile") }}</strong>
+        <small>{{ $t("components.emptyState.openFileHint") }}</small>
+      </span>
+    </button>
+
     <p class="empty-state__tip">
       <kbd>/</kbd>
       {{ $t("components.emptyState.tip") }}
@@ -32,9 +41,10 @@
 
 <script lang="ts">
 import { defineComponent } from "vue";
+import { FolderOpen } from "lucide-vue-next";
 import { partOptions } from "@/core/config/parts";
 import { parsePaste } from "@/core/paste";
-import { pasteSong } from "@/stores/commands";
+import { openSongFile, pasteSong } from "@/stores/commands";
 import type { PartType } from "@/types/song";
 
 // CAMPO EDITÁVEL (TÍTULO, ARTISTA...) CUIDA DA PRÓPRIA COLAGEM
@@ -47,6 +57,10 @@ function isEditable(target: EventTarget | null): boolean {
 
 export default defineComponent({
   name: "EmptyState",
+
+  components: {
+    FolderOpen,
+  },
 
   emits: {
     add: (type: PartType) => !!type,
@@ -69,6 +83,8 @@ export default defineComponent({
   },
 
   methods: {
+    openSongFile,
+
     onPaste(event: ClipboardEvent) {
       if (isEditable(event.target)) return;
 
@@ -132,6 +148,48 @@ export default defineComponent({
     span {
       color: var(--color-text-muted);
       font-size: var(--text-sm);
+    }
+
+    &:hover {
+      background: var(--color-accent-soft);
+      border-color: var(--color-accent);
+    }
+  }
+
+  // AÇÃO SECUNDÁRIA: MAIS DISCRETA QUE AS TRÊS PARTES ACIMA
+  &__open-file {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-3);
+    margin-top: var(--space-4);
+    padding: var(--space-2) var(--space-4);
+    background: none;
+    border: 1px dashed var(--color-border-strong);
+    border-radius: var(--radius-md);
+    color: var(--color-text);
+    text-align: left;
+    cursor: pointer;
+    transition:
+      border-color var(--duration-fast),
+      background var(--duration-fast);
+
+    svg {
+      flex: none;
+      color: var(--color-accent);
+    }
+
+    strong,
+    small {
+      display: block;
+    }
+
+    strong {
+      font-size: var(--text-sm);
+    }
+
+    small {
+      color: var(--color-text-muted);
+      font-size: var(--text-xs);
     }
 
     &:hover {

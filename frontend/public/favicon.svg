@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32">
+  <!-- O MESMO DESENHO DO LOGO DA BARRA DO TOPO (src/widgets/app-bar/logo.vue),
+       COM AS CORES DO TEMA (src/assets/scss/theme.scss) -->
+  <style>
+    .pick { fill: #941b0c; }
+    .strings { stroke: #ffffff; }
+    .note { fill: #f6aa1c; }
+
+    @media (prefers-color-scheme: dark) {
+      .pick { fill: #ea6a55; }
+      .strings { stroke: #1c0b07; }
+      .note { fill: #f6b84a; }
+    }
+  </style>
+  <path class="pick" d="M16 3c7.5 0 12.5 3.2 12.5 8.3 0 6.9-7.4 14.6-12.5 17.7C10.9 25.9 3.5 18.2 3.5 11.3 3.5 6.2 8.5 3 16 3Z"/>
+  <path class="strings" d="M9 10.5h14M10 14.5h12M12 18.5h8" fill="none" stroke-width="1.6" stroke-linecap="round" opacity="0.85"/>
+  <circle class="note" cx="18" cy="14.5" r="2.2"/>
+</svg>

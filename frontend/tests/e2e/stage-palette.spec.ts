@@ -129,7 +129,7 @@ test.describe("paleta de comandos", () => {
     await page.keyboard.type("letra");
     await page.keyboard.press("ControlOrMeta+k");
 
-    await page.keyboard.type("musica");
+    await page.keyboard.type("nova musica");
     await expect(page.locator(".palette__item")).toHaveText(["Nova música"]);
 
     await page.keyboard.press("Enter");
