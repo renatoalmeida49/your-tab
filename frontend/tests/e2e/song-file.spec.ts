@@ -234,3 +234,19 @@ test.describe("arquivo de músicas no acervo", () => {
     expect(api.ciphers).toEqual([]);
   });
 });
+
+test.describe("arquivo de música na tela inicial", () => {
+  test("a música vazia oferece abrir um arquivo", async ({ page }) => {
+    await page.goto("/");
+
+    await chooseFile(
+      page,
+      () => page.locator(".empty-state__open-file").click(),
+      fileOf(SONG)
+    );
+
+    await expect(page.locator(".tab-header__title")).toHaveText("Segredos");
+    expect(await songParts(page)).toEqual(["verse", "text:Eu procuro um amor"]);
+    await expect(page.locator(".empty-state")).toHaveCount(0);
+  });
+});

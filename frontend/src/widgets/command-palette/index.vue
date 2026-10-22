@@ -192,7 +192,7 @@ export default defineComponent({
         },
         {
           id: "export",
-          label: t("components.menu.downloadPdf"),
+          label: t("components.palette.export"),
           icon: markRaw(Download),
           run: () => ui.setExportOpen(true),
         },

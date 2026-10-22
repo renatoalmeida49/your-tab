@@ -125,7 +125,7 @@
       <TheButton class="app-bar__export" @click="setExportOpen(true)">
         <Download :size="16" />
         <span class="app-bar__label">
-          {{ $t("components.menu.downloadPdf") }}
+          {{ $t("components.menu.export") }}
         </span>
       </TheButton>
 
