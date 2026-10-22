@@ -96,6 +96,15 @@ export const useHistoryStore = defineStore("history", {
       restore(target);
     },
 
+    // OUTRA MÚSICA NO EDITOR (EX: ABERTA DO ACERVO): O HISTÓRICO RECOMEÇA DELA
+    reset() {
+      this.past = [];
+      this.future = [];
+      this.notice = null;
+      current = serializeSong();
+      typing = { key: null, time: 0 };
+    },
+
     notify(message: NoticeMessage | null) {
       this.notice = message ? { message, at: Date.now() } : null;
     },

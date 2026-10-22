@@ -21,6 +21,14 @@ export default defineConfig({
     },
   },
 
+  server: {
+    // A API (backend/) RODA À PARTE. PELO PROXY, FRONT E API FICAM NA MESMA
+    // ORIGEM, COMO EM PRODUÇÃO (NGINX), E O COOKIE DE SESSÃO FUNCIONA
+    proxy: {
+      "/api": "http://localhost:3000",
+    },
+  },
+
   build: {
     // O ÚNICO CHUNK ACIMA DE 500 kB É O html2pdf.js, CARREGADO SÓ AO GERAR O PDF
     chunkSizeWarningLimit: 1000,

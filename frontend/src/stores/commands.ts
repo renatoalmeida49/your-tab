@@ -1,18 +1,35 @@
 import { guessInstrument, sameTuning, type PastedSong } from "@/core/paste";
 import { hasNotes, retune } from "@/core/tab";
 import { useConfirmStore } from "./confirm";
+import { useHistoryStore } from "./history";
 import { useInstrumentStore } from "./instrument";
+import { useLibraryStore } from "./library";
 import { useSongStore } from "./song";
 
 // AÇÕES COM CONFIRMAÇÃO, USADAS PELA BARRA DO TOPO E PELA PALETA DE COMANDOS
 export async function startNewSong(): Promise<void> {
-  const confirmed = await useConfirmStore().ask({
-    message: "components.menu.newSongConfirm",
-    confirmLabel: "components.menu.newSongConfirmAction",
-    danger: true,
-  });
+  const library = useLibraryStore();
+  const linked = !!library.cipherId;
 
-  if (confirmed) useSongStore().newSong();
+  // JÁ SALVA NO ACERVO E SEM ALTERAÇÕES: NADA SE PERDE, NÃO PRECISA PERGUNTAR
+  const confirmed =
+    (linked && !library.dirty) ||
+    (await useConfirmStore().ask({
+      message: linked
+        ? "components.menu.newSongUnsavedConfirm"
+        : "components.menu.newSongConfirm",
+      confirmLabel: "components.menu.newSongConfirmAction",
+      danger: true,
+    }));
+
+  if (!confirmed) return;
+
+  useSongStore().newSong();
+  library.unlink();
+
+  // O DESFAZER TRARIA DE VOLTA A CIFRA JÁ DESLIGADA DO ACERVO (E O "SALVAR"
+  // CRIARIA UMA CÓPIA). ELA CONTINUA NO ACERVO: É SÓ ABRIR DE NOVO
+  if (linked) useHistoryStore().reset();
 }
 
 // TAB COLADA COM OUTRA AFINAÇÃO: MÚSICA SEM NOTAS EM TAB ADOTA A AFINAÇÃO

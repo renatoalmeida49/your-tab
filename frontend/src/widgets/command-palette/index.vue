@@ -63,9 +63,13 @@ import {
 } from "reka-ui";
 import {
   CircleHelp,
+  CloudUpload,
   Download,
   FilePlus2,
   Languages,
+  LibraryBig,
+  LogIn,
+  LogOut,
   Minus,
   MonitorPlay,
   Plus,
@@ -76,8 +80,10 @@ import {
 } from "lucide-vue-next";
 import { partOptions } from "@/core/config/parts";
 import { setLanguage } from "@/core/plugins/i18n";
+import { useAuthStore } from "@/stores/auth";
 import { startNewSong } from "@/stores/commands";
 import { useHistoryStore } from "@/stores/history";
+import { useLibraryStore } from "@/stores/library";
 import { useSongStore } from "@/stores/song";
 import { useThemeStore } from "@/stores/theme";
 import { useUiStore } from "@/stores/ui";
@@ -125,6 +131,33 @@ export default defineComponent({
       const ui = useUiStore();
       const song = useSongStore();
       const history = useHistoryStore();
+      const auth = useAuthStore();
+      const library = useLibraryStore();
+
+      // ACERVO PARA QUEM ESTÁ LOGADO; "ENTRAR" PARA VISITANTE
+      const account: Command[] = auth.user
+        ? [
+            {
+              id: "library",
+              label: t("components.palette.library"),
+              icon: markRaw(LibraryBig),
+              run: () => ui.setLibraryOpen(true),
+            },
+            {
+              id: "logout",
+              label: t("components.palette.logout"),
+              icon: markRaw(LogOut),
+              run: () => auth.logout(),
+            },
+          ]
+        : [
+            {
+              id: "login",
+              label: t("components.palette.login"),
+              icon: markRaw(LogIn),
+              run: () => ui.setLoginOpen(true),
+            },
+          ];
 
       return [
         ...partOptions.map((option) => ({
@@ -157,6 +190,14 @@ export default defineComponent({
           icon: markRaw(Download),
           run: () => ui.setExportOpen(true),
         },
+        {
+          id: "save",
+          label: t("components.palette.save"),
+          icon: markRaw(CloudUpload),
+          shortcut: "Ctrl+S",
+          run: () => library.save(),
+        },
+        ...account,
         {
           id: "new-song",
           label: t("components.menu.newSong"),

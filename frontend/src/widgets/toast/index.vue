@@ -1,9 +1,15 @@
 <template>
   <transition name="toast">
-    <div v-if="notice" class="toast" role="status">
-      <span>{{ $t(notice.message) }}</span>
+    <div
+      v-if="toast"
+      :key="toast.at"
+      class="toast"
+      :class="{ 'toast--error': toast.error }"
+      role="status"
+    >
+      <span>{{ $t(toast.message) }}</span>
 
-      <button class="toast__undo" @click="undo">
+      <button v-if="toast.undo" class="toast__undo" @click="undo">
         {{ $t("components.toast.undo") }}
       </button>
     </div>
@@ -14,8 +20,16 @@
 import { defineComponent } from "vue";
 import { mapActions, mapState } from "pinia";
 import { useHistoryStore } from "@/stores/history";
+import { useUiStore } from "@/stores/ui";
 
 const DURATION = 6000;
+
+interface Toast {
+  message: string;
+  at: number;
+  undo: boolean;
+  error: boolean;
+}
 
 export default defineComponent({
   name: "TheToast",
@@ -28,13 +42,29 @@ export default defineComponent({
 
   computed: {
     ...mapState(useHistoryStore, ["notice"]),
+    ...mapState(useUiStore, ["flash"]),
+
+    // UM AVISO POR VEZ: O MAIS RECENTE ENTRE "PARTE REMOVIDA" (COM DESFAZER)
+    // E OS DO ACERVO ("SALVO", ERROS)
+    toast(): Toast | null {
+      const notice = this.notice && {
+        ...this.notice,
+        undo: true,
+        error: false,
+      };
+      const flash = this.flash && { ...this.flash, undo: false };
+
+      if (notice && flash) return notice.at >= flash.at ? notice : flash;
+
+      return notice || flash;
+    },
   },
 
   watch: {
-    notice(notice) {
+    toast(toast: Toast | null) {
       clearTimeout(this.timer);
 
-      if (notice) this.timer = setTimeout(() => this.notify(null), DURATION);
+      if (toast) this.timer = setTimeout(this.dismiss, DURATION);
     },
   },
 
@@ -44,6 +74,12 @@ export default defineComponent({
 
   methods: {
     ...mapActions(useHistoryStore, { historyUndo: "undo", notify: "notify" }),
+    ...mapActions(useUiStore, ["showFlash"]),
+
+    dismiss() {
+      this.notify(null);
+      this.showFlash(null);
+    },
 
     undo() {
       this.historyUndo();
@@ -67,6 +103,11 @@ export default defineComponent({
   color: var(--color-inverse-text);
   border-radius: 8px;
   box-shadow: var(--shadow-lg);
+
+  &--error {
+    background: var(--color-danger);
+    color: var(--color-accent-contrast);
+  }
 
   &__undo {
     background: none;

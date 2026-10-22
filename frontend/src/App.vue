@@ -10,6 +10,8 @@
     <TheConfirm />
     <TheHelp />
     <TheExport />
+    <TheLogin />
+    <TheLibrary />
     <TheStage />
     <TheCommandPalette />
   </div>
@@ -19,6 +21,7 @@
 import { defineComponent } from "vue";
 import { mapActions } from "pinia";
 import { useHistoryStore } from "@/stores/history";
+import { useLibraryStore } from "@/stores/library";
 import { useUiStore } from "@/stores/ui";
 
 function isEditable(target: HTMLElement): boolean {
@@ -42,6 +45,7 @@ export default defineComponent({
   methods: {
     ...mapActions(useHistoryStore, ["undo", "redo"]),
     ...mapActions(useUiStore, ["setHelpOpen", "setPaletteOpen"]),
+    ...mapActions(useLibraryStore, ["save"]),
 
     handleShortcuts(event: KeyboardEvent) {
       const target = event.target as HTMLElement;
@@ -51,6 +55,13 @@ export default defineComponent({
       if (command && !event.altKey && event.key.toLowerCase() == "k") {
         event.preventDefault();
         this.setPaletteOpen(true);
+        return;
+      }
+
+      // Ctrl/Cmd+S SALVA NO ACERVO (NO LUGAR DO "SALVAR PÁGINA" DO NAVEGADOR)
+      if (command && !event.altKey && event.key.toLowerCase() == "s") {
+        event.preventDefault();
+        this.save();
         return;
       }
 

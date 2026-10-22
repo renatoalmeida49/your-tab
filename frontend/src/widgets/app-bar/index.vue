@@ -105,12 +105,31 @@
         <MonitorPlay :size="16" />
         <span class="app-bar__label">{{ $t("components.menu.stage") }}</span>
       </TheButton>
+      <TheButton
+        variant="secondary"
+        class="app-bar__save"
+        :class="{ 'app-bar__save--saved': saveState == 'saved' }"
+        :disabled="saveState == 'saving'"
+        :title="$t('components.menu.saveHint')"
+        @click="save"
+      >
+        <component
+          :is="saveIcons[saveState]"
+          :size="16"
+          :class="{ 'app-bar__spinner': saveState == 'saving' }"
+        />
+        <span class="app-bar__label">
+          {{ $t(`components.menu.${saveState}`) }}
+        </span>
+      </TheButton>
       <TheButton class="app-bar__export" @click="setExportOpen(true)">
         <Download :size="16" />
         <span class="app-bar__label">
           {{ $t("components.menu.downloadPdf") }}
         </span>
       </TheButton>
+
+      <AccountMenu />
     </div>
   </header>
 </template>
@@ -120,8 +139,11 @@ import { defineComponent } from "vue";
 import { mapActions, mapState } from "pinia";
 import {
   CircleHelp,
+  CloudCheck,
+  CloudUpload,
   Command,
   Download,
+  LoaderCircle,
   FilePlus2,
   Monitor,
   MonitorPlay,
@@ -133,10 +155,12 @@ import {
 import { partOptions } from "@/core/config/parts";
 import { startNewSong } from "@/stores/commands";
 import { useHistoryStore } from "@/stores/history";
+import { useLibraryStore } from "@/stores/library";
 import { useSongStore } from "@/stores/song";
 import { useThemeStore, type Theme } from "@/stores/theme";
 import { useUiStore } from "@/stores/ui";
 import type { PartType } from "@/types/song";
+import AccountMenu from "./account-menu.vue";
 import LanguageMenu from "./language-menu.vue";
 import TheLogo from "./logo.vue";
 
@@ -146,10 +170,19 @@ const themeIcons: Record<Theme, unknown> = {
   dark: Moon,
 };
 
+type SaveState = "save" | "saving" | "saved";
+
+const saveIcons: Record<SaveState, unknown> = {
+  save: CloudUpload,
+  saving: LoaderCircle,
+  saved: CloudCheck,
+};
+
 export default defineComponent({
   name: "TheAppBar",
 
   components: {
+    AccountMenu,
     CircleHelp,
     Command,
     Download,
@@ -164,6 +197,7 @@ export default defineComponent({
   data() {
     return {
       parts: partOptions,
+      saveIcons,
     };
   },
 
@@ -173,6 +207,14 @@ export default defineComponent({
       canRedo: (store) => store.future.length > 0,
     }),
     ...mapState(useThemeStore, ["theme"]),
+    ...mapState(useLibraryStore, ["saving", "cipherId", "dirty"]),
+
+    // "SALVO" SÓ QUANDO A MÚSICA DO EDITOR É IGUAL À DO ACERVO
+    saveState(): SaveState {
+      if (this.saving) return "saving";
+
+      return this.cipherId && !this.dirty ? "saved" : "save";
+    },
 
     themeIcon() {
       return themeIcons[this.theme];
@@ -181,6 +223,7 @@ export default defineComponent({
 
   methods: {
     ...mapActions(useSongStore, ["addContent"]),
+    ...mapActions(useLibraryStore, ["save"]),
     ...mapActions(useHistoryStore, ["undo", "redo"]),
     ...mapActions(useThemeStore, ["cycleTheme"]),
     ...mapActions(useUiStore, [
@@ -306,8 +349,17 @@ export default defineComponent({
     }
   }
 
+  &__save--saved.the-button {
+    color: var(--color-text-muted);
+  }
+
+  &__spinner {
+    animation: export-spin 0.9s linear infinite;
+  }
+
   &__new-song.the-button,
   &__stage.the-button,
+  &__save.the-button,
   &__export.the-button {
     @include tablet {
       padding: 0;

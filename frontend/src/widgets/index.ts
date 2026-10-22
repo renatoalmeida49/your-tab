@@ -6,6 +6,8 @@ import TheCommandPalette from "./command-palette/index.vue";
 import TheConfirm from "./confirm/index.vue";
 import TheExport from "./export/index.vue";
 import TheHelp from "./help/index.vue";
+import TheLibrary from "./library/index.vue";
+import TheLogin from "./login/index.vue";
 import Modal from "./modal/index.vue";
 import TheStage from "./stage/index.vue";
 import TheButton from "./the-button/index.vue";
@@ -19,6 +21,8 @@ export default {
     app.component("TheConfirm", TheConfirm);
     app.component("TheExport", TheExport);
     app.component("TheHelp", TheHelp);
+    app.component("TheLibrary", TheLibrary);
+    app.component("TheLogin", TheLogin);
     app.component("Modal", Modal);
     app.component("TheStage", TheStage);
     app.component("TheButton", TheButton);

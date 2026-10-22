@@ -21,7 +21,7 @@ test.describe("página", () => {
       "Feito para iniciantes e avançados"
     );
     await expect(details.locator("li").first()).toContainText(
-      "Funcionalidade de login"
+      "Baixos e guitarras com mais cordas"
     );
 
     await page.keyboard.press("Escape");

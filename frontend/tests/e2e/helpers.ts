@@ -4,6 +4,7 @@ import {
   type Locator,
   type Page,
 } from "@playwright/test";
+import { FakeApi } from "./fake-api";
 
 // FALHA O TESTE SE HOUVER ERRO NO CONSOLE OU WARNING DO VUE/VUE-I18N
 const frameworkWarning = /^\[(Vue warn|intlify)\]/;
@@ -12,9 +13,18 @@ const frameworkWarning = /^\[(Vue warn|intlify)\]/;
 // A CADA EXECUÇÃO (EX: CSP DE IFRAMES DO GOOGLE)
 const thirdParty = /googlesyndication|doubleclick|google\.com/;
 
-export const test = base.extend({
-  page: async ({ page }, use) => {
+// api: A API FALSA JÁ INSTALADA NA PÁGINA (VISITANTE). CONFIGURE ANTES DO goto
+export const test = base.extend<{ api: FakeApi }>({
+  // O PLAYWRIGHT EXIGE A DESESTRUTURAÇÃO, MESMO SEM USAR NENHUM FIXTURE
+  // eslint-disable-next-line no-empty-pattern
+  api: async ({}, use) => {
+    await use(new FakeApi());
+  },
+
+  page: async ({ page, api }, use) => {
     const errors: string[] = [];
+
+    await api.install(page);
 
     page.on("pageerror", (error) => errors.push(error.message));
     page.on("console", (message) => {
@@ -26,7 +36,12 @@ export const test = base.extend({
         thirdParty.test(message.location().url) ||
         thirdParty.test(message.text());
 
-      if ((isError || isWarning) && !isThirdParty) errors.push(message.text());
+      const status = /status of (\d+)/.exec(message.text())?.[1];
+      const isExpected = api.expectedStatuses.includes(Number(status));
+
+      if ((isError || isWarning) && !isThirdParty && !isExpected) {
+        errors.push(message.text());
+      }
     });
 
     await use(page);
