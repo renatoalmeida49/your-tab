@@ -223,6 +223,7 @@ export const locale: MessageSchema = {
       textHint: "Lyrics, sections and notes",
       verseHint: "Chords aligned with the lyrics",
       tabHint: "Tablature on the instrument strings",
+      pasteTip: "pastes a song copied from another site, with tabs and chords",
       tip: "in a text field inserts a tab or verse without leaving the keyboard",
     },
     theme: {

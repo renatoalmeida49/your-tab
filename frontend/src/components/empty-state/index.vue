@@ -23,13 +23,27 @@
       <kbd>/</kbd>
       {{ $t("components.emptyState.tip") }}
     </p>
+    <p class="empty-state__tip empty-state__tip--paste">
+      <kbd>Ctrl</kbd> + <kbd>V</kbd>
+      {{ $t("components.emptyState.pasteTip") }}
+    </p>
   </section>
 </template>
 
 <script lang="ts">
 import { defineComponent } from "vue";
 import { partOptions } from "@/core/config/parts";
+import { parsePaste } from "@/core/paste";
+import { pasteSong } from "@/stores/commands";
 import type { PartType } from "@/types/song";
+
+// CAMPO EDITÁVEL (TÍTULO, ARTISTA...) CUIDA DA PRÓPRIA COLAGEM
+function isEditable(target: EventTarget | null): boolean {
+  return (
+    target instanceof HTMLElement &&
+    (target.isContentEditable || ["INPUT", "TEXTAREA"].includes(target.tagName))
+  );
+}
 
 export default defineComponent({
   name: "EmptyState",
@@ -42,6 +56,29 @@ export default defineComponent({
     return {
       options: partOptions,
     };
+  },
+
+  // MÚSICA VAZIA: Ctrl+V EM QUALQUER LUGAR MONTA A MÚSICA, SEM PRECISAR
+  // CRIAR UM TEXTO ANTES PARA COLAR NELE
+  mounted() {
+    window.addEventListener("paste", this.onPaste);
+  },
+
+  unmounted() {
+    window.removeEventListener("paste", this.onPaste);
+  },
+
+  methods: {
+    onPaste(event: ClipboardEvent) {
+      if (isEditable(event.target)) return;
+
+      const pasted = parsePaste(event.clipboardData?.getData("text") ?? "");
+
+      if (!pasted.parts.length) return;
+
+      event.preventDefault();
+      pasteSong({ pasted, index: 0 });
+    },
   },
 });
 </script>
@@ -105,6 +142,11 @@ export default defineComponent({
 
   &__tip {
     margin-top: var(--space-5);
+
+    &--paste {
+      margin-top: var(--space-2);
+    }
+
     color: var(--color-text-muted);
     font-size: var(--text-sm);
 

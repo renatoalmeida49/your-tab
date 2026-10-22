@@ -78,6 +78,22 @@ test.describe("colar cifra com tablatura", () => {
     ]);
   });
 
+  test("com a música vazia, colar direto monta a música", async ({ page }) => {
+    await paste(page.locator("body"), BASS_SONG);
+
+    expect(await songParts(page)).toEqual([
+      "text:Introdução",
+      "text:",
+      "text:Parte 01",
+      "tab",
+      "tab",
+      "text:Primeira parte",
+      "text:",
+      "text:Left a good job in the city",
+    ]);
+    await expect(tuningLabel(page)).toHaveText("G - D - A - E");
+  });
+
   test("linha de acordes vira verso", async ({ page }) => {
     await addFromMenu(page, "textField");
     await paste(textFields(page).first(), "Am    G    C\nRolling on the river");
