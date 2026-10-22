@@ -116,6 +116,24 @@ export const useSongStore = defineStore("song", {
       useHistoryStore().notify("components.toast.partRemoved");
     },
 
+    // REMOÇÃO DOS BLOCOS SELECIONADOS: UM PASSO SÓ NO HISTÓRICO. O AVISO VEM
+    // DEPOIS DO setSong, QUE É QUEM REGISTRA O PASSO (E LIMPA O AVISO ANTERIOR)
+    removeParts(ids: string[]) {
+      this.setSong(this.parts.filter((part) => !ids.includes(part.id)));
+      useHistoryStore().notify("components.toast.partsRemoved");
+    },
+
+    // JUNTA O TEXTO DA PARTE DE BAIXO NO FIM DA DE CIMA (Backspace NO COMEÇO
+    // DA LINHA, Delete NO FIM). SÓ ENTRE CAMPOS DE TEXTO
+    mergeWithNext(index: number) {
+      const [part, next] = [this.parts[index], this.parts[index + 1]];
+
+      if (part?.type != "textField" || next?.type != "textField") return;
+
+      part.info.text += next.info.text;
+      this.parts.splice(index + 1, 1);
+    },
+
     // CÓPIA LOGO ABAIXO DA ORIGINAL, COM ID NOVO
     duplicatePart(index: number) {
       const part = this.parts[index];

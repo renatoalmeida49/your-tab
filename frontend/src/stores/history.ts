@@ -14,7 +14,8 @@ const IGNORED = ["song/setFocusId"];
 const TYPING = ["song/updatePart", "song/setSongInfo", "instrument/newTone"];
 const TYPING_PAUSE = 1000;
 
-export type NoticeMessage = "components.toast.partRemoved";
+export type NoticeMessage =
+  "components.toast.partRemoved" | "components.toast.partsRemoved";
 
 interface Notice {
   message: NoticeMessage;

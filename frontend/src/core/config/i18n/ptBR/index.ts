@@ -209,6 +209,34 @@ export const locale = {
           keys: "↑+↓",
           description: "Move o cursor entre as partes, mantendo a coluna",
         },
+        {
+          keys: "Backspace",
+          description:
+            "No começo da linha, junta com a de cima (Delete, no fim, junta com a de baixo)",
+        },
+        {
+          keys: "Arrastar",
+          description:
+            "De uma linha para outra (ou da margem), seleciona as linhas inteiras",
+        },
+        {
+          keys: "Esc",
+          description: "Seleciona a linha atual; Shift+↑/↓ aumenta a seleção",
+        },
+        {
+          keys: "Shift+Clique",
+          description: "Seleciona as linhas até a clicada",
+        },
+        {
+          keys: "Ctrl+A",
+          description:
+            "Seleciona o texto da linha; de novo, seleciona a música inteira",
+        },
+        {
+          keys: "Delete",
+          description:
+            "Com linhas selecionadas, apaga todas (Ctrl+C e Ctrl+X copiam e recortam)",
+        },
         { keys: "Ctrl+Z", description: "Desfaz a última alteração" },
         { keys: "Ctrl+Shift+Z", description: "Refaz a alteração desfeita" },
         { keys: "Ctrl+S", description: "Salva a música no acervo" },
@@ -234,6 +262,7 @@ export const locale = {
     },
     toast: {
       partRemoved: "Parte removida",
+      partsRemoved: "Partes removidas",
       undo: "Desfazer",
     },
     tuning: {

@@ -31,6 +31,18 @@ export function getSelectionOffsets(
   };
 }
 
+// A SELEÇÃO COBRE TODO O TEXTO DO ELEMENTO? (VAZIO CONTA COMO TUDO)
+export function selectsAll(element: HTMLElement): boolean {
+  const offsets = getSelectionOffsets(element);
+
+  if (!offsets) return false;
+
+  const range = document.createRange();
+  range.selectNodeContents(element);
+
+  return offsets.start == 0 && offsets.end == range.toString().length;
+}
+
 export function setCaret(element: HTMLElement, offset: number): void {
   const range = document.createRange();
   const walker = document.createTreeWalker(element, NodeFilter.SHOW_TEXT);

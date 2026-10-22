@@ -12,6 +12,13 @@ export interface NewTextFieldPayload {
   index: number;
 }
 
+// Backspace NO COMEÇO DA LINHA ("backward") OU Delete NO FIM ("forward"):
+// O Home JUNTA COM A VIZINHA OU, SE A LINHA ESTÁ VAZIA, REMOVE
+export interface JoinPayload {
+  direction: "backward" | "forward";
+  index: number;
+}
+
 export interface FocusTarget {
   direction: Direction;
   column: number;
@@ -26,4 +33,5 @@ export interface FocusablePart {
 export const partEmits = {
   newTextField: (payload: NewTextFieldPayload) => payload.index >= 0,
   moveCursor: (payload: MoveCursorPayload) => payload.index >= 0,
+  join: (payload: JoinPayload) => payload.index >= 0,
 };
