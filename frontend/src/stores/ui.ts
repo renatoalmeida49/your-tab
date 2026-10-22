@@ -5,6 +5,8 @@ interface Flash {
   message: string;
   error: boolean;
   at: number;
+  // VALORES DA MENSAGEM (EX: { count: 3 })
+  params?: Record<string, unknown>;
 }
 
 // ESTADO DA INTERFACE QUE NÃO É A MÚSICA (NÃO É SALVO NEM DESFEITO)
@@ -65,8 +67,12 @@ export const useUiStore = defineStore("ui", {
       if (this.selectedParts.length) this.selectedParts = [];
     },
 
-    showFlash(message: string | null, error = false) {
-      this.flash = message ? { message, error, at: Date.now() } : null;
+    showFlash(
+      message: string | null,
+      error = false,
+      params?: Record<string, unknown>
+    ) {
+      this.flash = message ? { message, error, at: Date.now(), params } : null;
     },
   },
 });

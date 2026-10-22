@@ -65,6 +65,8 @@ import {
   CircleHelp,
   CloudUpload,
   Download,
+  FileJson,
+  FolderOpen,
   FilePlus2,
   Languages,
   LibraryBig,
@@ -81,7 +83,11 @@ import {
 import { partOptions } from "@/core/config/parts";
 import { setLanguage } from "@/core/plugins/i18n";
 import { useAuthStore } from "@/stores/auth";
-import { startNewSong } from "@/stores/commands";
+import {
+  downloadSongFile,
+  openSongFile,
+  startNewSong,
+} from "@/stores/commands";
 import { useHistoryStore } from "@/stores/history";
 import { useLibraryStore } from "@/stores/library";
 import { useSongStore } from "@/stores/song";
@@ -189,6 +195,18 @@ export default defineComponent({
           label: t("components.menu.downloadPdf"),
           icon: markRaw(Download),
           run: () => ui.setExportOpen(true),
+        },
+        {
+          id: "download-song-file",
+          label: t("components.songFile.downloadFile"),
+          icon: markRaw(FileJson),
+          run: downloadSongFile,
+        },
+        {
+          id: "open-song-file",
+          label: t("components.songFile.openFile"),
+          icon: markRaw(FolderOpen),
+          run: openSongFile,
         },
         {
           id: "save",

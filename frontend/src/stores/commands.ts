@@ -1,10 +1,22 @@
+import { downloadText, pickFiles } from "@/core/files";
 import { guessInstrument, sameTuning, type PastedSong } from "@/core/paste";
+import {
+  parseSongFile,
+  songFile,
+  songFileMessage,
+  songFileName,
+} from "@/core/song-file";
 import { hasNotes, retune } from "@/core/tab";
+import type { CipherFields } from "@/types/library";
 import { useConfirmStore } from "./confirm";
 import { useHistoryStore } from "./history";
 import { useInstrumentStore } from "./instrument";
-import { useLibraryStore } from "./library";
+import { cipherToSong, songToCipher, useLibraryStore } from "./library";
+import { applySong, pickSong } from "./snapshot";
 import { useSongStore } from "./song";
+import { useUiStore } from "./ui";
+
+export const SONG_FILE_ACCEPT = ".json,application/json";
 
 // AÇÕES COM CONFIRMAÇÃO, USADAS PELA BARRA DO TOPO E PELA PALETA DE COMANDOS
 export async function startNewSong(): Promise<void> {
@@ -78,4 +90,61 @@ export async function pasteSong(payload: {
         : part
     ),
   });
+}
+
+// A MÚSICA DO EDITOR VIRA UM ARQUIVO .json, QUE ABRE EM OUTRO LUGAR
+export function downloadSongFile(): void {
+  const song = songToCipher(pickSong());
+
+  downloadText(songFile([song]), songFileName([song]));
+}
+
+// LÊ OS ARQUIVOS ESCOLHIDOS. ARQUIVO INVÁLIDO: AVISA E DEVOLVE null
+export async function readSongFiles(
+  files: File[]
+): Promise<CipherFields[] | null> {
+  try {
+    const contents = await Promise.all(files.map((file) => file.text()));
+
+    return contents.flatMap(parseSongFile);
+  } catch (error) {
+    useUiStore().showFlash(songFileMessage(error), true);
+    return null;
+  }
+}
+
+// ABRE UM ARQUIVO NO EDITOR COMO MÚSICA NOVA (FORA DO ACERVO). COM VÁRIAS
+// MÚSICAS, ABRE A PRIMEIRA: TRAZER TODAS É COM O "IMPORTAR" DO ACERVO
+export async function openSongFile(): Promise<void> {
+  const files = await pickFiles({ accept: SONG_FILE_ACCEPT });
+  const songs = files.length ? await readSongFiles(files) : null;
+
+  if (!songs) return;
+
+  const song = useSongStore();
+  const library = useLibraryStore();
+  const empty = !song.parts.length && !song.title && !song.artist;
+
+  const confirmed =
+    empty ||
+    (!!library.cipherId && !library.dirty) ||
+    (await useConfirmStore().ask({
+      message: "components.songFile.openConfirm",
+      confirmLabel: "components.songFile.openConfirmAction",
+      danger: true,
+    }));
+
+  if (!confirmed) return;
+
+  applySong(cipherToSong(songs[0]));
+  useHistoryStore().reset();
+  library.unlink();
+
+  useUiStore().showFlash(
+    songs.length > 1
+      ? "components.songFile.openedFirst"
+      : "components.songFile.opened",
+    false,
+    { count: songs.length }
+  );
 }

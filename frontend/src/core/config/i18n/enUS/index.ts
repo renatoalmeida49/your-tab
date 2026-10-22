@@ -151,6 +151,29 @@ export const locale: MessageSchema = {
         generic: "Something went wrong. Please try again.",
       },
     },
+    songFile: {
+      downloadFile: "Download song file (.json)",
+      downloadHint:
+        "To open it on another computer or import it into another account's library.",
+      openFile: "Open song file (.json)",
+      openConfirm:
+        "Open the file? Unsaved changes to the current song will be lost.",
+      openConfirmAction: "Open anyway",
+      opened: "Song opened from file",
+      openedFirst:
+        "The file has {count} songs: the first one was opened. To bring them all, use “Import” in the library",
+      import: "Import",
+      importHint: "Adds the songs from .json files to the library",
+      imported: "Songs imported into the library: {count}",
+      exportAll: "Export all",
+      exportAllHint: "Downloads every song in the library as a .json file",
+      errors: {
+        invalid: "Invalid file: it isn't a Tab Builder song file",
+        newer:
+          "File made by a newer version of Tab Builder. Reload the page and try again",
+        empty: "The file has no songs",
+      },
+    },
     palette: {
       title: "Command palette",
       placeholder: "Type a command…",
@@ -177,7 +200,7 @@ export const locale: MessageSchema = {
       pause: "Pause scrolling (Space)",
     },
     export: {
-      title: "Export PDF",
+      title: "Export song",
       preview: "PDF preview",
       generating: "Generating the PDF…",
       error: "Could not generate the PDF. Please try again.",

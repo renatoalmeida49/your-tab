@@ -151,6 +151,29 @@ export const locale = {
         generic: "Algo deu errado. Tente novamente.",
       },
     },
+    songFile: {
+      downloadFile: "Baixar arquivo da música (.json)",
+      downloadHint:
+        "Para abrir em outro computador ou importar no acervo de outra conta.",
+      openFile: "Abrir arquivo de música (.json)",
+      openConfirm:
+        "Abrir o arquivo? As alterações não salvas da música atual serão perdidas.",
+      openConfirmAction: "Abrir mesmo assim",
+      opened: "Música aberta do arquivo",
+      openedFirst:
+        "O arquivo tem {count} músicas: abrimos a primeira. Para trazer todas, use “Importar” no acervo",
+      import: "Importar",
+      importHint: "Traz para o acervo as músicas de arquivos .json",
+      imported: "Músicas importadas para o acervo: {count}",
+      exportAll: "Exportar tudo",
+      exportAllHint: "Baixa todas as cifras do acervo num arquivo .json",
+      errors: {
+        invalid: "Arquivo inválido: não é um arquivo de música do Tab Builder",
+        newer:
+          "Arquivo feito por uma versão mais nova do Tab Builder. Recarregue a página e tente de novo",
+        empty: "O arquivo não tem nenhuma música",
+      },
+    },
     palette: {
       title: "Paleta de comandos",
       placeholder: "Digite um comando…",
@@ -177,7 +200,7 @@ export const locale = {
       pause: "Pausar rolagem (Espaço)",
     },
     export: {
-      title: "Exportar PDF",
+      title: "Exportar música",
       preview: "Pré-visualização do PDF",
       generating: "Gerando o PDF…",
       error: "Não foi possível gerar o PDF. Tente novamente.",

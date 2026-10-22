@@ -69,6 +69,18 @@
           {{ $t("components.export.download") }}
         </TheButton>
       </form>
+
+      <div class="export__song-file">
+        <p>{{ $t("components.songFile.downloadHint") }}</p>
+        <TheButton
+          variant="secondary"
+          class="export__download-file"
+          @click="downloadSongFile"
+        >
+          <FileJson :size="16" />
+          {{ $t("components.songFile.downloadFile") }}
+        </TheButton>
+      </div>
     </div>
   </Modal>
 </template>
@@ -76,7 +88,7 @@
 <script lang="ts">
 import { defineComponent } from "vue";
 import { mapActions, mapState } from "pinia";
-import { Download, LoaderCircle } from "lucide-vue-next";
+import { Download, FileJson, LoaderCircle } from "lucide-vue-next";
 import {
   MIN_SCALE,
   PDF_SIZES,
@@ -85,6 +97,7 @@ import {
   type PdfOptions,
   type PdfSize,
 } from "@/core/pdf";
+import { downloadSongFile } from "@/stores/commands";
 import { useSongStore } from "@/stores/song";
 import { useUiStore } from "@/stores/ui";
 
@@ -93,6 +106,7 @@ export default defineComponent({
 
   components: {
     Download,
+    FileJson,
     LoaderCircle,
   },
 
@@ -205,6 +219,8 @@ export default defineComponent({
     close() {
       this.setExportOpen(false);
     },
+
+    downloadSongFile,
   },
 });
 </script>
@@ -331,6 +347,23 @@ export default defineComponent({
     display: flex;
     align-items: flex-end;
     gap: var(--space-3);
+
+    @include tablet {
+      flex-direction: column;
+      align-items: stretch;
+    }
+  }
+
+  // O ARQUIVO .json: OUTRA FORMA DE LEVAR A MÚSICA, SEPARADA DO PDF
+  &__song-file {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-3);
+    padding-top: var(--space-4);
+    border-top: 1px solid var(--color-border);
+    color: var(--color-text-muted);
+    font-size: var(--text-sm);
 
     @include tablet {
       flex-direction: column;

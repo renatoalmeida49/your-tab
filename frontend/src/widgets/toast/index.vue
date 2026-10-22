@@ -7,7 +7,7 @@
       :class="{ 'toast--error': toast.error }"
       role="status"
     >
-      <span>{{ $t(toast.message) }}</span>
+      <span>{{ $t(toast.message, toast.params ?? {}) }}</span>
 
       <button v-if="toast.undo" class="toast__undo" @click="undo">
         {{ $t("components.toast.undo") }}
@@ -29,6 +29,7 @@ interface Toast {
   at: number;
   undo: boolean;
   error: boolean;
+  params?: Record<string, unknown>;
 }
 
 export default defineComponent({

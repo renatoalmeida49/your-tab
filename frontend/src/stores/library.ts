@@ -1,6 +1,8 @@
 import { defineStore } from "pinia";
 
 import { api, ApiError } from "@/core/api";
+import { downloadText } from "@/core/files";
+import { songFile, songFileName } from "@/core/song-file";
 import type {
   Cipher,
   CipherFields,
@@ -71,6 +73,12 @@ export function cipherToSong(cipher: CipherFields): SavedSong {
   };
 }
 
+function fieldsOf(cipher: Cipher): CipherFields {
+  const { title, artist, instrument, tuning, tone, parts } = cipher;
+
+  return { title, artist, instrument, tuning, tone, parts };
+}
+
 function summary(cipher: Cipher): CipherSummary {
   const { id, title, artist, instrument, tone, updatedAt } = cipher;
 
@@ -101,6 +109,8 @@ export const useLibraryStore = defineStore("library", {
     playlists: [] as Playlist[],
     loading: false,
     loadFailed: false,
+    // IMPORTANDO OU EXPORTANDO ARQUIVO DE MÚSICAS
+    transferring: false,
   }),
 
   getters: {
@@ -240,6 +250,50 @@ export const useLibraryStore = defineStore("library", {
 
       // O EDITOR FICA COM A MÚSICA, AGORA COMO NOVA
       if (id == this.cipherId) this.unlink();
+    },
+
+    // TODO O ACERVO NUM ARQUIVO SÓ (A LISTA NÃO TRAZ AS PARTES: BUSCA CADA UMA)
+    async exportAll() {
+      if (this.transferring || !this.ciphers.length) return;
+
+      this.transferring = true;
+
+      try {
+        const ciphers = await Promise.all(
+          this.ciphers.map((cipher) => api.getCipher(cipher.id))
+        );
+        const songs = ciphers.map(fieldsOf);
+
+        downloadText(songFile(songs), songFileName(songs));
+      } catch (error) {
+        fail(error);
+      } finally {
+        this.transferring = false;
+      }
+    },
+
+    // CADA MÚSICA DOS ARQUIVOS VIRA UMA CIFRA NOVA, NA ORDEM DO ARQUIVO.
+    // SE A API FALHAR NO MEIO, AS QUE JÁ ENTRARAM FICAM
+    async importSongs(songs: CipherFields[]) {
+      if (this.transferring) return;
+
+      this.transferring = true;
+
+      try {
+        for (const song of songs) {
+          const cipher = await api.createCipher(song);
+
+          this.ciphers = [summary(cipher), ...this.ciphers];
+        }
+
+        useUiStore().showFlash("components.songFile.imported", false, {
+          count: songs.length,
+        });
+      } catch (error) {
+        fail(error);
+      } finally {
+        this.transferring = false;
+      }
     },
 
     async createPlaylist(name: string) {
