@@ -9,10 +9,6 @@ import { FakeApi } from "./fake-api";
 // FALHA O TESTE SE HOUVER ERRO NO CONSOLE OU WARNING DO VUE/VUE-I18N
 const frameworkWarning = /^\[(Vue warn|intlify)\]/;
 
-// O SCRIPT DE ANÚNCIOS (index.html) LOGA ERROS QUE NÃO SÃO DO APP E VARIAM
-// A CADA EXECUÇÃO (EX: CSP DE IFRAMES DO GOOGLE)
-const thirdParty = /googlesyndication|doubleclick|google\.com/;
-
 // api: A API FALSA JÁ INSTALADA NA PÁGINA (VISITANTE). CONFIGURE ANTES DO goto
 export const test = base.extend<{ api: FakeApi }>({
   // O PLAYWRIGHT EXIGE A DESESTRUTURAÇÃO, MESMO SEM USAR NENHUM FIXTURE
@@ -32,14 +28,10 @@ export const test = base.extend<{ api: FakeApi }>({
       const isWarning =
         message.type() == "warning" && frameworkWarning.test(message.text());
 
-      const isThirdParty =
-        thirdParty.test(message.location().url) ||
-        thirdParty.test(message.text());
-
       const status = /status of (\d+)/.exec(message.text())?.[1];
       const isExpected = api.expectedStatuses.includes(Number(status));
 
-      if ((isError || isWarning) && !isThirdParty && !isExpected) {
+      if ((isError || isWarning) && !isExpected) {
         errors.push(message.text());
       }
     });
