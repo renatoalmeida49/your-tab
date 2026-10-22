@@ -1,21 +1,88 @@
-# SOBE O BANCO E A API. AS VARIÁVEIS DA API VÊM DE backend/.env (VER .env.example)
+# PRODUÇÃO NA VPS (/opt/your-tab), ATRÁS DO EDGE COMPARTILHADO (caddy-docker-proxy).
+# SÓ O EDGE PUBLICA 80/443: O `web` ENTRA NA REDE EXTERNA `proxy` E SE REGISTRA
+# PELOS LABELS `caddy`. MONGO E API FICAM SÓ NA REDE INTERNA. VER DEPLOY.md
+#
+#   cp .env.example .env && ./scripts/deploy.sh
+name: your-tab
+
+x-logging: &logging
+  driver: json-file
+  options:
+    max-size: "10m"
+    max-file: "3"
+
 services:
   mongo:
     image: mongo:8
-    restart: unless-stopped
+    container_name: yourtab_mongo
+    restart: always
+    logging: *logging
     volumes:
-      - mongo-data:/data/db
+      - mongo_data:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping').ok"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+    mem_limit: 768m
+    networks: [default]
 
   api:
     build: ./backend
-    restart: unless-stopped
-    depends_on:
-      - mongo
-    env_file: ./backend/.env
+    image: your-tab-api:latest
+    container_name: yourtab_api
+    restart: always
+    logging: *logging
+    env_file: [.env]
     environment:
+      NODE_ENV: production
+      PORT: 3000
       MONGO_URL: mongodb://mongo:27017
-    ports:
-      - "3000:3000"
+      CORS_ORIGIN: https://${YOURTAB_DOMAIN:?defina YOURTAB_DOMAIN no .env}
+    depends_on:
+      mongo:
+        condition: service_healthy
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "node",
+          "-e",
+          "fetch('http://127.0.0.1:3000/api/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))",
+        ]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+      start_period: 15s
+    mem_limit: 512m
+    networks: [default]
+
+  web:
+    build: ./frontend
+    image: your-tab-web:latest
+    container_name: yourtab_web
+    restart: always
+    logging: *logging
+    labels:
+      caddy: ${YOURTAB_DOMAIN:?defina YOURTAB_DOMAIN no .env}
+      caddy.encode: "zstd gzip"
+      caddy.reverse_proxy: "{{upstreams 80}}"
+      caddy.header.Strict-Transport-Security: '"max-age=31536000; includeSubDomains"'
+    depends_on:
+      api:
+        condition: service_healthy
+    mem_limit: 128m
+    networks:
+      default:
+      proxy:
+        aliases: [yourtab-web]
 
 volumes:
-  mongo-data:
+  mongo_data:
+
+networks:
+  default:
+  proxy:
+    external: true
+    name: proxy

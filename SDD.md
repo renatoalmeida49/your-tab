@@ -34,7 +34,7 @@ O sistema tem uma **API própria** (Node.js) com banco **MongoDB**, tudo hospeda
  [ Cliente (Navegador via HTTPS) ]
          │
          ▼
- [ Proxy reverso com SSL (VPS) ]
+ [ Edge Caddy com SSL (VPS, rede proxy) ]
          │
          ▼
  [ Nginx (container frontend) ]
@@ -62,7 +62,7 @@ your-tab/
 │   │   └── server.ts    ponto de entrada
 │   ├── tests/           testes da API (Mongo em memória)
 │   └── Dockerfile
-├── docker-compose.yml   mongo + api
+├── docker-compose.yml   produção: mongo + api + web (edge da VPS)
 └── SDD.md
 ```
 
@@ -181,62 +181,23 @@ Erros de validação respondem `400` com `{ error, issues }`. Demais erros respo
 
 | Container | Imagem | Função |
 |---|---|---|
-| `mongo` | `mongo:8` | Banco de dados, com volume `mongo-data` para persistir os dados. Não é exposto para fora da VPS. |
-| `api` | `backend/Dockerfile` | API na porta 3000. |
-| `frontend` | `frontend/Dockerfile` (a criar) | Nginx servindo a SPA e repassando `/api` para a API. |
+| `yourtab_mongo` | `mongo:8` | Banco de dados, com volume `mongo_data`. Só na rede interna do projeto. |
+| `yourtab_api` | `backend/Dockerfile` | API na porta 3000. Só na rede interna do projeto. |
+| `yourtab_web` | `frontend/Dockerfile` | Nginx servindo a SPA e repassando `/api` para a API (`frontend/deploy/nginx.conf`). Único container na rede `proxy` do edge. |
 
-O `docker-compose.yml` na raiz sobe `mongo` e `api`. O serviço `frontend` entra quando o frontend for integrado à API.
+O `docker-compose.yml` na raiz é o de produção: sobe os três, sem publicar portas. O passo a passo está no [DEPLOY.md](./DEPLOY.md).
 
 ### 5.2. Containerização da API (`backend/Dockerfile`)
 
 Build em duas etapas: a primeira compila o TypeScript; a segunda leva só o JavaScript compilado e as dependências de produção, rodando com o usuário `node` (sem root).
 
-### 5.3. Containerização do Frontend (planejado)
+### 5.3. Containerização do Frontend (`frontend/Dockerfile`)
 
-#### Arquivo `frontend/Dockerfile`:
-
-```dockerfile
-# Etapa 1: Build
-FROM node:22-alpine AS builder
-WORKDIR /app
-COPY package.json yarn.lock ./
-RUN yarn install --frozen-lockfile
-COPY . .
-RUN yarn build
-
-# Etapa 2: Servidor Nginx
-FROM nginx:alpine
-COPY --from=builder /app/dist /usr/share/nginx/html
-COPY nginx.conf /etc/nginx/conf.d/default.conf
-EXPOSE 80
-CMD ["nginx", "-g", "daemon off;"]
-```
-
-#### Arquivo `frontend/nginx.conf`:
-
-```nginx
-server {
-    listen 80;
-    server_name localhost;
-
-    location /api/ {
-        proxy_pass http://api:3000;
-        proxy_set_header Host $host;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
-    }
-
-    location / {
-        root /usr/share/nginx/html;
-        index index.html index.htm;
-        try_files $uri $uri/ /index.html;
-    }
-}
-```
+Build em duas etapas: a primeira gera o `dist/` com o Vite; a segunda é um `nginx:alpine` com `frontend/deploy/nginx.conf`, que serve a SPA (fallback para `index.html`), repassa `/api/` para `api:3000` e responde `/health` para o healthcheck.
 
 ### 5.4. Variáveis de Ambiente da API
 
-Definidas em `backend/.env` (modelo em `backend/.env.example`). A API não sobe se alguma estiver faltando ou inválida.
+Em desenvolvimento, definidas em `backend/.env` (modelo em `backend/.env.example`). Em produção, no `.env` da raiz na VPS (modelo em `.env.example`); o compose fixa `NODE_ENV`, `PORT`, `MONGO_URL` e deriva `CORS_ORIGIN` de `YOURTAB_DOMAIN`. A API não sobe se alguma estiver faltando ou inválida.
 
 | Variável | Descrição |
 |---|---|
@@ -251,7 +212,7 @@ Definidas em `backend/.env` (modelo em `backend/.env.example`). A API não sobe 
 ### 5.5. Requisito de Segurança: SSL / HTTPS
 
 * **Motivação:** o login com Google exige um ambiente seguro (`https://`), e o cookie de sessão em produção só trafega por HTTPS.
-* **Implementação:** na VPS, um proxy reverso (como Nginx Proxy Manager ou Certbot/Let's Encrypt) emite e renova o certificado SSL gratuito e encaminha o tráfego para o container `frontend`.
+* **Implementação:** a VPS tem um edge compartilhado (`caddy-docker-proxy`, em `/opt/infra/edge`), único dono das portas 80/443. O container `web` entra na rede `proxy` e declara labels `caddy` com o domínio (`YOURTAB_DOMAIN`); o Caddy descobre a rota, emite e renova o certificado Let's Encrypt e encaminha o tráfego.
 
 ---
 
