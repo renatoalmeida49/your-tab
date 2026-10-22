@@ -223,6 +223,7 @@ export const locale = {
       textHint: "Letra, seções e anotações",
       verseHint: "Acordes alinhados com a letra",
       tabHint: "Tablatura nas cordas do instrumento",
+      pasteTip: "cola uma cifra copiada de outro site, com tabs e acordes",
       tip: "num campo de texto insere uma tab ou verso sem tirar a mão do teclado",
     },
     theme: {
