@@ -1,0 +1,6 @@
+node_modules
+/dist
+.env
+
+# O projeto usa Yarn 1 (yarn.lock); npm geraria um segundo lockfile
+package-lock.json
