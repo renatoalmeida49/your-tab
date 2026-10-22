@@ -80,6 +80,15 @@ Left a good job in the city
       { type: "tab", content: "G|---|\nD|-5-|" },
     ]);
   });
+
+  it("ignora caracteres invisíveis no começo das linhas (Cifra Club)", () => {
+    const song = parsePaste("\u200BIntro:\n\u200BG|-5-|\n\u200BD|-7-|\n");
+
+    expect(song.parts).toEqual([
+      { type: "textField", content: "Intro:" },
+      { type: "tab", content: "G|-5-|\nD|-7-|" },
+    ]);
+  });
 });
 
 describe("isChordLine", () => {

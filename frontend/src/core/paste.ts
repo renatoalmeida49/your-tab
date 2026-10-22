@@ -51,8 +51,12 @@ function tabContent(rows: { label: string; body: string }[]): string {
     .join("\n");
 }
 
+// CARACTERES INVISÍVEIS (ZERO-WIDTH SPACE, BOM...). O CIFRA CLUB PÕE UM NO
+// COMEÇO DE CADA LINHA: "\u200BG|---" NÃO PARECERIA TAB
+const INVISIBLE = /[\u200B-\u200D\u2060\uFEFF]/g;
+
 export function parsePaste(text: string): PastedSong {
-  const lines = text.replace(/\r/g, "").split("\n");
+  const lines = text.replace(/\r/g, "").replace(INVISIBLE, "").split("\n");
   const parts: PastedPart[] = [];
   let tuning: string[] | null = null;
   let index = 0;
