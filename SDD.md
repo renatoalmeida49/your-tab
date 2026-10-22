@@ -193,7 +193,7 @@ Build em duas etapas: a primeira compila o TypeScript; a segunda leva só o Java
 
 ### 5.3. Containerização do Frontend (`frontend/Dockerfile`)
 
-Build em duas etapas: a primeira gera o `dist/` com o Vite; a segunda é um `nginx:alpine` com `frontend/deploy/nginx.conf`, que serve a SPA (fallback para `index.html`), repassa `/api/` para `api:3000` e responde `/health` para o healthcheck.
+Build em duas etapas: a primeira gera o `dist/` com o Vite; a segunda é um `nginx:alpine` com `frontend/deploy/nginx.conf`, que serve a SPA (fallback para `index.html`), repassa `/api/` para `yourtab-api:3000` (nome único: na rede `proxy` o nome `api` pertence a outro site) e responde `/health` para o healthcheck.
 
 ### 5.4. Variáveis de Ambiente da API
 

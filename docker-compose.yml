@@ -56,7 +56,10 @@ services:
       retries: 10
       start_period: 15s
     mem_limit: 512m
-    networks: [default]
+    # NOME ÚNICO: O `web` TAMBÉM ESTÁ NA REDE `proxy`, ONDE `api` É O KAPITALES
+    networks:
+      default:
+        aliases: [yourtab-api]
 
   web:
     build: ./frontend
