@@ -209,6 +209,34 @@ export const locale: MessageSchema = {
           keys: "↑+↓",
           description: "Moves the cursor between parts, keeping the column",
         },
+        {
+          keys: "Backspace",
+          description:
+            "At the start of a line, joins it with the one above (Delete, at the end, joins the one below)",
+        },
+        {
+          keys: "Drag",
+          description:
+            "From one line to another (or from the margin), selects whole lines",
+        },
+        {
+          keys: "Esc",
+          description:
+            "Selects the current line; Shift+↑/↓ extends the selection",
+        },
+        {
+          keys: "Shift+Click",
+          description: "Selects the lines up to the clicked one",
+        },
+        {
+          keys: "Ctrl+A",
+          description: "Selects the line's text; again, selects the whole song",
+        },
+        {
+          keys: "Delete",
+          description:
+            "With lines selected, deletes them all (Ctrl+C and Ctrl+X copy and cut)",
+        },
         { keys: "Ctrl+Z", description: "Undoes the last change" },
         { keys: "Ctrl+Shift+Z", description: "Redoes the undone change" },
         { keys: "Ctrl+S", description: "Saves the song to your library" },
@@ -234,6 +262,7 @@ export const locale: MessageSchema = {
     },
     toast: {
       partRemoved: "Part removed",
+      partsRemoved: "Parts removed",
       undo: "Undo",
     },
     tuning: {

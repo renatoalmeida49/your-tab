@@ -17,7 +17,20 @@ export const useUiStore = defineStore("ui", {
     loginOpen: false,
     libraryOpen: false,
     flash: null as Flash | null,
+    // IDS DAS PARTES SELECIONADAS COMO BLOCOS (ARRASTO, Esc, Shift+CLIQUE...)
+    selectedParts: [] as string[],
   }),
+
+  getters: {
+    // ALGUMA JANELA POR CIMA DO EDITOR?
+    overlayOpen: (state) =>
+      state.helpOpen ||
+      state.exportOpen ||
+      state.stageOpen ||
+      state.paletteOpen ||
+      state.loginOpen ||
+      state.libraryOpen,
+  },
 
   actions: {
     setHelpOpen(open: boolean) {
@@ -42,6 +55,14 @@ export const useUiStore = defineStore("ui", {
 
     setLibraryOpen(open: boolean) {
       this.libraryOpen = open;
+    },
+
+    selectParts(ids: string[]) {
+      this.selectedParts = ids;
+    },
+
+    clearSelection() {
+      if (this.selectedParts.length) this.selectedParts = [];
     },
 
     showFlash(message: string | null, error = false) {

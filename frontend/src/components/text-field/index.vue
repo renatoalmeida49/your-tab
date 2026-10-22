@@ -139,11 +139,7 @@ export default defineComponent({
   },
 
   methods: {
-    ...mapActions(useSongStore, [
-      "removeContent",
-      "addContentBetweenParts",
-      "updatePart",
-    ]),
+    ...mapActions(useSongStore, ["addContentBetweenParts", "updatePart"]),
 
     input(): HTMLElement {
       return this.$refs.input as HTMLElement;
@@ -163,10 +159,6 @@ export default defineComponent({
       const length = this.input().innerText.length;
 
       focusAt(this.input(), Math.min(column, length));
-    },
-
-    remove() {
-      this.removeContent(this.songIndex);
     },
 
     change(event: KeyboardEvent) {
@@ -217,9 +209,9 @@ export default defineComponent({
         event.preventDefault();
       }
 
-      // BACKSPACE OU DELETE
+      // BACKSPACE NO COMEÇO OU DELETE NO FIM: JUNTA COM A LINHA VIZINHA
       if (event.key == "Backspace" || event.key == "Delete") {
-        this.checkRemove();
+        this.checkJoin(event);
       }
     },
 
@@ -251,10 +243,19 @@ export default defineComponent({
       });
     },
 
-    checkRemove() {
-      if (this.info.text.length == 0) {
-        this.remove();
-      }
+    checkJoin(event: KeyboardEvent) {
+      const offsets = getSelectionOffsets(this.input());
+      const backward = event.key == "Backspace";
+
+      if (this.showSelect || !offsets || offsets.start != offsets.end) return;
+      if (offsets.start != (backward ? 0 : this.info.text.length)) return;
+
+      this.$emit("join", {
+        direction: backward ? "backward" : "forward",
+        index: this.songIndex,
+      });
+
+      event.preventDefault();
     },
 
     changePlaceholder() {

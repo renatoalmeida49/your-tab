@@ -1,5 +1,8 @@
 <template>
-  <div class="song-content" :class="`song-content--${type}`">
+  <div
+    class="song-content"
+    :class="[`song-content--${type}`, { 'song-content--selected': selected }]"
+  >
     <div class="song-content__gutter" data-pdf-hide>
       <DropdownMenuRoot>
         <DropdownMenuTrigger
@@ -30,7 +33,8 @@
         </DropdownMenuPortal>
       </DropdownMenuRoot>
 
-      <!-- A ALÇA ARRASTA; UM CLIQUE SEM ARRASTAR ABRE AS AÇÕES. O GATILHO DO
+      <!-- A ALÇA ARRASTA; UM CLIQUE SEM ARRASTAR ABRE AS AÇÕES (COM Shift,
+           SELECIONA AS LINHAS, PELO Home). O GATILHO DO
            MENU É UM <span> SEM PONTEIRO SOBRE A ALÇA, PARA O pointerdown DO
            MENU NÃO DISPUTAR COM O DO ARRASTO -->
       <DropdownMenuRoot v-model:open="actionsOpen">
@@ -83,7 +87,7 @@
         class="song-content__move"
         :aria-label="$t('components.songContent.actions')"
         :title="$t('components.songContent.actions')"
-        @click="actionsOpen = true"
+        @click="actionsOpen = !$event.shiftKey"
       >
         <GripVertical :size="16" />
       </button>
@@ -140,6 +144,7 @@ export default defineComponent({
     contentIndex: { type: Number, required: true },
     isLast: { type: Boolean, default: false },
     type: { type: String, required: true },
+    selected: { type: Boolean, default: false },
   },
 
   data() {
@@ -258,6 +263,16 @@ export default defineComponent({
   }
 
   &--tab:focus-within &__body {
+    border-color: var(--color-accent);
+  }
+
+  // SELECIONADA COMO BLOCO: DEPOIS DO --tab PARA VENCER O FUNDO DA TAB
+  &--selected,
+  &--selected &__body {
+    background: var(--color-accent-soft);
+  }
+
+  &--selected.song-content--tab &__body {
     border-color: var(--color-accent);
   }
 

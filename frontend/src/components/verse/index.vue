@@ -92,6 +92,19 @@ export default defineComponent({
         event.preventDefault();
       }
 
+      // LINHA DE ACORDES VAZIA SAI COM BACKSPACE OU DELETE
+      if (
+        (event.key == "Backspace" || event.key == "Delete") &&
+        !this.input().innerText.trim()
+      ) {
+        this.$emit("join", {
+          direction: event.key == "Backspace" ? "backward" : "forward",
+          index: this.songIndex,
+        });
+
+        event.preventDefault();
+      }
+
       if (event.key == "ArrowUp" || event.key == "ArrowDown") {
         const offsets = getSelectionOffsets(this.input());
 
