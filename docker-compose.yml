@@ -1,0 +1,21 @@
+# SOBE O BANCO E A API. AS VARIÁVEIS DA API VÊM DE backend/.env (VER .env.example)
+services:
+  mongo:
+    image: mongo:8
+    restart: unless-stopped
+    volumes:
+      - mongo-data:/data/db
+
+  api:
+    build: ./backend
+    restart: unless-stopped
+    depends_on:
+      - mongo
+    env_file: ./backend/.env
+    environment:
+      MONGO_URL: mongodb://mongo:27017
+    ports:
+      - "3000:3000"
+
+volumes:
+  mongo-data:

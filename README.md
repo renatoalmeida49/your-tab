@@ -18,6 +18,12 @@ Recursos do editor:
 * Tema claro, escuro ou do sistema
 * PDF igual à folha do editor, com pré-visualização e nome do arquivo
 
+Acervo na nuvem:
+
+* Login com a conta Google
+* "Salvar" (`Ctrl+S`) guarda a música no seu acervo; abra, busque e exclua suas cifras de qualquer lugar
+* Playlists: monte repertórios com as cifras do acervo, na ordem que quiser
+
 ## :clipboard: Sumário
 
 - [Visão Geral](#visao-geral)
@@ -29,6 +35,10 @@ Recursos do editor:
   - [O que aprendi](#o-que-aprendi)
 - [Futuras implementações](#futuras-implementacoes)
 - [Como executar o projeto](#como-executar-o-projeto)
+  - [Banco de dados](#banco-de-dados)
+  - [Backend](#backend)
+  - [Frontend](#frontend)
+  - [Testes](#testes)
 - [Autor](#autor)
 
 ## :telescope: Visão geral
@@ -49,27 +59,27 @@ Encontrei um site que oferecia justamente isso: criação de tab de forma simple
   
 Editor, com os botões de um bloco (`+` para inserir, `⋮⋮` para arrastar ou abrir as ações):
 
-![Editor no tema claro](./src/assets/screenshots/editor.jpeg)
+![Editor no tema claro](./frontend/src/assets/screenshots/editor.jpeg)
 
 Tema escuro, tab de baixo e o seletor aberto com `/`:
 
-![Editor no tema escuro com o seletor de partes](./src/assets/screenshots/editor-escuro.jpeg)
+![Editor no tema escuro com o seletor de partes](./frontend/src/assets/screenshots/editor-escuro.jpeg)
 
 PDF gerado, igual à folha do editor:
 
-![PDF exportado](./src/assets/screenshots/pdf.jpeg)
+![PDF exportado](./frontend/src/assets/screenshots/pdf.jpeg)
 
 Modo palco, com transposição, tamanho da letra e rolagem automática:
 
-![Modo palco](./src/assets/screenshots/modo-palco.jpeg)
+![Modo palco](./frontend/src/assets/screenshots/modo-palco.jpeg)
 
 Paleta de comandos (`Ctrl+K`):
 
-![Paleta de comandos](./src/assets/screenshots/paleta.jpeg)
+![Paleta de comandos](./frontend/src/assets/screenshots/paleta.jpeg)
 
 No celular:
 
-<img src="./src/assets/screenshots/celular.jpeg" alt="Editor no celular" width="300">
+<img src="./frontend/src/assets/screenshots/celular.jpeg" alt="Editor no celular" width="300">
     
 ### Links
  
@@ -86,9 +96,25 @@ No celular:
   - Vue Draggable Plus
   - Reka UI (diálogos e menus acessíveis) e ícones Lucide
   - Inter e JetBrains Mono (@fontsource), design tokens em CSS custom properties
+- Backend:
+  - Node.js com Fastify e TypeScript
+  - MongoDB (driver oficial) e validação com Zod
+  - Login com Google (ID token validado no servidor) e sessão em cookie `httpOnly`
+- Infraestrutura:
+  - Docker e Docker Compose (MongoDB e API)
 - Testes:
-  - Vitest (núcleo: tab, acordes, PDF)
-  - Playwright
+  - Vitest (núcleo do editor; API inteira com MongoDB em memória)
+  - Playwright (E2E com uma API falsa, sem depender do backend)
+
+A arquitetura, o modelo de dados, os endpoints e as regras de acesso estão no [SDD](./SDD.md).
+
+```text
+your-tab/
+├── frontend/            o editor (Vue 3 + Vite)
+├── backend/             a API (Fastify + MongoDB)
+├── docker-compose.yml   MongoDB + API
+└── SDD.md               documento de design
+```
 
 ### O que aprendi
 
@@ -103,24 +129,69 @@ Há muitos recursos acessíveis pelo front e é possível construir muita coisa 
   
 :white_check_mark: Melhorar a tela inicial. Necessário deixar mais intuitiva e clara  
 :white_check_mark: Utilização da biblioteca i18n para múltiplas linguagens   
+:white_check_mark: Login, acervo de cifras e playlists  
 :white_medium_square: Rota 404  
 
 ## :arrow_forward: Como executar o projeto
 
-O projeto precisa do NodeJs 22 ou superior. Se você usa o [nvm](https://github.com/nvm-sh/nvm), a versão já está definida no `.nvmrc`:
+São três partes rodando ao mesmo tempo: o **MongoDB**, a **API** (`backend/`) e o **editor** (`frontend/`). O editor funciona sozinho, mas sem a API não há login nem acervo.
+
+Requisitos:
+
+- **Node.js 22** ou superior. Com o [nvm](https://github.com/nvm-sh/nvm), rode `nvm use` dentro de `backend/` ou `frontend/` (a versão está no `.nvmrc`)
+- **Yarn 1** (definido em `packageManager`; com o [Corepack](https://nodejs.org/api/corepack.html) ativo a versão certa é usada automaticamente)
+- **Docker**, para o MongoDB
+
+### Banco de dados
+
+Na primeira vez, crie o container do MongoDB (os dados ficam no volume `tab-mongo`):
 ```
-nvm use
+docker run -d --name tab-mongo -p 127.0.0.1:27017:27017 -v tab-mongo:/data/db mongo:8
 ```
 
-O gerenciador de pacotes é o Yarn 1 (definido em `packageManager` no `package.json`; com o [Corepack](https://nodejs.org/api/corepack.html) ativo a versão certa é usada automaticamente). Após realizar o clone do repositório, navegue até a pasta raiz do projeto e instale as dependências:
+Nas próximas, basta iniciá-lo:
 ```
+docker start tab-mongo
+```
+
+Para olhar os dados: `docker exec -it tab-mongo mongosh tab-builder`, a extensão *MongoDB for VS Code* ou o MongoDB Compass, conectando em `mongodb://localhost:27017`.
+
+### Backend
+
+```
+cd backend
 yarn
+cp .env.example .env
 ```
-  
-Com as dependências instaladas execute o comando seguinte para executar o projeto:
+
+No `.env`, preencha:
+
+- `JWT_SECRET`: um segredo de pelo menos 32 caracteres (ex: `openssl rand -base64 48`)
+- `GOOGLE_CLIENT_ID`: o ID do cliente OAuth do Google. Crie em *Google Cloud Console → APIs e serviços → Credenciais → ID do cliente OAuth (Aplicativo da Web)* e autorize a origem `http://localhost:5173`. Vazio, a API sobe, mas o login fica desligado
+
+Depois suba a API em `http://localhost:3000` (ela reinicia sozinha ao editar o código):
 ```
+yarn dev
+```
+
+Outros comandos:
+```
+yarn build     // compila para dist/
+yarn start     // roda o build (produção)
+yarn typecheck // checagem de tipos
+```
+
+Com Docker, o `docker-compose.yml` na raiz sobe o MongoDB e a API juntos (`docker compose up -d`), usando o mesmo `backend/.env`.
+
+### Frontend
+
+```
+cd frontend
+yarn
 yarn serve
 ```
+
+O editor abre em `http://localhost:5173`. Em desenvolvimento, o Vite repassa as chamadas `/api` para a API na porta 3000, então front e API ficam na mesma origem, como em produção.
 
 Outros comandos:
 ```
@@ -132,12 +203,19 @@ yarn lint      // ESLint + Prettier
 
 ### Testes
 
-Os testes unitários (lógica da tab em `src/core`) usam o [Vitest](https://vitest.dev/):
+Backend, a API inteira contra um MongoDB em memória (não precisa do Docker nem do Google):
 ```
+cd backend
+yarn test
+```
+
+Frontend, testes unitários do núcleo do editor (`src/core`) com o [Vitest](https://vitest.dev/):
+```
+cd frontend
 yarn test:unit
 ```
 
-Os testes E2E usam o [Playwright](https://playwright.dev/) e sobem o servidor de desenvolvimento sozinhos. Na primeira vez, instale o navegador:
+Frontend, testes E2E com o [Playwright](https://playwright.dev/). Eles sobem o servidor de desenvolvimento sozinhos e simulam a API, então não precisam do backend. Na primeira vez, instale o navegador:
 ```
 npx playwright install chromium
 ```
