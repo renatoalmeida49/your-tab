@@ -41,6 +41,13 @@ export class FakeApi {
     return doc;
   }
 
+  addPlaylist(name: string, cipherIds: string[]): Doc {
+    const doc = this.create({ name, cipherIds });
+
+    this.playlists.unshift(doc);
+    return doc;
+  }
+
   async install(page: Page): Promise<void> {
     await page.route("**/api/**", (route) => this.handle(route));
   }

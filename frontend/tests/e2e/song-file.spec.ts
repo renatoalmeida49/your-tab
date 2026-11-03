@@ -218,6 +218,64 @@ test.describe("arquivo de músicas no acervo", () => {
     ]);
   });
 
+  test("baixar a playlist leva as cifras na ordem dela e o nome", async ({
+    page,
+    api,
+  }) => {
+    const first = api.addCipher(SONG);
+    const second = api.addCipher(OTHER);
+    api.addPlaylist("Luau", [second.id, first.id, second.id]);
+    await openLibrary(page);
+    await page.locator(".library__tab-playlists").click();
+
+    const downloading = page.waitForEvent("download");
+    await page.locator(".library__export-playlist").click();
+    const download = await downloading;
+
+    expect(download.suggestedFilename()).toBe("Luau.json");
+    const file = await contentOf(download);
+    expect(file.playlist).toBe("Luau");
+    // A REPETIDA SAI UMA VEZ SÓ
+    expect(file.songs).toEqual([OTHER, SONG]);
+  });
+
+  test("playlist vazia não tem o que baixar", async ({ page, api }) => {
+    api.addPlaylist("Vazia", []);
+    await openLibrary(page);
+    await page.locator(".library__tab-playlists").click();
+
+    await expect(page.locator(".library__export-playlist")).toBeDisabled();
+  });
+
+  test("importar arquivo de playlist recria a playlist", async ({
+    page,
+    api,
+  }) => {
+    await openLibrary(page);
+
+    await chooseFile(
+      page,
+      () => page.locator(".library__import").click(),
+      JSON.stringify({ ...JSON.parse(fileOf(SONG, OTHER)), playlist: "Luau" })
+    );
+
+    await expect(page.locator(".toast")).toContainText(
+      "Playlist Luau importada com 2 músicas"
+    );
+    expect(api.playlists).toHaveLength(1);
+    expect(api.playlists[0].name).toBe("Luau");
+    const titles = (api.playlists[0].cipherIds as string[]).map(
+      (id) => api.ciphers.find((cipher) => cipher.id == id)?.title
+    );
+    expect(titles).toEqual(["Segredos", "Proud Mary"]);
+
+    await page.locator(".library__tab-playlists").click();
+    await expect(page.locator(".library__song-title")).toHaveText([
+      "Segredos",
+      "Proud Mary",
+    ]);
+  });
+
   test("importar arquivo inválido não cria nada", async ({ page, api }) => {
     await openLibrary(page);
 

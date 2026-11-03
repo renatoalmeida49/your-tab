@@ -125,6 +125,8 @@ export const locale: MessageSchema = {
       open: "Open",
       delete: "Delete",
       addToPlaylist: "Add to playlist",
+      alreadyInPlaylist: "Already in this playlist",
+      addedToPlaylist: "Added to playlist {name}",
       noPlaylists: "Create a playlist in the Playlists tab",
       saved: "Saved to your library",
       openConfirm:
@@ -165,8 +167,10 @@ export const locale: MessageSchema = {
       import: "Import",
       importHint: "Adds the songs from .json files to the library",
       imported: "Songs imported into the library: {count}",
+      importedPlaylist: "Playlist {name} imported with {count} songs",
       exportAll: "Export all",
       exportAllHint: "Downloads every song in the library as a .json file",
+      exportPlaylist: "Download the playlist (.json)",
       errors: {
         invalid: "Invalid file: it isn't a Tab Builder song file",
         newer:
