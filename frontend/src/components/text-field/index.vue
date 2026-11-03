@@ -139,7 +139,11 @@ export default defineComponent({
   },
 
   methods: {
-    ...mapActions(useSongStore, ["addContentBetweenParts", "updatePart"]),
+    ...mapActions(useSongStore, [
+      "addContentBetweenParts",
+      "replacePart",
+      "updatePart",
+    ]),
 
     input(): HTMLElement {
       return this.$refs.input as HTMLElement;
@@ -215,16 +219,22 @@ export default defineComponent({
       }
     },
 
-    // O VERSO (ACORDES) ENTRA ACIMA DA LETRA; A TAB, ABAIXO
+    // CAMPO VAZIO DÁ LUGAR À PARTE ESCOLHIDA. COM TEXTO, O VERSO (ACORDES)
+    // ENTRA ACIMA DA LETRA; A TAB, ABAIXO
     insertOption(index: number) {
       const partToAdd = this.options[index].type;
+
+      this.showSelect = false;
+
+      if (!this.info.text.trim()) {
+        this.replacePart({ id: this.partId, component: partToAdd });
+        return;
+      }
 
       this.addContentBetweenParts({
         component: partToAdd,
         index: partToAdd == "verse" ? this.songIndex : this.songIndex + 1,
       });
-
-      this.showSelect = false;
     },
 
     moveSelection(step: number) {

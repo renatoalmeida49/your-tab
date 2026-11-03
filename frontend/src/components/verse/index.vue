@@ -17,7 +17,7 @@
 
 <script lang="ts">
 import { defineComponent, type PropType } from "vue";
-import { mapActions } from "pinia";
+import { mapActions, mapState } from "pinia";
 import { useSongStore } from "@/stores/song";
 import { focusAt, getSelectionOffsets } from "@/core/caret";
 import { partEmits, type FocusTarget } from "@/types/editor";
@@ -43,6 +43,8 @@ export default defineComponent({
 
   mounted() {
     this.input().innerText = this.info.chords;
+
+    if (this.focusId == this.partId) this.input().focus();
   },
 
   // CONTENTEDITABLE NÃO É REATIVO: ATUALIZA QUANDO O STORE MUDA POR FORA
@@ -52,6 +54,10 @@ export default defineComponent({
         this.input().innerText = chords;
       }
     },
+  },
+
+  computed: {
+    ...mapState(useSongStore, ["focusId"]),
   },
 
   methods: {
