@@ -125,6 +125,8 @@ export const locale = {
       open: "Abrir",
       delete: "Excluir",
       addToPlaylist: "Adicionar à playlist",
+      alreadyInPlaylist: "Já está nesta playlist",
+      addedToPlaylist: "Adicionada à playlist {name}",
       noPlaylists: "Crie uma playlist na aba Playlists",
       saved: "Salvo no acervo",
       openConfirm:
@@ -165,8 +167,10 @@ export const locale = {
       import: "Importar",
       importHint: "Traz para o acervo as músicas de arquivos .json",
       imported: "Músicas importadas para o acervo: {count}",
+      importedPlaylist: "Playlist {name} importada com {count} músicas",
       exportAll: "Exportar tudo",
       exportAllHint: "Baixa todas as cifras do acervo num arquivo .json",
+      exportPlaylist: "Baixar a playlist (.json)",
       errors: {
         invalid: "Arquivo inválido: não é um arquivo de música do Tab Builder",
         newer:

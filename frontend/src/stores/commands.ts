@@ -1,13 +1,13 @@
 import { downloadText, pickFiles } from "@/core/files";
 import { guessInstrument, sameTuning, type PastedSong } from "@/core/paste";
 import {
-  parseSongFile,
+  parseSongFileContent,
   songFile,
   songFileMessage,
   songFileName,
+  type SongFileContent,
 } from "@/core/song-file";
 import { hasNotes, retune } from "@/core/tab";
-import type { CipherFields } from "@/types/library";
 import { useConfirmStore } from "./confirm";
 import { useHistoryStore } from "./history";
 import { useInstrumentStore } from "./instrument";
@@ -99,14 +99,15 @@ export function downloadSongFile(): void {
   downloadText(songFile([song]), songFileName([song]));
 }
 
-// LÊ OS ARQUIVOS ESCOLHIDOS. ARQUIVO INVÁLIDO: AVISA E DEVOLVE null
+// LÊ OS ARQUIVOS ESCOLHIDOS, UM ITEM POR ARQUIVO. ARQUIVO INVÁLIDO: AVISA E
+// DEVOLVE null
 export async function readSongFiles(
   files: File[]
-): Promise<CipherFields[] | null> {
+): Promise<SongFileContent[] | null> {
   try {
     const contents = await Promise.all(files.map((file) => file.text()));
 
-    return contents.flatMap(parseSongFile);
+    return contents.map(parseSongFileContent);
   } catch (error) {
     useUiStore().showFlash(songFileMessage(error), true);
     return null;
@@ -117,9 +118,11 @@ export async function readSongFiles(
 // MÚSICAS, ABRE A PRIMEIRA: TRAZER TODAS É COM O "IMPORTAR" DO ACERVO
 export async function openSongFile(): Promise<void> {
   const files = await pickFiles({ accept: SONG_FILE_ACCEPT });
-  const songs = files.length ? await readSongFiles(files) : null;
+  const contents = files.length ? await readSongFiles(files) : null;
 
-  if (!songs) return;
+  if (!contents) return;
+
+  const songs = contents.flatMap((content) => content.songs);
 
   const song = useSongStore();
   const library = useLibraryStore();

@@ -22,6 +22,14 @@ export interface SongFile {
   version: number;
   exportedAt: string;
   songs: CipherFields[];
+  // VEIO DE UMA PLAYLIST: AO IMPORTAR, ELA É RECRIADA COM ESTE NOME
+  playlist?: string;
+}
+
+// O QUE SE LÊ DE UM ARQUIVO
+export interface SongFileContent {
+  songs: CipherFields[];
+  playlist?: string;
 }
 
 // reason É O FIM DA CHAVE DO i18n: components.songFile.errors.<reason>
@@ -33,19 +41,31 @@ export class SongFileError extends Error {
   }
 }
 
-export function songFile(songs: CipherFields[], now = new Date()): string {
+export function songFile(
+  songs: CipherFields[],
+  now = new Date(),
+  playlist?: string
+): string {
   const file: SongFile = {
     app: APP,
     version: VERSION,
     exportedAt: now.toISOString(),
     songs,
+    ...(playlist && { playlist }),
   };
 
   return JSON.stringify(file, null, 2);
 }
 
-// UMA MÚSICA: "Título - Artista.json". VÁRIAS: "tab-builder-2026-10-22.json"
-export function songFileName(songs: CipherFields[], now = new Date()): string {
+// PLAYLIST: "Luau.json". UMA MÚSICA: "Título - Artista.json". VÁRIAS:
+// "tab-builder-2026-10-22.json"
+export function songFileName(
+  songs: CipherFields[],
+  now = new Date(),
+  playlist?: string
+): string {
+  if (playlist) return `${pdfFileName(playlist, "")}.json`;
+
   if (songs.length == 1) {
     return `${pdfFileName(songs[0].title, songs[0].artist)}.json`;
   }
@@ -122,7 +142,7 @@ function song(value: unknown): CipherFields {
 }
 
 // CONFERE TUDO ANTES DE USAR: O ARQUIVO PODE TER SIDO EDITADO À MÃO
-export function parseSongFile(content: string): CipherFields[] {
+export function parseSongFileContent(content: string): SongFileContent {
   let file: unknown;
 
   try {
@@ -139,7 +159,14 @@ export function parseSongFile(content: string): CipherFields[] {
   if (!Array.isArray(file.songs)) throw new SongFileError("invalid");
   if (!file.songs.length) throw new SongFileError("empty");
 
-  return file.songs.map(song);
+  const songs = file.songs.map(song);
+  const playlist = text(file.playlist, MAX_TEXT);
+
+  return playlist ? { songs, playlist } : { songs };
+}
+
+export function parseSongFile(content: string): CipherFields[] {
+  return parseSongFileContent(content).songs;
 }
 
 // CHAVE DO i18n DO AVISO DE ERRO AO LER UM ARQUIVO

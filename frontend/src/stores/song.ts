@@ -67,7 +67,7 @@ export const useSongStore = defineStore("song", {
     newPart(type: PartType, content?: string): Part {
       const part = createPart(type, content);
 
-      if (part.type == "textField") this.setFocusId(part.id);
+      this.setFocusId(part.id);
 
       return part;
     },
@@ -86,6 +86,14 @@ export const useSongStore = defineStore("song", {
         0,
         this.newPart(payload.component, payload.content)
       );
+    },
+
+    // A PARTE DE `id` DÁ LUGAR A UMA NOVA, NA MESMA POSIÇÃO
+    replacePart(payload: { id: string; component: PartType }) {
+      const index = this.parts.findIndex((part) => part.id == payload.id);
+
+      if (index >= 0)
+        this.parts.splice(index, 1, this.newPart(payload.component));
     },
 
     // PARTES COLADAS, EM ORDEM, A PARTIR DE `index`. replaceId: CAMPO VAZIO

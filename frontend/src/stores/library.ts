@@ -2,7 +2,7 @@ import { defineStore } from "pinia";
 
 import { api, ApiError } from "@/core/api";
 import { downloadText } from "@/core/files";
-import { songFile, songFileName } from "@/core/song-file";
+import { songFile, songFileName, type SongFileContent } from "@/core/song-file";
 import type {
   Cipher,
   CipherFields,
@@ -252,19 +252,22 @@ export const useLibraryStore = defineStore("library", {
       if (id == this.cipherId) this.unlink();
     },
 
-    // TODO O ACERVO NUM ARQUIVO SÓ (A LISTA NÃO TRAZ AS PARTES: BUSCA CADA UMA)
-    async exportAll() {
-      if (this.transferring || !this.ciphers.length) return;
+    // AS CIFRAS NUM ARQUIVO SÓ, NA ORDEM DE ids (A LISTA NÃO TRAZ AS PARTES:
+    // BUSCA CADA UMA). playlist: O ARQUIVO RECRIA A PLAYLIST AO IMPORTAR
+    async exportCiphers(ids: string[], playlist?: string) {
+      if (this.transferring || !ids.length) return;
 
       this.transferring = true;
 
       try {
-        const ciphers = await Promise.all(
-          this.ciphers.map((cipher) => api.getCipher(cipher.id))
-        );
+        const ciphers = await Promise.all(ids.map((id) => api.getCipher(id)));
         const songs = ciphers.map(fieldsOf);
+        const now = new Date();
 
-        downloadText(songFile(songs), songFileName(songs));
+        downloadText(
+          songFile(songs, now, playlist),
+          songFileName(songs, now, playlist)
+        );
       } catch (error) {
         fail(error);
       } finally {
@@ -272,23 +275,70 @@ export const useLibraryStore = defineStore("library", {
       }
     },
 
-    // CADA MÚSICA DOS ARQUIVOS VIRA UMA CIFRA NOVA, NA ORDEM DO ARQUIVO.
-    // SE A API FALHAR NO MEIO, AS QUE JÁ ENTRARAM FICAM
-    async importSongs(songs: CipherFields[]) {
+    // TODO O ACERVO
+    exportAll() {
+      return this.exportCiphers(this.ciphers.map((cipher) => cipher.id));
+    },
+
+    // A MESMA CIFRA SÓ UMA VEZ, MESMO EM PLAYLIST ANTIGA COM REPETIDAS
+    exportPlaylist(playlist: Playlist) {
+      return this.exportCiphers(
+        [...new Set(playlist.cipherIds)],
+        playlist.name
+      );
+    },
+
+    // CADA MÚSICA DOS ARQUIVOS VIRA UMA CIFRA NOVA, NA ORDEM DO ARQUIVO; ARQUIVO
+    // DE PLAYLIST RECRIA A PLAYLIST COM ELAS. SE A API FALHAR NO MEIO, AS QUE
+    // JÁ ENTRARAM FICAM
+    async importSongs(contents: SongFileContent[]) {
       if (this.transferring) return;
 
       this.transferring = true;
 
       try {
-        for (const song of songs) {
-          const cipher = await api.createCipher(song);
+        const playlists: string[] = [];
 
-          this.ciphers = [summary(cipher), ...this.ciphers];
+        for (const content of contents) {
+          const ids: string[] = [];
+
+          for (const song of content.songs) {
+            const cipher = await api.createCipher(song);
+
+            this.ciphers = [summary(cipher), ...this.ciphers];
+            ids.push(cipher.id);
+          }
+
+          if (content.playlist) {
+            const playlist = await api.createPlaylist({
+              name: content.playlist,
+              cipherIds: ids,
+            });
+
+            this.playlists.unshift(playlist);
+            playlists.push(playlist.name);
+          }
         }
 
-        useUiStore().showFlash("components.songFile.imported", false, {
-          count: songs.length,
-        });
+        const count = contents.reduce(
+          (sum, item) => sum + item.songs.length,
+          0
+        );
+
+        if (playlists.length == 1) {
+          useUiStore().showFlash(
+            "components.songFile.importedPlaylist",
+            false,
+            {
+              name: playlists[0],
+              count,
+            }
+          );
+        } else {
+          useUiStore().showFlash("components.songFile.imported", false, {
+            count,
+          });
+        }
       } catch (error) {
         fail(error);
       } finally {
@@ -307,25 +357,39 @@ export const useLibraryStore = defineStore("library", {
     },
 
     // NOME E ORDEM DAS CIFRAS. A LISTA SÓ MUDA NA TELA DEPOIS DA API ACEITAR
+    // true SE SALVOU
     async updatePlaylist(
       id: string,
       fields: Pick<Playlist, "name" | "cipherIds">
-    ) {
+    ): Promise<boolean> {
       try {
         const playlist = await api.updatePlaylist(id, fields);
         const index = this.playlists.findIndex((item) => item.id == id);
 
         if (index >= 0) this.playlists.splice(index, 1, playlist);
+
+        return true;
       } catch (error) {
         fail(error);
+
+        return false;
       }
     },
 
-    addToPlaylist(playlist: Playlist, cipherId: string) {
-      return this.updatePlaylist(playlist.id, {
+    // A MESMA CIFRA NÃO REPETE NA PLAYLIST
+    async addToPlaylist(playlist: Playlist, cipherId: string) {
+      if (playlist.cipherIds.includes(cipherId)) return;
+
+      const saved = await this.updatePlaylist(playlist.id, {
         name: playlist.name,
         cipherIds: [...playlist.cipherIds, cipherId],
       });
+
+      if (saved) {
+        useUiStore().showFlash("components.library.addedToPlaylist", false, {
+          name: playlist.name,
+        });
+      }
     },
 
     removeFromPlaylist(playlist: Playlist, index: number) {

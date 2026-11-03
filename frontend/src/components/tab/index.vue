@@ -14,7 +14,7 @@
 
 <script lang="ts">
 import { defineComponent, type PropType } from "vue";
-import { mapActions } from "pinia";
+import { mapActions, mapState } from "pinia";
 import { useSongStore } from "@/stores/song";
 import { getSelectionOffsets, setCaret } from "@/core/caret";
 import { partEmits, type FocusTarget } from "@/types/editor";
@@ -48,6 +48,11 @@ export default defineComponent({
 
   mounted() {
     this.render(clean(this.info.text));
+
+    // TAB NOVA: CURSOR NO COMEÇO DA PRIMEIRA CORDA
+    if (this.focusId == this.partId) {
+      this.focusAt({ direction: "down", column: 0 });
+    }
   },
 
   // CONTENTEDITABLE NÃO É REATIVO: ATUALIZA QUANDO O STORE MUDA POR FORA
@@ -56,6 +61,10 @@ export default defineComponent({
     "info.text"(text: string) {
       if (clean(text) != this.text()) this.render(clean(text));
     },
+  },
+
+  computed: {
+    ...mapState(useSongStore, ["focusId"]),
   },
 
   methods: {

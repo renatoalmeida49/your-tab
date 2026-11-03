@@ -133,6 +133,32 @@ test.describe("seletor '/'", () => {
     await expect(verse).toHaveClass(/show/);
 
     await page.keyboard.press("Enter");
-    expect(await songParts(page)).toEqual(["verse", "text:"]);
+    expect(await songParts(page)).toEqual(["verse"]);
+  });
+
+  test("campo vazio dá lugar à parte escolhida", async ({ page }) => {
+    await addFromMenu(page, "textField");
+    await page.keyboard.press("/");
+    await page.keyboard.press("Enter");
+
+    expect(await songParts(page)).toEqual(["tab"]);
+    await expect(partSelect(page)).toHaveCount(0);
+  });
+
+  test("a parte escolhida já vem em foco", async ({ page }) => {
+    await addFromMenu(page, "textField");
+    await page.keyboard.press("/");
+    await page.keyboard.press("ArrowDown");
+    await page.keyboard.press("Enter");
+
+    await expect(page.locator(".verse__input")).toBeFocused();
+    await page.keyboard.type("Am");
+    await expect(page.locator(".verse__input")).toHaveText("Am");
+
+    await page.keyboard.press("Enter");
+    await page.keyboard.press("/");
+    await page.keyboard.press("Enter");
+
+    await expect(page.locator(".tab")).toBeFocused();
   });
 });

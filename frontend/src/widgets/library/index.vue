@@ -124,9 +124,19 @@
                         v-for="playlist in playlists"
                         :key="playlist.id"
                         class="dropdown__item library__add-item"
+                        :disabled="playlist.cipherIds.includes(cipher.id)"
+                        :title="
+                          playlist.cipherIds.includes(cipher.id)
+                            ? $t('components.library.alreadyInPlaylist')
+                            : undefined
+                        "
                         @select="addToPlaylist(playlist, cipher.id)"
                       >
-                        <ListMusic :size="16" />
+                        <Check
+                          v-if="playlist.cipherIds.includes(cipher.id)"
+                          :size="16"
+                        />
+                        <ListMusic v-else :size="16" />
                         {{ playlist.name }}
                       </DropdownMenuItem>
                       <DropdownMenuItem
@@ -206,6 +216,18 @@
               </div>
 
               <div class="library__actions">
+                <TheButton
+                  size="sm"
+                  variant="ghost"
+                  icon
+                  class="library__export-playlist"
+                  :title="$t('components.songFile.exportPlaylist')"
+                  :aria-label="$t('components.songFile.exportPlaylist')"
+                  :disabled="!playlist.cipherIds.length || transferring"
+                  @click="exportPlaylist(playlist)"
+                >
+                  <Download :size="16" />
+                </TheButton>
                 <TheButton
                   size="sm"
                   variant="ghost"
@@ -306,6 +328,7 @@ import {
   TabsTrigger,
 } from "reka-ui";
 import {
+  Check,
   ChevronDown,
   ChevronUp,
   Download,
@@ -337,6 +360,7 @@ export default defineComponent({
   name: "TheLibrary",
 
   components: {
+    Check,
     ChevronDown,
     ChevronUp,
     Download,
@@ -416,6 +440,7 @@ export default defineComponent({
       "moveInPlaylist",
       "deletePlaylist",
       "exportAll",
+      "exportPlaylist",
       "importSongs",
     ]),
 
@@ -425,9 +450,9 @@ export default defineComponent({
         accept: SONG_FILE_ACCEPT,
         multiple: true,
       });
-      const songs = files.length ? await readSongFiles(files) : null;
+      const contents = files.length ? await readSongFiles(files) : null;
 
-      if (songs) await this.importSongs(songs);
+      if (contents) await this.importSongs(contents);
     },
 
     cipherById(id: string): CipherSummary | undefined {

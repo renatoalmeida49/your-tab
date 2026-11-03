@@ -189,7 +189,18 @@ test.describe("logado", () => {
       await page.locator(".library__add").nth(index).click();
       await page.locator(".library__add-item", { hasText: "Luau" }).click();
       await expect(page.locator(".library__menu")).toHaveCount(0);
+      // O AVISO ANTERIOR AINDA PODE ESTAR SAINDO
+      await expect(page.locator(".toast").last()).toContainText(
+        "Adicionada à playlist Luau"
+      );
     }
+
+    // JÁ ESTÁ NA PLAYLIST: A OPÇÃO APARECE, MAS DESABILITADA
+    await page.locator(".library__add").first().click();
+    await expect(
+      page.locator(".library__add-item", { hasText: "Luau" })
+    ).toHaveAttribute("data-disabled");
+    await page.keyboard.press("Escape");
 
     await page.locator(".library__tab-playlists").click();
     await expect(songs).toHaveText(["Segunda", "Primeira"]);
