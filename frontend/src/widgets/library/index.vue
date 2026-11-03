@@ -257,40 +257,40 @@
               {{ $t("components.library.playlistEmpty") }}
             </p>
 
-            <ol v-else class="library__list library__songs">
+            <!-- ARRASTA PELA ALÇA; COM O FOCO NELA, ↑/↓ TAMBÉM MOVEM -->
+            <VueDraggable
+              v-else
+              tag="ol"
+              class="library__list library__songs"
+              handle=".library__drag"
+              :animation="150"
+              :model-value="playlist.cipherIds"
+              @update:model-value="reorderPlaylist(playlist, $event)"
+            >
               <li
                 v-for="(id, index) in playlist.cipherIds"
-                :key="`${id}-${index}`"
+                :key="songKeys(playlist)[index]"
                 class="library__item library__song"
               >
+                <button
+                  class="library__drag"
+                  :title="$t('components.library.dragToReorder')"
+                  :aria-label="$t('components.library.dragToReorder')"
+                  @keydown.up.prevent="
+                    moveWithKeyboard($event, playlist, index, -1)
+                  "
+                  @keydown.down.prevent="
+                    moveWithKeyboard($event, playlist, index, 1)
+                  "
+                >
+                  <GripVertical :size="16" />
+                </button>
                 <span class="library__position">{{ index + 1 }}</span>
                 <button class="library__song-title" @click="openCipher(id)">
                   {{ titleOf(cipherById(id)) }}
                 </button>
 
                 <div class="library__actions">
-                  <TheButton
-                    size="sm"
-                    variant="ghost"
-                    icon
-                    :disabled="index == 0"
-                    :title="$t('components.library.moveUp')"
-                    :aria-label="$t('components.library.moveUp')"
-                    @click="moveInPlaylist(playlist, index, -1)"
-                  >
-                    <ChevronUp :size="16" />
-                  </TheButton>
-                  <TheButton
-                    size="sm"
-                    variant="ghost"
-                    icon
-                    :disabled="index == playlist.cipherIds.length - 1"
-                    :title="$t('components.library.moveDown')"
-                    :aria-label="$t('components.library.moveDown')"
-                    @click="moveInPlaylist(playlist, index, 1)"
-                  >
-                    <ChevronDown :size="16" />
-                  </TheButton>
                   <TheButton
                     size="sm"
                     variant="ghost"
@@ -304,7 +304,7 @@
                   </TheButton>
                 </div>
               </li>
-            </ol>
+            </VueDraggable>
           </section>
         </TabsContent>
       </template>
@@ -313,7 +313,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue";
+import { defineComponent, nextTick } from "vue";
 import { mapActions, mapState } from "pinia";
 import {
   DropdownMenuContent,
@@ -329,9 +329,8 @@ import {
 } from "reka-ui";
 import {
   Check,
-  ChevronDown,
-  ChevronUp,
   Download,
+  GripVertical,
   ListMusic,
   ListPlus,
   Music,
@@ -342,6 +341,7 @@ import {
   Upload,
   X,
 } from "lucide-vue-next";
+import { VueDraggable } from "vue-draggable-plus";
 import { pickFiles } from "@/core/files";
 import { readSongFiles, SONG_FILE_ACCEPT } from "@/stores/commands";
 import { useLibraryStore } from "@/stores/library";
@@ -361,8 +361,6 @@ export default defineComponent({
 
   components: {
     Check,
-    ChevronDown,
-    ChevronUp,
     Download,
     DropdownMenuContent,
     DropdownMenuItem,
@@ -370,6 +368,7 @@ export default defineComponent({
     DropdownMenuPortal,
     DropdownMenuRoot,
     DropdownMenuTrigger,
+    GripVertical,
     ListMusic,
     ListPlus,
     Music,
@@ -382,6 +381,7 @@ export default defineComponent({
     TabsTrigger,
     Trash2,
     Upload,
+    VueDraggable,
     X,
   },
 
@@ -438,6 +438,7 @@ export default defineComponent({
       "addToPlaylist",
       "removeFromPlaylist",
       "moveInPlaylist",
+      "reorderPlaylist",
       "deletePlaylist",
       "exportAll",
       "exportPlaylist",
@@ -478,6 +479,39 @@ export default defineComponent({
       ]
         .filter(Boolean)
         .join(" · ");
+    },
+
+    // CHAVE QUE NÃO MUDA QUANDO A MÚSICA TROCA DE LUGAR. CIFRA REPETIDA (DE
+    // PLAYLIST ANTIGA) GANHA "#2", "#3"...
+    songKeys(playlist: Playlist): string[] {
+      const seen: Record<string, number> = {};
+
+      return playlist.cipherIds.map((id) => {
+        seen[id] = (seen[id] ?? 0) + 1;
+
+        return `${id}#${seen[id]}`;
+      });
+    },
+
+    // O FOCO ACOMPANHA A MÚSICA: DÁ PARA CONTINUAR APERTANDO ↑/↓
+    async moveWithKeyboard(
+      event: KeyboardEvent,
+      playlist: Playlist,
+      index: number,
+      step: -1 | 1
+    ) {
+      const list = (event.currentTarget as HTMLElement).closest("ol");
+      const target = index + step;
+
+      if (target < 0 || target >= playlist.cipherIds.length) return;
+
+      const moving = this.moveInPlaylist(playlist, index, step);
+
+      await nextTick();
+      list?.children[target]
+        ?.querySelector<HTMLElement>(".library__drag")
+        ?.focus();
+      await moving;
     },
 
     async openCipher(id: string) {
@@ -749,6 +783,32 @@ export default defineComponent({
   &__song {
     padding: var(--space-1) var(--space-2);
     background: var(--color-surface);
+  }
+
+  &__drag {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 28px;
+    padding: 0;
+    border: none;
+    border-radius: var(--radius-sm);
+    background: none;
+    color: var(--color-text-subtle);
+    cursor: grab;
+    touch-action: none;
+
+    &:hover,
+    &:focus-visible {
+      background: var(--color-surface-hover);
+      color: var(--color-text);
+    }
+  }
+
+  // ONDE A MÚSICA ARRASTADA VAI CAIR
+  .sortable-ghost {
+    opacity: 0.4;
   }
 
   &__position {

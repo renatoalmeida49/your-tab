@@ -20,6 +20,10 @@ import { useUiStore } from "./ui";
 // QUAL CIFRA DO ACERVO ESTÁ NO EDITOR, PARA CONTINUAR APÓS RECARREGAR
 const STORAGE_KEY = "tab-builder:cipher";
 
+// ÚLTIMO PEDIDO DE CADA PLAYLIST: RESPOSTA DE UM PEDIDO ANTERIOR (EX: ↑/↓
+// APERTADOS RÁPIDO) NÃO DESFAZ O QUE VEIO DEPOIS
+const playlistRequests: Record<string, number> = {};
+
 interface Link {
   cipherId: string | null;
   // A MÚSICA COMO FOI SALVA/ABERTA: DIFERENTE DA ATUAL = ALTERAÇÕES NÃO SALVAS
@@ -362,11 +366,17 @@ export const useLibraryStore = defineStore("library", {
       id: string,
       fields: Pick<Playlist, "name" | "cipherIds">
     ): Promise<boolean> {
+      const request = (playlistRequests[id] ?? 0) + 1;
+
+      playlistRequests[id] = request;
+
       try {
         const playlist = await api.updatePlaylist(id, fields);
         const index = this.playlists.findIndex((item) => item.id == id);
 
-        if (index >= 0) this.playlists.splice(index, 1, playlist);
+        if (index >= 0 && request == playlistRequests[id]) {
+          this.playlists.splice(index, 1, playlist);
+        }
 
         return true;
       } catch (error) {
@@ -399,6 +409,27 @@ export const useLibraryStore = defineStore("library", {
       });
     },
 
+    // NOVA ORDEM NA HORA (O ARRASTO NÃO PULA DE VOLTA ENQUANTO A API
+    // RESPONDE). SE A API RECUSAR, VOLTA A ORDEM ANTERIOR, A MENOS QUE OUTRA
+    // MUDANÇA JÁ TENHA VINDO DEPOIS
+    async reorderPlaylist(playlist: Playlist, cipherIds: string[]) {
+      const previous = playlist.cipherIds;
+
+      playlist.cipherIds = cipherIds;
+
+      // LIDO DE VOLTA: O STORE GUARDA A VERSÃO REATIVA DO ARRAY
+      const applied = playlist.cipherIds;
+      const saved = await this.updatePlaylist(playlist.id, {
+        name: playlist.name,
+        cipherIds,
+      });
+      const current = this.playlists.find((item) => item.id == playlist.id);
+
+      if (!saved && current?.cipherIds == applied) {
+        current.cipherIds = previous;
+      }
+    },
+
     // step -1 SOBE, 1 DESCE
     moveInPlaylist(playlist: Playlist, index: number, step: -1 | 1) {
       const target = index + step;
@@ -411,10 +442,7 @@ export const useLibraryStore = defineStore("library", {
         cipherIds[index],
       ];
 
-      return this.updatePlaylist(playlist.id, {
-        name: playlist.name,
-        cipherIds,
-      });
+      return this.reorderPlaylist(playlist, cipherIds);
     },
 
     async deletePlaylist(id: string) {

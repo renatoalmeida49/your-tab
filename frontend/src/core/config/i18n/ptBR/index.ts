@@ -144,8 +144,7 @@ export const locale = {
       songs: "nenhuma música | {n} música | {n} músicas",
       rename: "Renomear",
       deletePlaylist: "Excluir playlist",
-      moveUp: "Mover para cima",
-      moveDown: "Mover para baixo",
+      dragToReorder: "Arraste para reordenar (ou use ↑/↓)",
       removeFromPlaylist: "Tirar da playlist",
       errors: {
         session: "Sua sessão expirou. Entre de novo para salvar.",
