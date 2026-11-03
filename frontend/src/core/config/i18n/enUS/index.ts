@@ -238,6 +238,11 @@ export const locale: MessageSchema = {
           description: "Moves the cursor between parts, keeping the column",
         },
         {
+          keys: "Alt+→",
+          description:
+            "In a tab, opens a column at the cursor on every string (Alt+← removes an empty column)",
+        },
+        {
           keys: "Backspace",
           description:
             "At the start of a line, joins it with the one above (Delete, at the end, joins the one below)",
