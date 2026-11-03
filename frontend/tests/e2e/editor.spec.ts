@@ -119,6 +119,35 @@ test.describe("tab: edição por cima dos traços", () => {
     expect(new Set(rows.map((row) => row.length)).size).toBe(1);
   });
 
+  test("Alt+→ abre espaço no meio e Alt+← tira, sem desalinhar", async ({
+    page,
+  }) => {
+    await placeCaret(page, 1, 2);
+    await page.keyboard.type("13");
+    await placeCaret(page, 1, 3);
+    await page.keyboard.press("Alt+ArrowRight");
+    await page.keyboard.press("Alt+ArrowRight");
+
+    let rows = await tabLines(page);
+    expect(rows[1]).toBe("B|1--3" + "-".repeat(39));
+    expect(new Set(rows.map((row) => row.length)).size).toBe(1);
+    expect(await caretInTab(page)).toEqual({ line: 1, column: 3 });
+
+    // O ESPAÇO ABERTO RECEBE A NOTA NOVA
+    await page.keyboard.type("2");
+    expect((await tabLines(page))[1]).toBe("B|12-3" + "-".repeat(39));
+
+    // TIRA SÓ COLUNA VAZIA: A NOTA ANTES DO CURSOR FICA
+    await page.keyboard.press("Alt+ArrowLeft");
+    expect((await tabLines(page))[1]).toBe("B|12-3" + "-".repeat(39));
+
+    await page.keyboard.press("ArrowRight");
+    await page.keyboard.press("Alt+ArrowLeft");
+    rows = await tabLines(page);
+    expect(rows[1]).toBe("B|123" + "-".repeat(39));
+    expect(new Set(rows.map((row) => row.length)).size).toBe(1);
+  });
+
   test("Enter cria um campo de texto abaixo da tab", async ({ page }) => {
     await placeCaret(page, 0, 2);
     await page.keyboard.press("Enter");

@@ -5,10 +5,12 @@ import {
   eraseBackward,
   eraseForward,
   eraseRange,
+  insertColumn,
   notesLostByRetune,
   overwrite,
   pasteBlock,
   positionToCursor,
+  removeColumn,
   retune,
 } from "./tab";
 
@@ -101,6 +103,55 @@ describe("apagar", () => {
 
     expect(eraseRange(full, start, end).text).toBe(
       ["e|12---", "B|--345"].join("\n")
+    );
+  });
+});
+
+describe("colunas", () => {
+  const notes = ["e|-0-3-", "B|-1---", "G|-----"].join("\n");
+
+  it("inserir abre um traço no cursor em todas as cordas", () => {
+    const result = insertColumn(notes, { line: 1, column: 4 });
+
+    expect(result.text).toBe(["e|-0--3-", "B|-1----", "G|------"].join("\n"));
+    expect(result.cursor).toEqual({ line: 1, column: 4 });
+  });
+
+  it("inserir no rótulo abre a coluna logo depois dele", () => {
+    const result = insertColumn(notes, { line: 0, column: 0 });
+
+    expect(result.text.split("\n")[0]).toBe("e|--0-3-");
+    expect(result.cursor).toEqual({ line: 0, column: 2 });
+  });
+
+  it("corda mais curta que o cursor é completada até a coluna nova", () => {
+    const uneven = ["e|--", "B|-----"].join("\n");
+
+    expect(insertColumn(uneven, { line: 1, column: 5 }).text).toBe(
+      ["e|----", "B|------"].join("\n")
+    );
+  });
+
+  it("remover tira a coluna vazia antes do cursor em todas as cordas", () => {
+    const result = removeColumn(notes, { line: 2, column: 5 });
+
+    expect(result.text).toBe(["e|-03-", "B|-1--", "G|----"].join("\n"));
+    expect(result.cursor).toEqual({ line: 2, column: 4 });
+  });
+
+  it("remover não apaga nota, barra nem rótulo", () => {
+    const bar = ["e|-|-", "B|-|-"].join("\n");
+
+    expect(removeColumn(notes, { line: 2, column: 4 }).text).toBe(notes);
+    expect(removeColumn(bar, { line: 0, column: 4 }).text).toBe(bar);
+    expect(removeColumn(notes, { line: 0, column: 2 }).text).toBe(notes);
+  });
+
+  it("inserir e remover voltam ao original", () => {
+    const inserted = insertColumn(notes, { line: 0, column: 3 });
+
+    expect(removeColumn(inserted.text, { line: 0, column: 4 }).text).toBe(
+      notes
     );
   });
 });

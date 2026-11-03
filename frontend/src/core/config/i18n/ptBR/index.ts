@@ -238,6 +238,11 @@ export const locale = {
           description: "Move o cursor entre as partes, mantendo a coluna",
         },
         {
+          keys: "Alt+→",
+          description:
+            "Na tab, abre uma coluna no cursor em todas as cordas (Alt+← tira uma coluna vazia)",
+        },
+        {
           keys: "Backspace",
           description:
             "No começo da linha, junta com a de cima (Delete, no fim, junta com a de baixo)",

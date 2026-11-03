@@ -25,9 +25,11 @@ import {
   eraseForward,
   eraseRange,
   firstColumn,
+  insertColumn,
   overwrite,
   pasteBlock,
   positionToCursor,
+  removeColumn,
 } from "@/core/tab";
 
 function clean(text: string): string {
@@ -183,6 +185,23 @@ export default defineComponent({
         this.$emit("newTextField", { index: this.songIndex });
 
         event.preventDefault();
+        return;
+      }
+
+      // Alt+→ ABRE ESPAÇO NO CURSOR; Alt+← TIRA O ESPAÇO VAZIO ANTES DELE
+      if (event.altKey && ["ArrowRight", "ArrowLeft"].includes(event.key)) {
+        const { text, cursor } = this.selection();
+        const result =
+          event.key == "ArrowRight"
+            ? insertColumn(text, cursor)
+            : removeColumn(text, cursor);
+
+        event.preventDefault();
+
+        if (result.text == text) return;
+
+        this.render(result.text, cursorToPosition(result.text, result.cursor));
+        this.save(result.text);
         return;
       }
 

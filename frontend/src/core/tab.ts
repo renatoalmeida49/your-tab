@@ -148,6 +148,39 @@ export function eraseRange(text: string, start: number, end: number): Edit {
   return { text: result, cursor: positionToCursor(result, start) };
 }
 
+// ABRE UMA COLUNA DE TRAÇO NO CURSOR, EM TODAS AS CORDAS: O QUE VEM DEPOIS
+// ANDA PARA A DIREITA SEM DESALINHAR. O CURSOR FICA NA COLUNA NOVA
+export function insertColumn(text: string, cursor: Cursor): Edit {
+  const column = Math.max(cursor.column, firstColumn(lines(text)[cursor.line]));
+  const rows = ensureWidth(lines(text), column).map(
+    (row) => row.slice(0, column) + EMPTY + row.slice(column)
+  );
+
+  return { text: rows.join("\n"), cursor: { line: cursor.line, column } };
+}
+
+// TIRA A COLUNA ANTES DO CURSOR, EM TODAS AS CORDAS. SÓ SE ELA ESTIVER VAZIA
+// (TRAÇO OU ESPAÇO) EM TODAS: NÃO APAGA NOTA NEM BARRA DE COMPASSO
+export function removeColumn(text: string, cursor: Cursor): Edit {
+  const rows = lines(text);
+  const column = cursor.column - 1;
+
+  if (column < firstColumn(rows[cursor.line])) return { text, cursor };
+
+  const empty = rows.every((row) =>
+    [EMPTY, " ", undefined].includes(row[column])
+  );
+
+  if (!empty) return { text, cursor };
+
+  return {
+    text: rows
+      .map((row) => row.slice(0, column) + row.slice(column + 1))
+      .join("\n"),
+    cursor: { line: cursor.line, column },
+  };
+}
+
 export function hasNotes(line: string): boolean {
   return body(line).replace(/[-|\s]/g, "") !== "";
 }
