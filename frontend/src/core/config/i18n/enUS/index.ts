@@ -144,8 +144,7 @@ export const locale: MessageSchema = {
       songs: "no songs | {n} song | {n} songs",
       rename: "Rename",
       deletePlaylist: "Delete playlist",
-      moveUp: "Move up",
-      moveDown: "Move down",
+      dragToReorder: "Drag to reorder (or use ↑/↓)",
       removeFromPlaylist: "Remove from playlist",
       errors: {
         session: "Your session expired. Sign in again to save.",

@@ -205,8 +205,17 @@ test.describe("logado", () => {
     await page.locator(".library__tab-playlists").click();
     await expect(songs).toHaveText(["Segunda", "Primeira"]);
 
-    await page.getByLabel("Mover para baixo").first().click();
+    // ARRASTA A PRIMEIRA PARA BAIXO DA SEGUNDA
+    await page
+      .locator(".library__drag")
+      .first()
+      .dragTo(page.locator(".library__song").nth(1), {
+        targetPosition: { x: 40, y: 20 },
+      });
     await expect(songs).toHaveText(["Primeira", "Segunda"]);
+    await expect
+      .poll(() => api.playlists[0].cipherIds)
+      .toEqual([api.ciphers[1].id, api.ciphers[0].id]);
 
     await page.locator(".library__remove-song").first().click();
     await expect(songs).toHaveText(["Segunda"]);
@@ -214,6 +223,54 @@ test.describe("logado", () => {
       name: "Luau",
       cipherIds: [api.ciphers[0].id],
     });
+  });
+
+  test("playlist: ↑/↓ na alça reordenam e o foco acompanha a música", async ({
+    page,
+    api,
+  }) => {
+    const first = api.addCipher({ ...SONG, title: "Primeira" });
+    const second = api.addCipher({ ...SONG, title: "Segunda" });
+    const third = api.addCipher({ ...SONG, title: "Terceira" });
+    api.addPlaylist("Luau", [first.id, second.id, third.id]);
+    const songs = page.locator(".library__song-title");
+
+    await openLibrary(page);
+    await page.locator(".library__tab-playlists").click();
+    await page.locator(".library__drag").first().focus();
+    await page.keyboard.press("ArrowDown");
+    await page.keyboard.press("ArrowDown");
+
+    await expect(songs).toHaveText(["Segunda", "Terceira", "Primeira"]);
+    await expect(page.locator(".library__drag").nth(2)).toBeFocused();
+
+    // NA PONTA NÃO FAZ NADA
+    await page.keyboard.press("ArrowDown");
+    await expect(songs).toHaveText(["Segunda", "Terceira", "Primeira"]);
+    await expect
+      .poll(() => api.playlists[0].cipherIds)
+      .toEqual([second.id, third.id, first.id]);
+  });
+
+  test("playlist: se a API recusar, a ordem volta", async ({ page, api }) => {
+    const first = api.addCipher({ ...SONG, title: "Primeira" });
+    const second = api.addCipher({ ...SONG, title: "Segunda" });
+    api.addPlaylist("Luau", [first.id, second.id]);
+    api.expectedStatuses.push(500);
+    await page.route("**/api/playlists/*", (route) =>
+      route.request().method() == "PUT"
+        ? route.fulfill({ status: 500, body: "" })
+        : route.fallback()
+    );
+    const songs = page.locator(".library__song-title");
+
+    await openLibrary(page);
+    await page.locator(".library__tab-playlists").click();
+    await page.locator(".library__drag").first().focus();
+    await page.keyboard.press("ArrowDown");
+
+    await expect(page.locator(".toast--error")).toBeVisible();
+    await expect(songs).toHaveText(["Primeira", "Segunda"]);
   });
 
   test("sair volta para visitante e mantém a música", async ({ page }) => {
