@@ -3,7 +3,9 @@ import {
   expect,
   addFromMenu,
   answerConfirm,
+  placeCaret,
   songParts,
+  tabLines,
   textFields,
 } from "./helpers";
 
@@ -34,6 +36,27 @@ test.describe("transpor", () => {
 
     await expect(page.locator(".tab-header__tone")).toHaveText("G#m");
     await expect(page.locator(".verse__input")).toHaveText("G#m F#  B");
+  });
+
+  test("as tabs sobem junto, abrindo coluna quando o traste ganha um dígito", async ({
+    page,
+  }) => {
+    await addFromMenu(page, "tab");
+    await placeCaret(page, 5, 3);
+    await page.keyboard.type("5");
+    await placeCaret(page, 0, 3);
+    await page.keyboard.type("9");
+
+    await page.locator(".tab-header__transpose-up").click();
+
+    const rows = await tabLines(page);
+    expect(rows[0]).toBe("e|-10" + "-".repeat(39));
+    expect(rows[5]).toBe("E|-6-" + "-".repeat(39));
+    expect(new Set(rows.map((row) => row.length)).size).toBe(1);
+
+    await page.locator(".tab-header__transpose-down").click();
+
+    expect((await tabLines(page))[5]).toBe("E|-5" + "-".repeat(39));
   });
 
   test("um Ctrl+Z desfaz a transposição inteira", async ({ page }) => {

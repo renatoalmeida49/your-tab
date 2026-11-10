@@ -211,3 +211,121 @@ export function retune(text: string, tuning: string[]): string {
     .map((row, index) => label(tuning[index], labels) + body(row))
     .join("\n");
 }
+
+// TRANSPOSIÇÃO: CADA TRASTE (SEQUÊNCIA DE DÍGITOS) SOBE OU DESCE `semitones`
+// CASAS. LETRAS E SÍMBOLOS (h, p, b, /, |) FICAM. ABAIXO DA CASA 0, A NOTA
+// SOBE UMA OITAVA (0 -1 -> 11)
+function transposeFret(fret: string, semitones: number): string {
+  let value = Number(fret) + semitones;
+
+  while (value < 0) value += 12;
+
+  return String(value);
+}
+
+interface Fret {
+  start: number;
+  end: number;
+}
+
+function frets(row: string): Fret[] {
+  return [...row.matchAll(/\d+/g)].map((match) => ({
+    start: match.index,
+    end: match.index + match[0].length,
+  }));
+}
+
+function isFiller(char: string): boolean {
+  return char == EMPTY || char == " ";
+}
+
+// TRASTES SOBREPOSTOS ENTRE AS CORDAS (UM ACORDE, UM "10" SOBRE UM "8") FORMAM
+// UM TRECHO. SE O NÚMERO DE DÍGITOS MUDA, O TRECHO GANHA OU PERDE COLUNAS EM
+// TODAS AS CORDAS, PARA NADA DESALINHAR (COMO O insertColumn/removeColumn)
+export function transposeTab(text: string, semitones: number): string {
+  if (!semitones) return text;
+
+  const rows = lines(text);
+  const labels = rows.map((row) => row.slice(0, firstColumn(row)));
+  const bodies = rows.map(body);
+  const fretsByRow = bodies.map(frets);
+  const width = Math.max(...bodies.map((row) => row.length));
+  const result = bodies.map(() => "");
+
+  let column = 0;
+
+  while (column < width) {
+    const startsHere = fretsByRow.some((list) =>
+      list.some((fret) => fret.start == column)
+    );
+
+    if (!startsHere) {
+      bodies.forEach((row, index) => {
+        result[index] += row[column] ?? "";
+      });
+      column++;
+      continue;
+    }
+
+    // O TRECHO CRESCE ENQUANTO HOUVER TRASTE COMEÇANDO DENTRO DELE
+    let end = column;
+    let grown = true;
+
+    while (grown) {
+      grown = false;
+
+      for (const list of fretsByRow) {
+        for (const fret of list) {
+          if (fret.start >= column && fret.start <= end && fret.end > end) {
+            end = fret.end;
+            grown = true;
+          }
+        }
+      }
+    }
+
+    const segments = bodies.map((row, index) => {
+      let segment = "";
+      let position = column;
+
+      for (const fret of fretsByRow[index]) {
+        if (fret.start < column || fret.start >= end) continue;
+
+        segment += row.slice(position, fret.start);
+        segment += transposeFret(row.slice(fret.start, fret.end), semitones);
+        position = fret.end;
+      }
+
+      return segment + row.slice(position, end);
+    });
+
+    // LARGURA NOVA: O QUE NÃO É TRAÇO NO FIM DO TRECHO PRECISA CABER. SE
+    // LOGO DEPOIS VEM OUTRO TRASTE, UM TRAÇO FICA PARA SEPARAR OS DOIS
+    const needed = Math.max(
+      ...segments.map((segment, index) => {
+        let size = segment.length;
+
+        while (size > 0 && isFiller(segment[size - 1])) size--;
+
+        const separated = size < segment.length;
+        const nextIsFret = /\d/.test(bodies[index][end] ?? "");
+
+        return separated && nextIsFret ? size + 1 : size;
+      })
+    );
+
+    segments.forEach((segment, index) => {
+      // CORDA QUE TERMINA ANTES DO TRECHO CONTINUA TERMINANDO ANTES
+      if (bodies[index].length <= column) return;
+
+      result[index] +=
+        segment.length > needed
+          ? segment.slice(0, needed)
+          : segment.padEnd(needed, EMPTY);
+    });
+
+    column = end;
+  }
+
+  return result.map((row, index) => labels[index] + row).join("\n");
+}

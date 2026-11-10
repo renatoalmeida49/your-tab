@@ -12,6 +12,7 @@ import {
   positionToCursor,
   removeColumn,
   retune,
+  transposeTab,
 } from "./tab";
 
 // TAB CURTA PARA OS TESTES FICAREM LEGÍVEIS
@@ -208,5 +209,67 @@ describe("retune", () => {
     expect(notesLostByRetune(highNote, 4)).toBe(true);
     expect(notesLostByRetune(lowNote, 4)).toBe(false);
     expect(notesLostByRetune(highNote, 6)).toBe(false);
+  });
+});
+
+describe("transposeTab", () => {
+  const rows = (...lines: string[]) => lines.join("\n");
+
+  it("sobe e desce cada traste, mantendo o tamanho das cordas", () => {
+    const text = rows("e|-----", "B|-3---", "E|-5-7-");
+
+    expect(transposeTab(text, 1)).toBe(rows("e|-----", "B|-4---", "E|-6-8-"));
+    expect(transposeTab(text, -2)).toBe(rows("e|-----", "B|-1---", "E|-3-5-"));
+  });
+
+  it("não mexe na tab quando não há transposição", () => {
+    const text = rows("e|-9-", "B|---");
+
+    expect(transposeTab(text, 0)).toBe(text);
+  });
+
+  it("abre uma coluna em todas as cordas quando o traste ganha um dígito", () => {
+    const text = rows("e|-9---", "B|-7---", "G|-----");
+
+    expect(transposeTab(text, 1)).toBe(
+      rows("e|-10---", "B|-8----", "G|------")
+    );
+  });
+
+  it("fecha a coluna quando todos os trastes do trecho perdem um dígito", () => {
+    const text = rows("e|-10---", "B|-8----", "G|------");
+
+    expect(transposeTab(text, -1)).toBe(rows("e|-9---", "B|-7---", "G|-----"));
+  });
+
+  it("mantém a coluna se outra corda ainda precisa dela", () => {
+    const text = rows("e|-10-", "B|-12-");
+
+    expect(transposeTab(text, -1)).toBe(rows("e|-9--", "B|-11-"));
+  });
+
+  it("sobe uma oitava o que ficaria abaixo da casa 0", () => {
+    expect(transposeTab(rows("e|-0-2-"), -1)).toBe(rows("e|-11-1-"));
+  });
+
+  it("preserva técnicas e barras de compasso", () => {
+    const text = rows("e|-5h7-|-7b9-|-12/14-", "B|------|-----|-------");
+
+    expect(transposeTab(text, 2)).toBe(
+      rows("e|-7h9-|-9b11-|-14/16-", "B|------|------|-------")
+    );
+  });
+
+  it("não cola dois trastes que estavam separados por um traço", () => {
+    const text = rows("e|-9-10-", "G|-11---");
+
+    expect(transposeTab(text, 3)).toBe(rows("e|-12-13-", "G|-14----"));
+  });
+
+  it("ida e volta devolve a tab original", () => {
+    const text = rows("e|-8---10--12-|", "B|-9---10--13-|", "G|---7----0---|");
+
+    expect(transposeTab(transposeTab(text, 3), -3)).toBe(text);
+    expect(transposeTab(transposeTab(text, 2), -2)).toBe(text);
   });
 });
