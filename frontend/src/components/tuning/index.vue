@@ -3,14 +3,14 @@
     <ul class="tuning__menu" role="tablist">
       <li
         v-for="tab in tabs"
-        :key="tab.component"
-        :class="{ active: selectedComponent == tab.component }"
+        :key="tab.instrument"
+        :class="{ active: selected == tab.instrument }"
       >
         <button
           type="button"
           role="tab"
-          :aria-selected="selectedComponent == tab.component"
-          @click="newTab(tab.component)"
+          :aria-selected="selected == tab.instrument"
+          @click="selected = tab.instrument"
         >
           {{ $t(tab.label) }}
         </button>
@@ -18,23 +18,21 @@
     </ul>
 
     <section class="tuning__tabs">
-      <component :is="selectedComponent" @close="close" />
+      <TuningForm :key="selected" :instrument="selected" @close="close" />
     </section>
   </div>
 </template>
 
 <script lang="ts">
 import { defineComponent } from "vue";
-import Bass from "./components/bass.vue";
-import Guitar from "./components/guitar.vue";
-import Ukulele from "./components/ukulele.vue";
+import TuningForm from "./components/form.vue";
+import { useInstrumentStore } from "@/stores/instrument";
+import type { Instrument } from "@/types/song";
 
-type TuningTab = "Guitar" | "Ukulele" | "Bass";
-
-const tabs: { component: TuningTab; label: string }[] = [
-  { component: "Guitar", label: "components.tuning.guitar" },
-  { component: "Ukulele", label: "components.tuning.ukulele" },
-  { component: "Bass", label: "components.tuning.bass" },
+const tabs: { instrument: Instrument; label: string }[] = [
+  { instrument: "guitar", label: "components.tuning.guitar" },
+  { instrument: "ukulele", label: "components.tuning.ukulele" },
+  { instrument: "bass", label: "components.tuning.bass" },
 ];
 
 export default defineComponent({
@@ -43,23 +41,18 @@ export default defineComponent({
   emits: ["close"],
 
   components: {
-    Bass,
-    Guitar,
-    Ukulele,
+    TuningForm,
   },
 
+  // ABRE NA ABA DO INSTRUMENTO ATUAL
   data() {
     return {
-      selectedComponent: "Guitar" as TuningTab,
+      selected: useInstrumentStore().instrument,
       tabs,
     };
   },
 
   methods: {
-    newTab(component: TuningTab) {
-      this.selectedComponent = component;
-    },
-
     close() {
       this.$emit("close");
     },
@@ -124,6 +117,37 @@ export default defineComponent({
     .tuning__caption {
       width: 100%;
       margin-bottom: 0;
+    }
+  }
+
+  &__count {
+    margin-bottom: var(--space-5);
+  }
+
+  &__count-options {
+    display: inline-flex;
+    gap: var(--space-1);
+    padding: 3px;
+    background: var(--color-surface-muted);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+
+    button {
+      min-width: 40px;
+      height: 28px;
+      border: none;
+      border-radius: var(--radius-sm);
+      background: none;
+      color: var(--color-text-muted);
+      font-family: var(--font-mono);
+      font-weight: 700;
+      cursor: pointer;
+
+      &.active {
+        background: var(--color-surface);
+        color: var(--color-text);
+        box-shadow: var(--shadow-sm);
+      }
     }
   }
 

@@ -33,6 +33,14 @@ function noteIndex(note: string): number {
   return index >= 0 ? index : FLATS.indexOf(note);
 }
 
+// ALTURA (0-11) DE UMA NOTA ESCRITA COMO RÓTULO DE CORDA ("e", "Bb", "F#").
+// null SE NÃO FOR NOTA
+export function notePitch(note: string): number | null {
+  const index = noteIndex(note.charAt(0).toUpperCase() + note.slice(1));
+
+  return index >= 0 ? index : null;
+}
+
 export function transposeNote(note: string, semitones: number): string {
   const index = noteIndex(note);
 

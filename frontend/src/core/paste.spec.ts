@@ -121,5 +121,8 @@ describe("afinação", () => {
     expect(guessInstrument(["G", "D", "A", "E"])).toBe("bass");
     expect(guessInstrument(["A", "E", "C", "G"])).toBe("ukulele");
     expect(guessInstrument(["e", "B", "G", "D", "A", "E"])).toBe("guitar");
+    expect(guessInstrument(["G", "D", "A", "E", "B"])).toBe("bass");
+    expect(guessInstrument(["C", "G", "D", "A", "E", "B"])).toBe("bass");
+    expect(guessInstrument(["e", "B", "G", "D", "A", "E", "B"])).toBe("guitar");
   });
 });

@@ -54,12 +54,12 @@ export const useSongStore = defineStore("song", {
   }),
 
   getters: {
-    // ALGUMA TAB PERDERIA NOTAS SE A AFINAÇÃO PASSASSE A TER `strings` CORDAS?
-    tabsLoseNotes: (state) => (strings: number) =>
+    // ALGUMA TAB PERDERIA NOTAS SE A AFINAÇÃO PASSASSE A SER `tuning`?
+    tabsLoseNotes: (state) => (tuning: string[]) =>
       state.parts.some(
         (part) =>
           part.type == "tab" &&
-          notesLostByRetune(cleanTab(part.info.text), strings)
+          notesLostByRetune(cleanTab(part.info.text), tuning)
       ),
   },
 

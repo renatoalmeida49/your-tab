@@ -129,3 +129,36 @@ test.describe("colar cifra com tablatura", () => {
     ]);
   });
 });
+
+test("cifra de baixo de 5 cordas colada: dá para voltar a 4 cordas", async ({
+  page,
+}) => {
+  await addFromMenu(page, "textField");
+  await paste(
+    textFields(page).first(),
+    `G|-----5-|
+D|---7---|
+A|-------|
+E|-------|
+B|-0-----|
+`
+  );
+
+  await expect(tuningLabel(page)).toHaveText("G - D - A - E - B");
+
+  await page.locator("#changeTuningBtn").click();
+  await expect(page.locator(".bass input")).toHaveCount(5);
+  await page
+    .locator(".bass .tuning__count-options button", { hasText: "4" })
+    .click();
+  await page.locator(".bass button[type=submit]").click();
+  await answerConfirm(page, true);
+
+  await expect(tuningLabel(page)).toHaveText("G - D - A - E");
+  expect(await tabLines(page, 0)).toEqual([
+    "G|-----5-|",
+    "D|---7---|",
+    "A|-------|",
+    "E|-------|",
+  ]);
+});
