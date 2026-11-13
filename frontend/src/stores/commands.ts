@@ -46,9 +46,9 @@ export async function startNewSong(): Promise<void> {
 
 // TAB COLADA COM OUTRA AFINAÇÃO: MÚSICA SEM NOTAS EM TAB ADOTA A AFINAÇÃO
 // COLADA; COM NOTAS, PERGUNTA. RECUSANDO, A TAB COLADA VAI PARA A AFINAÇÃO
-// ATUAL (ALINHADA PELAS CORDAS GRAVES, COMO AO TROCAR A AFINAÇÃO)
+// ATUAL (CORDAS ALINHADAS COMO AO TROCAR A AFINAÇÃO)
 function askToRetune(pasted: string[]): Promise<boolean> {
-  const loses = useSongStore().tabsLoseNotes(pasted.length);
+  const loses = useSongStore().tabsLoseNotes(pasted);
 
   return useConfirmStore().ask({
     message: loses

@@ -181,7 +181,7 @@ describe("retune", () => {
     expect(result[5]).toBe("D|3" + "-".repeat(40));
   });
 
-  it("menos cordas: remove as do topo (agudas)", () => {
+  it("violão -> baixo: mantém as cordas G D A E", () => {
     const result = retune(guitar, ["G", "D", "A", "E"]).split("\n");
 
     expect(result.map((row: string) => row.slice(0, 2))).toEqual([
@@ -192,7 +192,7 @@ describe("retune", () => {
     ]);
   });
 
-  it("mais cordas: adiciona no topo, com o mesmo tamanho", () => {
+  it("baixo -> violão: cordas novas entram no topo, com o mesmo tamanho", () => {
     const bass = createTab(["G", "D", "A", "E"]);
     const noted = overwrite(bass, { line: 3, column: 2 }, "5").text;
     const result = retune(noted, ["e", "B", "G", "D", "A", "E"]).split("\n");
@@ -202,13 +202,87 @@ describe("retune", () => {
     expect(result[5].startsWith("E|5")).toBe(true);
   });
 
+  describe("baixo de 5 e 6 cordas", () => {
+    const five = "G|-1-\nD|-2-\nA|-3-\nE|-4-\nB|-5-";
+
+    it("5 -> 4: tira o B grave e cada nota fica na sua corda", () => {
+      expect(retune(five, ["G", "D", "A", "E"])).toBe(
+        "G|-1-\nD|-2-\nA|-3-\nE|-4-"
+      );
+    });
+
+    it("4 -> 5: o B entra embaixo", () => {
+      const four = "G|-1-\nD|-2-\nA|-3-\nE|-4-";
+
+      expect(retune(four, ["G", "D", "A", "E", "B"])).toBe(
+        "G|-1-\nD|-2-\nA|-3-\nE|-4-\nB|---"
+      );
+    });
+
+    it("4 -> 6: o C entra em cima e o B embaixo", () => {
+      const four = "G|-1-\nD|-2-\nA|-3-\nE|-4-";
+
+      expect(retune(four, ["C", "G", "D", "A", "E", "B"])).toBe(
+        "C|---\nG|-1-\nD|-2-\nA|-3-\nE|-4-\nB|---"
+      );
+    });
+
+    it("6 -> 4: tira o C e o B", () => {
+      const six = "C|-0-\nG|-1-\nD|-2-\nA|-3-\nE|-4-\nB|-5-";
+
+      expect(retune(six, ["G", "D", "A", "E"])).toBe(
+        "G|-1-\nD|-2-\nA|-3-\nE|-4-"
+      );
+    });
+
+    it("5 -> 4 afinado 1 tom abaixo: tira o B (corda mais grave)", () => {
+      expect(retune(five, ["F", "C", "G", "D"])).toBe(
+        "F|-1-\nC|-2-\nG|-3-\nD|-4-"
+      );
+    });
+
+    it("rótulos colados em minúsculas também alinham", () => {
+      const lower = "g|-1-\nd|-2-\na|-3-\ne|-4-\nb|-5-";
+
+      expect(retune(lower, ["G", "D", "A", "E"])).toBe(
+        "G|-1-\nD|-2-\nA|-3-\nE|-4-"
+      );
+    });
+  });
+
+  it("violão drop D -> baixo: mantém as cordas graves", () => {
+    const dropD = createTab(["e", "B", "G", "D", "A", "D"]);
+    const noted = overwrite(dropD, { line: 5, column: 2 }, "0").text;
+    const result = retune(noted, ["G", "D", "A", "E"]).split("\n");
+
+    expect(result[3].startsWith("E|0")).toBe(true);
+  });
+
+  it("violão -> baixo 1 tom abaixo: mantém as 4 cordas graves", () => {
+    const noted = overwrite(guitar, { line: 5, column: 2 }, "3").text;
+    const result = retune(noted, ["F", "C", "G", "D"]).split("\n");
+
+    expect(result[3].startsWith("D|3")).toBe(true);
+  });
+
   it("avisa quando cordas removidas têm notas", () => {
     const highNote = overwrite(guitar, { line: 0, column: 2 }, "0").text;
     const lowNote = overwrite(guitar, { line: 5, column: 2 }, "0").text;
+    const bass = ["G", "D", "A", "E"];
 
-    expect(notesLostByRetune(highNote, 4)).toBe(true);
-    expect(notesLostByRetune(lowNote, 4)).toBe(false);
-    expect(notesLostByRetune(highNote, 6)).toBe(false);
+    expect(notesLostByRetune(highNote, bass)).toBe(true);
+    expect(notesLostByRetune(lowNote, bass)).toBe(false);
+    expect(notesLostByRetune(highNote, ["e", "B", "G", "D", "A", "D"])).toBe(
+      false
+    );
+  });
+
+  it("baixo 5 -> 4: avisa se o B tem notas, não o G", () => {
+    const lowB = "G|---\nD|---\nA|---\nE|---\nB|-5-";
+    const highG = "G|-5-\nD|---\nA|---\nE|---\nB|---";
+
+    expect(notesLostByRetune(lowB, ["G", "D", "A", "E"])).toBe(true);
+    expect(notesLostByRetune(highG, ["G", "D", "A", "E"])).toBe(false);
   });
 });
 

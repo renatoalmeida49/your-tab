@@ -160,7 +160,9 @@ test.describe("tabs acompanham a afinação", () => {
     await placeCaret(page, 3, 2);
     await page.keyboard.type("5");
 
+    // A TELA ABRE NO INSTRUMENTO ATUAL (BAIXO)
     await page.locator("#changeTuningBtn").click();
+    await openInstrument(page, "Violão");
     await confirm(page, "guitar");
 
     const rows = await tabLines(page);
@@ -193,5 +195,58 @@ test.describe("tabs acompanham a afinação", () => {
     await page.reload();
 
     expect(await tabLines(page)).toHaveLength(4);
+  });
+});
+
+test.describe("baixo de 5 e 6 cordas", () => {
+  function stringCount(page: Page, count: number) {
+    return page.locator(".bass .tuning__count-options button", {
+      hasText: String(count),
+    });
+  }
+
+  test("escolher 5 cordas mostra 5 campos e aplica G D A E B", async ({
+    page,
+  }) => {
+    await openInstrument(page, "Baixo");
+    await stringCount(page, 5).click();
+
+    await expect(page.locator(".bass input")).toHaveCount(5);
+    await confirm(page, "bass");
+
+    await expect(tuningLabel(page)).toHaveText("G - D - A - E - B");
+  });
+
+  test("tela abre no instrumento atual, com todas as cordas", async ({
+    page,
+  }) => {
+    await openInstrument(page, "Baixo");
+    await stringCount(page, 6).click();
+    await confirm(page, "bass");
+
+    await page.locator("#changeTuningBtn").click();
+
+    await expect(page.locator(".bass input")).toHaveCount(6);
+    await expect(stringCount(page, 6)).toHaveAttribute("aria-checked", "true");
+  });
+
+  test("5 -> 4 cordas: tira o B e as notas ficam nas suas cordas", async ({
+    page,
+  }) => {
+    await openInstrument(page, "Baixo");
+    await stringCount(page, 5).click();
+    await confirm(page, "bass");
+    await addFromMenu(page, "tab");
+    await placeCaret(page, 0, 2);
+    await page.keyboard.type("7");
+
+    await page.locator("#changeTuningBtn").click();
+    await stringCount(page, 4).click();
+    await confirm(page, "bass");
+
+    await expect(tuningLabel(page)).toHaveText("G - D - A - E");
+    const rows = await tabLines(page);
+    expect(rows).toHaveLength(4);
+    expect(rows[0].startsWith("G|7")).toBe(true);
   });
 });

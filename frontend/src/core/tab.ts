@@ -1,3 +1,4 @@
+import { notePitch } from "@/core/chords";
 import string from "@/core/config/string";
 
 // UMA TAB É TEXTO: UMA LINHA POR CORDA, DA MAIS AGUDA PARA A MAIS GRAVE,
@@ -185,30 +186,84 @@ export function hasNotes(line: string): boolean {
   return body(line).replace(/[-|\s]/g, "") !== "";
 }
 
-// AO TROCAR A AFINAÇÃO, AS CORDAS SÃO ALINHADAS PELA MAIS GRAVE (EMBAIXO):
-// SAEM OU ENTRAM CORDAS NO TOPO. EX: VIOLÃO -> BAIXO MANTÉM D-A-E... -> G-D-A-E
-export function notesLostByRetune(text: string, strings: number): boolean {
-  const rows = lines(text);
+// RÓTULO DE UMA CORDA JÁ ESCRITA ("Eb|---" -> "Eb")
+function rowLabel(row: string): string {
+  const bar = row.indexOf("|");
 
-  return rows.slice(0, Math.max(rows.length - strings, 0)).some(hasNotes);
+  return bar < 0 ? "" : row.slice(0, bar).trim();
+}
+
+// DISTÂNCIA ENTRE DUAS NOTAS, EM SEMITONS (0-6). RÓTULO QUE NÃO É NOTA: 6
+function pitchDistance(a: number | null, b: number | null): number {
+  if (a === null || b === null) return 6;
+
+  const diff = (((a - b) % 12) + 12) % 12;
+
+  return Math.min(diff, 12 - diff);
+}
+
+// AO TROCAR A QUANTIDADE DE CORDAS, AS QUE FICAM CONTINUAM JUNTAS: CORDAS SÓ
+// SAEM OU ENTRAM NAS PONTAS (BAIXO DE 5 GANHA UM B EMBAIXO, DE 6 GANHA TAMBÉM
+// UM C EM CIMA). PARA CADA ENCAIXE, A AFINAÇÃO ANTIGA É TRANSPOSTA PARA PERTO
+// DA NOVA; O CUSTO É A DIFERENÇA QUE SOBRA ENTRE AS CORDAS MAIS O TAMANHO DA
+// TRANSPOSIÇÃO. GANHA O MAIS BARATO; NO EMPATE, O ALINHADO PELA MAIS GRAVE.
+// EX: G-D-A-E-B -> G-D-A-E TIRA O B; VIOLÃO -> BAIXO MANTÉM G-D-A-E;
+// G-D-A-E-B -> F-C-G-D (1 TOM ABAIXO) TAMBÉM TIRA O B.
+// DEVOLVE, PARA CADA CORDA NOVA, A LINHA ANTIGA QUE ELA HERDA (OU null)
+function alignStrings(labels: string[], tuning: string[]): (number | null)[] {
+  const from = labels.map(notePitch);
+  const to = tuning.map(notePitch);
+  const fromLonger = from.length > to.length;
+  const shorter = Math.min(from.length, to.length);
+  const offsets = Math.abs(from.length - to.length);
+
+  let best = { offset: offsets, cost: Infinity };
+
+  // DO MAIS GRAVE PARA O MAIS AGUDO: SÓ TROCA SE FOR ESTRITAMENTE MELHOR
+  for (let offset = offsets; offset >= 0; offset--) {
+    for (let transpose = 0; transpose < 12; transpose++) {
+      let cost = Math.min(transpose, 12 - transpose);
+
+      for (let i = 0; i < shorter; i++) {
+        const old = from[fromLonger ? i + offset : i];
+        const next = to[fromLonger ? i : i + offset];
+
+        cost += pitchDistance(old === null ? null : old + transpose, next);
+      }
+
+      if (cost < best.cost) best = { offset, cost };
+    }
+  }
+
+  return tuning.map((_, next) => {
+    const old = fromLonger ? next + best.offset : next - best.offset;
+
+    return old >= 0 && old < from.length ? old : null;
+  });
+}
+
+function stringsOf(text: string, tuning: string[]): (number | null)[] {
+  return alignStrings(lines(text).map(rowLabel), tuning);
+}
+
+// ALGUMA CORDA QUE SAI DA TAB TEM NOTAS?
+export function notesLostByRetune(text: string, tuning: string[]): boolean {
+  const kept = new Set(stringsOf(text, tuning));
+
+  return lines(text).some((row, index) => !kept.has(index) && hasNotes(row));
 }
 
 export function retune(text: string, tuning: string[]): string {
-  let rows = lines(text);
+  const rows = lines(text);
   const width = Math.max(...rows.map((row) => body(row).length));
-
-  if (rows.length > tuning.length) {
-    rows = rows.slice(rows.length - tuning.length);
-  }
-
-  while (rows.length < tuning.length) {
-    rows.unshift(EMPTY.repeat(width));
-  }
-
   const labels = labelWidth(tuning);
 
-  return rows
-    .map((row, index) => label(tuning[index], labels) + body(row))
+  return stringsOf(text, tuning)
+    .map(
+      (old, index) =>
+        label(tuning[index], labels) +
+        (old === null ? EMPTY.repeat(width) : body(rows[old]))
+    )
     .join("\n");
 }
 

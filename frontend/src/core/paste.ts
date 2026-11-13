@@ -2,7 +2,7 @@
 // DE TAB VIRAM UMA TAB, LINHAS SÓ DE ACORDES VIRAM UM VERSO E O RESTO, TEXTO
 
 import type { Instrument, PartType } from "@/types/song";
-import { isChord } from "./chords";
+import { isChord, notePitch } from "./chords";
 
 export interface PastedPart {
   type: PartType;
@@ -127,9 +127,25 @@ export function sameTuning(a: string[], b: string[]): boolean {
 
 const UKULELE = ["a e c g", "g c e a"];
 
-// INSTRUMENTO PELAS CORDAS: 4 OU 5 É BAIXO (OU UKULELE, PELAS NOTAS), 6+ VIOLÃO
+// BAIXO É AFINADO EM QUARTAS (5 SEMITONS ENTRE CORDAS VIZINHAS). O VIOLÃO
+// TEM A TERÇA ENTRE G E B
+function allFourths(tuning: string[]): boolean {
+  const pitches = tuning.map(notePitch);
+
+  return pitches.every(
+    (pitch, index) =>
+      index == 0 ||
+      (pitch !== null &&
+        pitches[index - 1] !== null &&
+        (((pitches[index - 1]! - pitch) % 12) + 12) % 12 == 5)
+  );
+}
+
+// INSTRUMENTO PELAS CORDAS: 4 OU 5 É BAIXO (OU UKULELE, PELAS NOTAS); 6+ É
+// VIOLÃO, A MENOS QUE SEJA TUDO EM QUARTAS (BAIXO DE 6: C G D A E B)
 export function guessInstrument(tuning: string[]): Instrument {
   if (UKULELE.includes(tuning.join(" ").toLowerCase())) return "ukulele";
+  if (tuning.length <= 5) return "bass";
 
-  return tuning.length <= 5 ? "bass" : "guitar";
+  return allFourths(tuning) ? "bass" : "guitar";
 }
