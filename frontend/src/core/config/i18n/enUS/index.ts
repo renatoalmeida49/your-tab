@@ -144,6 +144,10 @@ export const locale: MessageSchema = {
       songs: "no songs | {n} song | {n} songs",
       rename: "Rename",
       deletePlaylist: "Delete playlist",
+      select: "Select",
+      selectHint: "Choose songs to export",
+      selectAll: "All",
+      cancelSelect: "Cancel",
       dragToReorder: "Drag to reorder (or use ↑/↓)",
       removeFromPlaylist: "Remove from playlist",
       errors: {
@@ -169,6 +173,8 @@ export const locale: MessageSchema = {
       importedPlaylist: "Playlist {name} imported with {count} songs",
       exportAll: "Export all",
       exportAllHint: "Downloads every song in the library as a .json file",
+      exportSelected: "Export ({n})",
+      exportSelectedHint: "Downloads the selected songs as a .json file",
       exportPlaylist: "Download the playlist (.json)",
       errors: {
         invalid: "Invalid file: it isn't a Tab Builder song file",

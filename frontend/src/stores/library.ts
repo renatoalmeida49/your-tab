@@ -298,9 +298,10 @@ export const useLibraryStore = defineStore("library", {
     },
 
     // AS CIFRAS NUM ARQUIVO SÓ, NA ORDEM DE ids (A LISTA NÃO TRAZ AS PARTES:
-    // BUSCA CADA UMA). playlist: O ARQUIVO RECRIA A PLAYLIST AO IMPORTAR
-    async exportCiphers(ids: string[], playlist?: string) {
-      if (this.transferring || !ids.length) return;
+    // BUSCA CADA UMA). playlist: O ARQUIVO RECRIA A PLAYLIST AO IMPORTAR.
+    // true SE BAIXOU
+    async exportCiphers(ids: string[], playlist?: string): Promise<boolean> {
+      if (this.transferring || !ids.length) return false;
 
       this.transferring = true;
 
@@ -313,8 +314,12 @@ export const useLibraryStore = defineStore("library", {
           songFile(songs, now, playlist),
           songFileName(songs, now, playlist)
         );
+
+        return true;
       } catch (error) {
         fail(error);
+
+        return false;
       } finally {
         this.transferring = false;
       }
