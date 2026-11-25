@@ -21,7 +21,7 @@ Recursos do editor:
 Acervo na nuvem:
 
 * Login com a conta Google
-* "Salvar" (`Ctrl+S`) guarda a música no seu acervo; abra, busque e exclua suas cifras de qualquer lugar
+* "Salvar" (`Ctrl+S`) guarda a música no seu acervo; abra, busque, reordene (arrastando) e exclua suas cifras de qualquer lugar
 * Playlists: monte repertórios com as cifras do acervo, na ordem que quiser
 
 ## :clipboard: Sumário

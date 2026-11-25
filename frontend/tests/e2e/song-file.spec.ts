@@ -193,6 +193,88 @@ test.describe("arquivo de músicas no acervo", () => {
     expect(file.songs).toHaveLength(2);
   });
 
+  test("exportar selecionadas baixa só as marcadas, na ordem do acervo", async ({
+    page,
+    api,
+  }) => {
+    const THIRD = { ...SONG, title: "Terceira" };
+    api.addCipher(SONG);
+    api.addCipher(OTHER);
+    api.addCipher(THIRD);
+    await openLibrary(page);
+
+    const exportSelected = page.locator(".library__export-selected");
+    const checks = page.locator(".library__check");
+
+    await page.locator(".library__select").click();
+    await expect(exportSelected).toBeDisabled();
+    await expect(page.locator(".library__drag")).toHaveCount(0);
+
+    // MARCA PELA CAIXA E PELO NOME, FORA DA ORDEM DO ACERVO
+    await checks.nth(2).check();
+    await page
+      .locator(".library__cipher strong", { hasText: "Terceira" })
+      .click();
+    await expect(exportSelected).toHaveText("Exportar (2)");
+
+    const downloading = page.waitForEvent("download");
+    await exportSelected.click();
+    const download = await downloading;
+
+    expect(download.suggestedFilename()).toMatch(
+      /^tab-builder-\d{4}-\d{2}-\d{2}\.json$/
+    );
+    expect((await contentOf(download)).songs).toEqual([THIRD, SONG]);
+    // BAIXOU: SAI DA SELEÇÃO
+    await expect(page.locator(".library__select")).toBeVisible();
+    await expect(checks).toHaveCount(0);
+  });
+
+  test("selecionar: 'Todas' vale para o que a busca mostra", async ({
+    page,
+    api,
+  }) => {
+    api.addCipher(SONG);
+    api.addCipher(OTHER);
+    await openLibrary(page);
+
+    const all = page.locator(".library__select-all input");
+    const exportSelected = page.locator(".library__export-selected");
+
+    await page.locator(".library__select").click();
+    await page.getByPlaceholder("Buscar").fill("Proud");
+    await all.check();
+    await expect(exportSelected).toHaveText("Exportar (1)");
+
+    await page.getByPlaceholder("Buscar").fill("");
+    await expect(page.locator(".library__check:checked")).toHaveCount(1);
+    await all.check();
+    await expect(exportSelected).toHaveText("Exportar (2)");
+    await all.uncheck();
+    await expect(exportSelected).toHaveText("Exportar (0)");
+
+    // UMA SÓ: O ARQUIVO LEVA O NOME DA MÚSICA
+    await page.locator(".library__check").first().check();
+    const downloading = page.waitForEvent("download");
+    await exportSelected.click();
+    expect((await downloading).suggestedFilename()).toBe(
+      "Proud Mary - Creedence.json"
+    );
+  });
+
+  test("cancelar a seleção desmarca tudo", async ({ page, api }) => {
+    api.addCipher(SONG);
+    await openLibrary(page);
+
+    await page.locator(".library__select").click();
+    await page.locator(".library__check").check();
+    await page.locator(".library__select-cancel").click();
+    await expect(page.locator(".library__check")).toHaveCount(0);
+
+    await page.locator(".library__select").click();
+    await expect(page.locator(".library__check")).not.toBeChecked();
+  });
+
   test("importar traz as músicas de vários arquivos para o acervo", async ({
     page,
     api,

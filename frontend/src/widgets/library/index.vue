@@ -44,29 +44,78 @@
               />
             </label>
 
-            <TheButton
-              size="sm"
-              variant="secondary"
-              class="library__import"
-              :disabled="transferring"
-              :title="$t('components.songFile.importHint')"
-              @click="importFiles"
-            >
-              <Upload :size="16" />
-              {{ $t("components.songFile.import") }}
-            </TheButton>
-            <TheButton
-              v-if="ciphers.length"
-              size="sm"
-              variant="secondary"
-              class="library__export"
-              :disabled="transferring"
-              :title="$t('components.songFile.exportAllHint')"
-              @click="exportAll"
-            >
-              <Download :size="16" />
-              {{ $t("components.songFile.exportAll") }}
-            </TheButton>
+            <!-- MODO SELEÇÃO: MARCA AS CIFRAS E EXPORTA SÓ ELAS -->
+            <template v-if="selecting">
+              <label class="library__select-all">
+                <input
+                  type="checkbox"
+                  :checked="allVisibleSelected"
+                  :indeterminate="!allVisibleSelected && someVisibleSelected"
+                  :disabled="!filtered.length"
+                  @change="toggleAllVisible"
+                />
+                {{ $t("components.library.selectAll") }}
+              </label>
+              <TheButton
+                size="sm"
+                class="library__export-selected"
+                :disabled="!selectedIds.length || transferring"
+                :title="$t('components.songFile.exportSelectedHint')"
+                @click="exportSelected"
+              >
+                <Download :size="16" />
+                {{
+                  $t("components.songFile.exportSelected", {
+                    n: selectedIds.length,
+                  })
+                }}
+              </TheButton>
+              <TheButton
+                size="sm"
+                variant="secondary"
+                class="library__select-cancel"
+                @click="stopSelecting"
+              >
+                {{ $t("components.library.cancelSelect") }}
+              </TheButton>
+            </template>
+
+            <template v-else>
+              <TheButton
+                size="sm"
+                variant="secondary"
+                class="library__import"
+                :disabled="transferring"
+                :title="$t('components.songFile.importHint')"
+                @click="importFiles"
+              >
+                <Upload :size="16" />
+                {{ $t("components.songFile.import") }}
+              </TheButton>
+              <TheButton
+                v-if="ciphers.length"
+                size="sm"
+                variant="secondary"
+                class="library__select"
+                :title="$t('components.library.selectHint')"
+                @click="selecting = true"
+              >
+                <ListChecks :size="16" />
+                {{ $t("components.library.select") }}
+              </TheButton>
+              <TheButton
+                v-if="ciphers.length"
+                size="sm"
+                variant="secondary"
+                class="library__export"
+                :disabled="transferring"
+                :title="$t('components.songFile.exportAllHint')"
+                @click="exportAll"
+              >
+                <Download :size="16" />
+                {{ $t("components.songFile.exportAll") }}
+              </TheButton>
+            </template>
           </div>
 
           <p v-if="!ciphers.length" class="library__status">
@@ -76,17 +125,57 @@
             {{ $t("components.library.noResults") }}
           </p>
 
-          <ul class="library__list">
+          <!-- ARRASTA PELA ALÇA; COM O FOCO NELA, ↑/↓ TAMBÉM MOVEM. BUSCANDO,
+               A LISTA É SÓ UM PEDAÇO DO ACERVO: SEM REORDENAR. SELECIONANDO,
+               A ALÇA DÁ LUGAR À CAIXA DE MARCAR -->
+          <VueDraggable
+            tag="ol"
+            class="library__list library__ciphers"
+            handle=".library__drag"
+            :animation="150"
+            :disabled="searching || selecting"
+            :model-value="filtered"
+            @update:model-value="reorderCiphers($event)"
+          >
             <li
-              v-for="cipher in filtered"
+              v-for="(cipher, index) in filtered"
               :key="cipher.id"
               class="library__item library__cipher"
-              :class="{ 'library__item--current': cipher.id == cipherId }"
+              :class="{
+                'library__item--current': cipher.id == cipherId,
+                'library__item--selected':
+                  selecting && selected.includes(cipher.id),
+              }"
             >
-              <div class="library__info">
+              <input
+                v-if="selecting"
+                :id="`library-select-${cipher.id}`"
+                v-model="selected"
+                type="checkbox"
+                class="library__check"
+                :value="cipher.id"
+                :aria-label="titleOf(cipher)"
+              />
+              <button
+                v-else-if="!searching"
+                class="library__drag"
+                :title="$t('components.library.dragToReorder')"
+                :aria-label="$t('components.library.dragToReorder')"
+                @keydown.up.prevent="moveCipherWithKeyboard($event, index, -1)"
+                @keydown.down.prevent="moveCipherWithKeyboard($event, index, 1)"
+              >
+                <GripVertical :size="16" />
+              </button>
+              <!-- SELECIONANDO, CLICAR NO NOME TAMBÉM MARCA -->
+              <component
+                :is="selecting ? 'label' : 'div'"
+                :for="selecting ? `library-select-${cipher.id}` : undefined"
+                class="library__info"
+                :class="{ 'library__info--selectable': selecting }"
+              >
                 <strong>{{ titleOf(cipher) }}</strong>
                 <span>{{ details(cipher) }}</span>
-              </div>
+              </component>
 
               <span v-if="cipher.id == cipherId" class="library__badge">
                 {{ $t("components.library.current") }}
@@ -163,7 +252,7 @@
                 </TheButton>
               </div>
             </li>
-          </ul>
+          </VueDraggable>
         </TabsContent>
 
         <TabsContent value="playlists" class="library__panel">
@@ -331,6 +420,7 @@ import {
   Check,
   Download,
   GripVertical,
+  ListChecks,
   ListMusic,
   ListPlus,
   Music,
@@ -369,6 +459,7 @@ export default defineComponent({
     DropdownMenuRoot,
     DropdownMenuTrigger,
     GripVertical,
+    ListChecks,
     ListMusic,
     ListPlus,
     Music,
@@ -392,6 +483,9 @@ export default defineComponent({
       newName: "",
       editingId: null as string | null,
       editingName: "",
+      selecting: false,
+      // NA ORDEM EM QUE FORAM MARCADAS; A EXPORTAÇÃO SEGUE A ORDEM DO ACERVO
+      selected: [] as string[],
     };
   },
 
@@ -405,6 +499,29 @@ export default defineComponent({
       "loadFailed",
       "transferring",
     ]),
+
+    // SÓ AS QUE AINDA ESTÃO NO ACERVO (UMA MARCADA PODE TER SIDO EXCLUÍDA),
+    // NA ORDEM DO ACERVO
+    selectedIds(): string[] {
+      return this.ciphers
+        .filter((cipher) => this.selected.includes(cipher.id))
+        .map((cipher) => cipher.id);
+    },
+
+    allVisibleSelected(): boolean {
+      return (
+        !!this.filtered.length &&
+        this.filtered.every((cipher) => this.selected.includes(cipher.id))
+      );
+    },
+
+    someVisibleSelected(): boolean {
+      return this.filtered.some((cipher) => this.selected.includes(cipher.id));
+    },
+
+    searching(): boolean {
+      return !!this.query.trim();
+    },
 
     filtered(): CipherSummary[] {
       const words = normalize(this.query).split(/\s+/).filter(Boolean);
@@ -423,6 +540,7 @@ export default defineComponent({
 
       this.query = "";
       this.editingId = null;
+      this.stopSelecting();
       this.fetchAll();
     },
   },
@@ -440,7 +558,10 @@ export default defineComponent({
       "moveInPlaylist",
       "reorderPlaylist",
       "deletePlaylist",
+      "reorderCiphers",
+      "moveCipher",
       "exportAll",
+      "exportCiphers",
       "exportPlaylist",
       "importSongs",
     ]),
@@ -454,6 +575,25 @@ export default defineComponent({
       const contents = files.length ? await readSongFiles(files) : null;
 
       if (contents) await this.importSongs(contents);
+    },
+
+    stopSelecting() {
+      this.selecting = false;
+      this.selected = [];
+    },
+
+    // "TODAS" VALE PARA O QUE A BUSCA MOSTRA; AS MARCADAS FORA DELA FICAM
+    toggleAllVisible() {
+      const visible = this.filtered.map((cipher) => cipher.id);
+
+      this.selected = this.allVisibleSelected
+        ? this.selected.filter((id) => !visible.includes(id))
+        : [...new Set([...this.selected, ...visible])];
+    },
+
+    // BAIXOU: SAI DO MODO SELEÇÃO. FALHOU: CONTINUA, PARA TENTAR DE NOVO
+    async exportSelected() {
+      if (await this.exportCiphers(this.selectedIds)) this.stopSelecting();
     },
 
     cipherById(id: string): CipherSummary | undefined {
@@ -500,12 +640,33 @@ export default defineComponent({
       index: number,
       step: -1 | 1
     ) {
+      await this.keepFocus(event, index + step, playlist.cipherIds.length, () =>
+        this.moveInPlaylist(playlist, index, step)
+      );
+    },
+
+    async moveCipherWithKeyboard(
+      event: KeyboardEvent,
+      index: number,
+      step: -1 | 1
+    ) {
+      await this.keepFocus(event, index + step, this.ciphers.length, () =>
+        this.moveCipher(index, step)
+      );
+    },
+
+    // MOVE E LEVA O FOCO PARA A ALÇA DA MÚSICA NA POSIÇÃO NOVA
+    async keepFocus(
+      event: KeyboardEvent,
+      target: number,
+      length: number,
+      move: () => Promise<unknown> | undefined
+    ) {
       const list = (event.currentTarget as HTMLElement).closest("ol");
-      const target = index + step;
 
-      if (target < 0 || target >= playlist.cipherIds.length) return;
+      if (target < 0 || target >= length) return;
 
-      const moving = this.moveInPlaylist(playlist, index, step);
+      const moving = move();
 
       await nextTick();
       list?.children[target]
@@ -720,6 +881,33 @@ export default defineComponent({
       color: var(--color-text-muted);
       font-size: var(--text-xs);
     }
+  }
+
+  &__item--selected {
+    border-color: var(--color-accent);
+  }
+
+  &__check,
+  &__select-all input {
+    flex: none;
+    width: 16px;
+    height: 16px;
+    margin: 0 4px;
+    accent-color: var(--color-accent);
+    cursor: pointer;
+  }
+
+  &__select-all {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-1);
+    font-size: var(--text-sm);
+    white-space: nowrap;
+    cursor: pointer;
+  }
+
+  &__info--selectable {
+    cursor: pointer;
   }
 
   &__badge {

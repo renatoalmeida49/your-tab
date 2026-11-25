@@ -273,6 +273,76 @@ test.describe("logado", () => {
     await expect(songs).toHaveText(["Primeira", "Segunda"]);
   });
 
+  test("acervo: arrastar e ↑/↓ reordenam as cifras", async ({ page, api }) => {
+    const first = api.addCipher({ ...SONG, title: "Primeira" });
+    const second = api.addCipher({ ...SONG, title: "Segunda" });
+    const third = api.addCipher({ ...SONG, title: "Terceira" });
+    const titles = page.locator(".library__cipher strong");
+    const handles = page.locator(".library__cipher .library__drag");
+
+    await openLibrary(page);
+    await expect(titles).toHaveText(["Terceira", "Segunda", "Primeira"]);
+
+    // ARRASTA A PRIMEIRA PARA BAIXO DA SEGUNDA
+    await handles.first().dragTo(page.locator(".library__cipher").nth(1), {
+      targetPosition: { x: 40, y: 30 },
+    });
+    await expect(titles).toHaveText(["Segunda", "Terceira", "Primeira"]);
+    await expect
+      .poll(() => api.ciphers.map((cipher) => cipher.id))
+      .toEqual([second.id, third.id, first.id]);
+
+    await handles.nth(2).focus();
+    await page.keyboard.press("ArrowUp");
+    await page.keyboard.press("ArrowUp");
+
+    await expect(titles).toHaveText(["Primeira", "Segunda", "Terceira"]);
+    await expect(handles.first()).toBeFocused();
+    await expect
+      .poll(() => api.ciphers.map((cipher) => cipher.id))
+      .toEqual([first.id, second.id, third.id]);
+
+    // BUSCANDO NÃO DÁ PARA REORDENAR
+    await page.getByPlaceholder("Buscar").fill("Seg");
+    await expect(titles).toHaveText(["Segunda"]);
+    await expect(handles).toHaveCount(0);
+  });
+
+  test("acervo: salvar a cifra aberta não muda a ordem", async ({
+    page,
+    api,
+  }) => {
+    api.addCipher({ ...SONG, title: "Primeira" });
+    api.addCipher({ ...SONG, title: "Segunda" });
+    const titles = page.locator(".library__cipher strong");
+
+    await openLibrary(page);
+    await page.locator(".library__open").nth(1).click();
+    await typeTitle(page, " editada");
+    await page.keyboard.press("Control+s");
+    await expect(page.locator(".app-bar__save")).toHaveText("Salvo");
+
+    await openLibrary(page);
+    await expect(titles).toHaveText(["Segunda", "Primeira editada"]);
+  });
+
+  test("acervo: se a API recusar, a ordem volta", async ({ page, api }) => {
+    api.addCipher({ ...SONG, title: "Primeira" });
+    api.addCipher({ ...SONG, title: "Segunda" });
+    api.expectedStatuses.push(500);
+    await page.route("**/api/ciphers/order", (route) =>
+      route.fulfill({ status: 500, body: "" })
+    );
+    const titles = page.locator(".library__cipher strong");
+
+    await openLibrary(page);
+    await page.locator(".library__cipher .library__drag").first().focus();
+    await page.keyboard.press("ArrowDown");
+
+    await expect(page.locator(".toast--error")).toBeVisible();
+    await expect(titles).toHaveText(["Segunda", "Primeira"]);
+  });
+
   test("sair volta para visitante e mantém a música", async ({ page }) => {
     await typeTitle(page, "Fica");
 

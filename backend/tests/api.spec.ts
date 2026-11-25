@@ -1,5 +1,5 @@
 import type { FastifyInstance } from "fastify";
-import { MongoClient, type Db } from "mongodb";
+import { MongoClient, ObjectId, type Db } from "mongodb";
 import { MongoMemoryServer } from "mongodb-memory-server";
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 import { buildApp } from "../src/app.js";
@@ -202,6 +202,79 @@ describe("cifras", () => {
     const api = as(await login("alice"));
 
     expect((await api("GET", "/api/ciphers/nao-e-um-id")).statusCode).toBe(404);
+  });
+
+  it("cifra nova entra no topo; editar não muda a ordem", async () => {
+    const api = as(await login("alice"));
+    const a = (await api("POST", "/api/ciphers", SONG)).json().id;
+    const b = (await api("POST", "/api/ciphers", SONG)).json().id;
+
+    await api("PUT", `/api/ciphers/${a}`, { ...SONG, tone: "G" });
+
+    const ids = (await api("GET", "/api/ciphers"))
+      .json()
+      .map(({ id }: { id: string }) => id);
+    expect(ids).toEqual([b, a]);
+  });
+
+  it("reordena o acervo", async () => {
+    const api = as(await login("alice"));
+    const a = (await api("POST", "/api/ciphers", SONG)).json().id;
+    const b = (await api("POST", "/api/ciphers", SONG)).json().id;
+    const c = (await api("POST", "/api/ciphers", SONG)).json().id;
+    const ids = async () =>
+      (await api("GET", "/api/ciphers"))
+        .json()
+        .map(({ id }: { id: string }) => id);
+
+    const response = await api("PUT", "/api/ciphers/order", { ids: [a, c, b] });
+    expect(response.statusCode).toBe(204);
+    expect(await ids()).toEqual([a, c, b]);
+
+    // A PRÓXIMA NOVA CONTINUA ENTRANDO NO TOPO
+    const d = (await api("POST", "/api/ciphers", SONG)).json().id;
+    expect(await ids()).toEqual([d, a, c, b]);
+  });
+
+  it("ordem que não bate com o acervo responde 409", async () => {
+    const alice = as(await login("alice"));
+    const bruno = as(await login("bruno"));
+    const a = (await alice("POST", "/api/ciphers", SONG)).json().id;
+    const b = (await alice("POST", "/api/ciphers", SONG)).json().id;
+    const outra = (await bruno("POST", "/api/ciphers", SONG)).json().id;
+
+    for (const ids of [[a], [a, b, outra], [a, outra]]) {
+      const response = await alice("PUT", "/api/ciphers/order", { ids });
+      expect(response.statusCode).toBe(409);
+    }
+    const repeated = await alice("PUT", "/api/ciphers/order", { ids: [a, a] });
+    expect(repeated.statusCode).toBe(400);
+  });
+
+  it("cifras sem posição (antigas) ficam na ordem de atualização", async () => {
+    const api = as(await login("alice"));
+    const a = (await api("POST", "/api/ciphers", SONG)).json().id;
+    const b = (await api("POST", "/api/ciphers", SONG)).json().id;
+    const c = (await api("POST", "/api/ciphers", SONG)).json().id;
+    const ciphers = db.collection("ciphers");
+
+    await ciphers.updateMany({}, { $unset: { position: "" } });
+    for (const [id, minute] of [
+      [a, 3],
+      [b, 1],
+      [c, 2],
+    ] as const) {
+      await ciphers.updateOne(
+        { _id: new ObjectId(id) },
+        { $set: { updatedAt: new Date(Date.UTC(2026, 0, 1, 0, minute)) } }
+      );
+    }
+
+    const d = (await api("POST", "/api/ciphers", SONG)).json().id;
+    const ids = (await api("GET", "/api/ciphers"))
+      .json()
+      .map(({ id }: { id: string }) => id);
+    expect(ids).toEqual([d, a, c, b]);
   });
 });
 

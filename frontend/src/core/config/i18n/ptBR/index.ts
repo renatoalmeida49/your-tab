@@ -144,6 +144,10 @@ export const locale = {
       songs: "nenhuma música | {n} música | {n} músicas",
       rename: "Renomear",
       deletePlaylist: "Excluir playlist",
+      select: "Selecionar",
+      selectHint: "Escolher as cifras para exportar",
+      selectAll: "Todas",
+      cancelSelect: "Cancelar",
       dragToReorder: "Arraste para reordenar (ou use ↑/↓)",
       removeFromPlaylist: "Tirar da playlist",
       errors: {
@@ -169,6 +173,8 @@ export const locale = {
       importedPlaylist: "Playlist {name} importada com {count} músicas",
       exportAll: "Exportar tudo",
       exportAllHint: "Baixa todas as cifras do acervo num arquivo .json",
+      exportSelected: "Exportar ({n})",
+      exportSelectedHint: "Baixa as cifras selecionadas num arquivo .json",
       exportPlaylist: "Baixar a playlist (.json)",
       errors: {
         invalid: "Arquivo inválido: não é um arquivo de música do Tab Builder",

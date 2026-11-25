@@ -23,6 +23,8 @@ const STORAGE_KEY = "tab-builder:cipher";
 // ÚLTIMO PEDIDO DE CADA PLAYLIST: RESPOSTA DE UM PEDIDO ANTERIOR (EX: ↑/↓
 // APERTADOS RÁPIDO) NÃO DESFAZ O QUE VEIO DEPOIS
 const playlistRequests: Record<string, number> = {};
+// O MESMO PARA A ORDEM DO ACERVO
+let cipherOrderRequest = 0;
 
 interface Link {
   cipherId: string | null;
@@ -172,10 +174,12 @@ export const useLibraryStore = defineStore("library", {
         cipher ??= await api.createCipher(fields);
 
         this.link(cipher.id, snapshot);
-        this.ciphers = [
-          summary(cipher),
-          ...this.ciphers.filter((item) => item.id != cipher.id),
-        ];
+
+        // EDITADA FICA NO LUGAR; NOVA ENTRA NO TOPO (COMO NA API)
+        const index = this.ciphers.findIndex((item) => item.id == cipher.id);
+
+        if (index >= 0) this.ciphers.splice(index, 1, summary(cipher));
+        else this.ciphers.unshift(summary(cipher));
         useUiStore().showFlash("components.library.saved");
       } catch (error) {
         fail(error);
@@ -256,10 +260,48 @@ export const useLibraryStore = defineStore("library", {
       if (id == this.cipherId) this.unlink();
     },
 
+    // NOVA ORDEM DO ACERVO NA HORA (O ARRASTO NÃO PULA DE VOLTA ENQUANTO A
+    // API RESPONDE). SE A API RECUSAR, VOLTA A ORDEM ANTERIOR, A MENOS QUE
+    // OUTRA MUDANÇA JÁ TENHA VINDO DEPOIS. 409: O ACERVO MUDOU EM OUTRO LUGAR,
+    // RECARREGA
+    async reorderCiphers(ciphers: CipherSummary[]) {
+      const previous = this.ciphers;
+      const request = ++cipherOrderRequest;
+
+      this.ciphers = ciphers;
+
+      try {
+        await api.reorderCiphers(ciphers.map((cipher) => cipher.id));
+      } catch (error) {
+        fail(error);
+
+        if (request != cipherOrderRequest) return;
+
+        if (error instanceof ApiError && error.status == 409) {
+          await this.fetchAll();
+        } else {
+          this.ciphers = previous;
+        }
+      }
+    },
+
+    // step -1 SOBE, 1 DESCE
+    moveCipher(index: number, step: -1 | 1) {
+      const target = index + step;
+      const ciphers = [...this.ciphers];
+
+      if (target < 0 || target >= ciphers.length) return;
+
+      [ciphers[index], ciphers[target]] = [ciphers[target], ciphers[index]];
+
+      return this.reorderCiphers(ciphers);
+    },
+
     // AS CIFRAS NUM ARQUIVO SÓ, NA ORDEM DE ids (A LISTA NÃO TRAZ AS PARTES:
-    // BUSCA CADA UMA). playlist: O ARQUIVO RECRIA A PLAYLIST AO IMPORTAR
-    async exportCiphers(ids: string[], playlist?: string) {
-      if (this.transferring || !ids.length) return;
+    // BUSCA CADA UMA). playlist: O ARQUIVO RECRIA A PLAYLIST AO IMPORTAR.
+    // true SE BAIXOU
+    async exportCiphers(ids: string[], playlist?: string): Promise<boolean> {
+      if (this.transferring || !ids.length) return false;
 
       this.transferring = true;
 
@@ -272,8 +314,12 @@ export const useLibraryStore = defineStore("library", {
           songFile(songs, now, playlist),
           songFileName(songs, now, playlist)
         );
+
+        return true;
       } catch (error) {
         fail(error);
+
+        return false;
       } finally {
         this.transferring = false;
       }
