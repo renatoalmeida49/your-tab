@@ -14,6 +14,9 @@ export interface UserDoc {
 export interface CipherDoc extends CipherFields {
   _id: ObjectId;
   userId: ObjectId;
+  // ORDEM DO ACERVO (MENOR PRIMEIRO). CIFRA ANTIGA PODE NÃO TER: GANHA AO
+  // LISTAR (VER ensurePositions)
+  position?: number;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -47,7 +50,7 @@ export async function ensureIndexes(db: Db): Promise<void> {
 
   await Promise.all([
     users.createIndex({ googleId: 1 }, { unique: true }),
-    ciphers.createIndex({ userId: 1, updatedAt: -1 }),
+    ciphers.createIndex({ userId: 1, position: 1 }),
     playlists.createIndex({ userId: 1, updatedAt: -1 }),
     playlists.createIndex({ cipherIds: 1 }),
   ]);

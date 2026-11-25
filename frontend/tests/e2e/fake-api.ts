@@ -100,6 +100,20 @@ export class FakeApi {
 
     if (!list) return json(404, { error: "Rota não encontrada" });
 
+    if (collection == "ciphers" && id == "order" && method == "PUT") {
+      const ids = (body as { ids: string[] }).ids;
+      const sorted = ids
+        .map((item) => this.ciphers.find((doc) => doc.id == item))
+        .filter((doc) => doc !== undefined);
+
+      if (sorted.length != this.ciphers.length || ids.length != sorted.length) {
+        return json(409, { error: "O acervo mudou; recarregue" });
+      }
+
+      this.ciphers = sorted;
+      return json(204);
+    }
+
     const index = list.findIndex((doc) => doc.id == id);
 
     if (!id && method == "GET") {

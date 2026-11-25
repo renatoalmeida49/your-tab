@@ -76,13 +76,33 @@
             {{ $t("components.library.noResults") }}
           </p>
 
-          <ul class="library__list">
+          <!-- ARRASTA PELA ALÇA; COM O FOCO NELA, ↑/↓ TAMBÉM MOVEM. BUSCANDO,
+               A LISTA É SÓ UM PEDAÇO DO ACERVO: SEM REORDENAR -->
+          <VueDraggable
+            tag="ol"
+            class="library__list library__ciphers"
+            handle=".library__drag"
+            :animation="150"
+            :disabled="searching"
+            :model-value="filtered"
+            @update:model-value="reorderCiphers($event)"
+          >
             <li
-              v-for="cipher in filtered"
+              v-for="(cipher, index) in filtered"
               :key="cipher.id"
               class="library__item library__cipher"
               :class="{ 'library__item--current': cipher.id == cipherId }"
             >
+              <button
+                v-if="!searching"
+                class="library__drag"
+                :title="$t('components.library.dragToReorder')"
+                :aria-label="$t('components.library.dragToReorder')"
+                @keydown.up.prevent="moveCipherWithKeyboard($event, index, -1)"
+                @keydown.down.prevent="moveCipherWithKeyboard($event, index, 1)"
+              >
+                <GripVertical :size="16" />
+              </button>
               <div class="library__info">
                 <strong>{{ titleOf(cipher) }}</strong>
                 <span>{{ details(cipher) }}</span>
@@ -163,7 +183,7 @@
                 </TheButton>
               </div>
             </li>
-          </ul>
+          </VueDraggable>
         </TabsContent>
 
         <TabsContent value="playlists" class="library__panel">
@@ -406,6 +426,10 @@ export default defineComponent({
       "transferring",
     ]),
 
+    searching(): boolean {
+      return !!this.query.trim();
+    },
+
     filtered(): CipherSummary[] {
       const words = normalize(this.query).split(/\s+/).filter(Boolean);
 
@@ -440,6 +464,8 @@ export default defineComponent({
       "moveInPlaylist",
       "reorderPlaylist",
       "deletePlaylist",
+      "reorderCiphers",
+      "moveCipher",
       "exportAll",
       "exportPlaylist",
       "importSongs",
@@ -500,12 +526,33 @@ export default defineComponent({
       index: number,
       step: -1 | 1
     ) {
+      await this.keepFocus(event, index + step, playlist.cipherIds.length, () =>
+        this.moveInPlaylist(playlist, index, step)
+      );
+    },
+
+    async moveCipherWithKeyboard(
+      event: KeyboardEvent,
+      index: number,
+      step: -1 | 1
+    ) {
+      await this.keepFocus(event, index + step, this.ciphers.length, () =>
+        this.moveCipher(index, step)
+      );
+    },
+
+    // MOVE E LEVA O FOCO PARA A ALÇA DA MÚSICA NA POSIÇÃO NOVA
+    async keepFocus(
+      event: KeyboardEvent,
+      target: number,
+      length: number,
+      move: () => Promise<unknown> | undefined
+    ) {
       const list = (event.currentTarget as HTMLElement).closest("ol");
-      const target = index + step;
 
-      if (target < 0 || target >= playlist.cipherIds.length) return;
+      if (target < 0 || target >= length) return;
 
-      const moving = this.moveInPlaylist(playlist, index, step);
+      const moving = move();
 
       await nextTick();
       list?.children[target]

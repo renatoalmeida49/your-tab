@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { objectIdString } from "../ids.js";
 
 // ESPELHA src/types/song.ts DO FRONTEND: A CIFRA É SALVA NO MESMO FORMATO
 // QUE O EDITOR USA, ENTÃO ABRIR E SALVAR NÃO PERDE NADA
@@ -30,3 +31,13 @@ export const cipherSchema = z.object({
 });
 
 export type CipherFields = z.infer<typeof cipherSchema>;
+
+// A ORDEM NOVA DO ACERVO: TODAS AS CIFRAS DO USUÁRIO, CADA UMA UMA VEZ
+export const cipherOrderSchema = z.object({
+  ids: z
+    .array(objectIdString)
+    .max(5000)
+    .refine((ids) => new Set(ids).size === ids.length, {
+      message: "cifra repetida",
+    }),
+});

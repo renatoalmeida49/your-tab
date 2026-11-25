@@ -60,6 +60,9 @@ export const api = {
   updateCipher: (id: string, fields: CipherFields) =>
     request<Cipher>("PUT", `/ciphers/${id}`, fields),
   deleteCipher: (id: string) => request<void>("DELETE", `/ciphers/${id}`),
+  // TODAS AS CIFRAS DO ACERVO, NA ORDEM NOVA
+  reorderCiphers: (ids: string[]) =>
+    request<void>("PUT", "/ciphers/order", { ids }),
 
   listPlaylists: () => request<Playlist[]>("GET", "/playlists"),
   createPlaylist: (fields: PlaylistFields) =>
