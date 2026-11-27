@@ -92,7 +92,7 @@ function summary(cipher: Cipher): CipherSummary {
 }
 
 // MOSTRA O ERRO NO RODAPÉ. 401: A SESSÃO ACABOU, PEDE LOGIN DE NOVO
-function fail(error: unknown): void {
+export function reportApiError(error: unknown): void {
   const ui = useUiStore();
 
   if (error instanceof ApiError && error.status == 401) {
@@ -182,7 +182,7 @@ export const useLibraryStore = defineStore("library", {
         else this.ciphers.unshift(summary(cipher));
         useUiStore().showFlash("components.library.saved");
       } catch (error) {
-        fail(error);
+        reportApiError(error);
       } finally {
         this.saving = false;
       }
@@ -199,9 +199,23 @@ export const useLibraryStore = defineStore("library", {
         ]);
       } catch (error) {
         this.loadFailed = true;
-        fail(error);
+        reportApiError(error);
       } finally {
         this.loading = false;
+      }
+    },
+
+    // SÓ AS PLAYLISTS, SEM AVISO DE ERRO: PARA A PALETA E O PALCO OFERECEREM
+    // "TOCAR PLAYLIST" SEM PRECISAR ABRIR O ACERVO ANTES
+    async loadPlaylists() {
+      if (!useAuthStore().user) return;
+
+      try {
+        this.playlists = await api.listPlaylists();
+      } catch (error) {
+        if (error instanceof ApiError && error.status == 401) {
+          useAuthStore().expire();
+        }
       }
     },
 
@@ -229,7 +243,7 @@ export const useLibraryStore = defineStore("library", {
 
         return true;
       } catch (error) {
-        fail(error);
+        reportApiError(error);
 
         return false;
       }
@@ -247,7 +261,7 @@ export const useLibraryStore = defineStore("library", {
       try {
         await api.deleteCipher(id);
       } catch (error) {
-        return fail(error);
+        return reportApiError(error);
       }
 
       // A API JÁ TIROU A CIFRA DAS PLAYLISTS; AQUI SÓ ESPELHA
@@ -273,7 +287,7 @@ export const useLibraryStore = defineStore("library", {
       try {
         await api.reorderCiphers(ciphers.map((cipher) => cipher.id));
       } catch (error) {
-        fail(error);
+        reportApiError(error);
 
         if (request != cipherOrderRequest) return;
 
@@ -317,7 +331,7 @@ export const useLibraryStore = defineStore("library", {
 
         return true;
       } catch (error) {
-        fail(error);
+        reportApiError(error);
 
         return false;
       } finally {
@@ -390,7 +404,7 @@ export const useLibraryStore = defineStore("library", {
           });
         }
       } catch (error) {
-        fail(error);
+        reportApiError(error);
       } finally {
         this.transferring = false;
       }
@@ -402,7 +416,7 @@ export const useLibraryStore = defineStore("library", {
 
         this.playlists.unshift(playlist);
       } catch (error) {
-        fail(error);
+        reportApiError(error);
       }
     },
 
@@ -426,7 +440,7 @@ export const useLibraryStore = defineStore("library", {
 
         return true;
       } catch (error) {
-        fail(error);
+        reportApiError(error);
 
         return false;
       }
@@ -504,7 +518,7 @@ export const useLibraryStore = defineStore("library", {
         await api.deletePlaylist(id);
         this.playlists = this.playlists.filter((item) => item.id != id);
       } catch (error) {
-        fail(error);
+        reportApiError(error);
       }
     },
   },

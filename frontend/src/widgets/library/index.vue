@@ -307,6 +307,18 @@
               <div class="library__actions">
                 <TheButton
                   size="sm"
+                  class="library__play-playlist"
+                  :disabled="!playlist.cipherIds.length"
+                  :title="$t('components.library.play')"
+                  @click="play(playlist)"
+                >
+                  <Play :size="16" />
+                  <span class="library__play-label">
+                    {{ $t("components.library.play") }}
+                  </span>
+                </TheButton>
+                <TheButton
+                  size="sm"
                   variant="ghost"
                   icon
                   class="library__export-playlist"
@@ -384,6 +396,17 @@
                     size="sm"
                     variant="ghost"
                     icon
+                    class="library__play-from"
+                    :title="$t('components.library.playFrom')"
+                    :aria-label="$t('components.library.playFrom')"
+                    @click="play(playlist, index)"
+                  >
+                    <Play :size="16" />
+                  </TheButton>
+                  <TheButton
+                    size="sm"
+                    variant="ghost"
+                    icon
                     class="library__remove-song"
                     :title="$t('components.library.removeFromPlaylist')"
                     :aria-label="$t('components.library.removeFromPlaylist')"
@@ -425,6 +448,7 @@ import {
   ListPlus,
   Music,
   Pencil,
+  Play,
   Plus,
   Search,
   Trash2,
@@ -435,6 +459,7 @@ import { VueDraggable } from "vue-draggable-plus";
 import { pickFiles } from "@/core/files";
 import { readSongFiles, SONG_FILE_ACCEPT } from "@/stores/commands";
 import { useLibraryStore } from "@/stores/library";
+import { useStageStore } from "@/stores/stage";
 import { useUiStore } from "@/stores/ui";
 import type { CipherSummary, Playlist } from "@/types/library";
 
@@ -464,6 +489,7 @@ export default defineComponent({
     ListPlus,
     Music,
     Pencil,
+    Play,
     Plus,
     SearchIcon: Search,
     TabsContent,
@@ -673,6 +699,13 @@ export default defineComponent({
         ?.querySelector<HTMLElement>(".library__drag")
         ?.focus();
       await moving;
+    },
+
+    // A PLAYLIST VAI PARA O PALCO, A PARTIR DA MÚSICA start. O EDITOR FICA
+    // COMO ESTÁ
+    play(playlist: Playlist, start = 0) {
+      this.setLibraryOpen(false);
+      useStageStore().playPlaylist(playlist, start);
     },
 
     async openCipher(id: string) {
@@ -929,6 +962,13 @@ export default defineComponent({
     display: flex;
     align-items: center;
     gap: var(--space-1);
+  }
+
+  // CELULAR: "TOCAR" SÓ COM O ÍCONE (TEM title)
+  &__play-label {
+    @media (max-width: 480px) {
+      display: none;
+    }
   }
 
   // DENTRO DO MODAL: O MENU PRECISA FICAR ACIMA DELE (.dropdown VEM DEPOIS
