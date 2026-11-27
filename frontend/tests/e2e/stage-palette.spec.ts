@@ -128,6 +128,60 @@ test.describe("modo palco", () => {
     await page.waitForTimeout(300);
     expect(await scrollTop()).toBe(stopped);
   });
+
+  test("rolar na mão não desliga a rolagem automática", async ({ page }) => {
+    await page.locator(".app-bar__stage").click();
+
+    const stage = page.locator(".stage");
+    const scrollTop = () => stage.evaluate((element) => element.scrollTop);
+
+    await page.keyboard.press(" ");
+    await expect.poll(scrollTop).toBeGreaterThan(10);
+
+    await page.mouse.move(200, 200);
+    await page.mouse.wheel(0, 200);
+    await expect.poll(scrollTop).toBeGreaterThan(200);
+
+    // CONTINUA DE ONDE O USUÁRIO PAROU
+    const afterWheel = await scrollTop();
+    await expect.poll(scrollTop).toBeGreaterThan(afterWheel + 10);
+    await expect(page.locator(".stage__play")).toHaveAttribute(
+      "aria-label",
+      /Pausar/
+    );
+  });
+
+  test.describe("no celular (375px)", () => {
+    test.use({
+      viewport: { width: 375, height: 667 },
+      deviceScaleFactor: 3,
+      isMobile: true,
+      hasTouch: true,
+    });
+
+    test("a página não estoura a tela e o play do palco rola a música", async ({
+      page,
+    }) => {
+      // UMA PÁGINA MAIS LARGA QUE O VIEWPORT AUMENTA O PALCO FIXO E JOGA OS
+      // CONTROLES PARA FORA DA TELA
+      const width = () =>
+        page.evaluate(() => document.documentElement.scrollWidth);
+      expect(await width()).toBeLessThanOrEqual(375);
+
+      await page.locator(".app-bar__stage").click();
+
+      const controls = await page.locator(".stage__controls").boundingBox();
+      expect(controls!.x).toBeGreaterThanOrEqual(0);
+      expect(controls!.x + controls!.width).toBeLessThanOrEqual(375);
+      expect(controls!.y + controls!.height).toBeLessThanOrEqual(667);
+
+      const stage = page.locator(".stage");
+      const scrollTop = () => stage.evaluate((element) => element.scrollTop);
+
+      await page.locator(".stage__play").tap();
+      await expect.poll(scrollTop).toBeGreaterThan(10);
+    });
+  });
 });
 
 test.describe("paleta de comandos", () => {
