@@ -70,6 +70,7 @@ import {
   FilePlus2,
   Languages,
   LibraryBig,
+  ListMusic,
   LogIn,
   LogOut,
   Minus,
@@ -91,6 +92,7 @@ import {
 import { useHistoryStore } from "@/stores/history";
 import { useLibraryStore } from "@/stores/library";
 import { useSongStore } from "@/stores/song";
+import { useStageStore } from "@/stores/stage";
 import { useThemeStore } from "@/stores/theme";
 import { useUiStore } from "@/stores/ui";
 
@@ -139,6 +141,18 @@ export default defineComponent({
       const history = useHistoryStore();
       const auth = useAuthStore();
       const library = useLibraryStore();
+
+      // CADA PLAYLIST COM MÚSICAS VAI DIRETO PARA O PALCO
+      const playlists: Command[] = auth.user
+        ? library.playlists
+            .filter((playlist) => playlist.cipherIds.length)
+            .map((playlist) => ({
+              id: `play-${playlist.id}`,
+              label: `${t("components.palette.playPlaylist")}: ${playlist.name}`,
+              icon: markRaw(ListMusic),
+              run: () => useStageStore().playPlaylist(playlist),
+            }))
+        : [];
 
       // ACERVO PARA QUEM ESTÁ LOGADO; "ENTRAR" PARA VISITANTE
       const account: Command[] = auth.user
@@ -190,6 +204,7 @@ export default defineComponent({
           icon: markRaw(MonitorPlay),
           run: () => ui.setStageOpen(true),
         },
+        ...playlists,
         {
           id: "export",
           label: t("components.palette.export"),
@@ -285,6 +300,8 @@ export default defineComponent({
 
       this.query = "";
       this.selected = 0;
+      // PARA OFERECER "TOCAR PLAYLIST" SEM TER ABERTO O ACERVO ANTES
+      useLibraryStore().loadPlaylists();
     },
 
     query() {
