@@ -170,9 +170,17 @@ export const locale = {
       openedFirst:
         "O arquivo tem {count} músicas: abrimos a primeira. Para trazer todas, use “Importar” no acervo",
       import: "Importar",
-      importHint: "Traz para o acervo as músicas de arquivos .json",
+      importHint:
+        "Traz para o acervo as músicas de arquivos .json. Arquivo de playlist recria a playlist; música que já está no acervo não é duplicada",
       imported: "Músicas importadas para o acervo: {count}",
+      importedReused:
+        "Músicas novas no acervo: {count}. Já estavam lá: {reused}",
       importedPlaylist: "Playlist {name} importada com {count} músicas",
+      importedPlaylistReused:
+        "Playlist {name} importada com {count} músicas ({reused} já estavam no acervo)",
+      importPlaylist: "Importar playlist",
+      importPlaylistHint:
+        "Recria uma playlist baixada pelo Tab Builder (.json). Música que já está no acervo não é duplicada",
       exportAll: "Exportar tudo",
       exportAllHint: "Baixa todas as cifras do acervo num arquivo .json",
       exportSelected: "Exportar ({n})",

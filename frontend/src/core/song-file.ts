@@ -169,6 +169,32 @@ export function parseSongFile(content: string): CipherFields[] {
   return parseSongFileContent(content).songs;
 }
 
+// O CONTEÚDO DE UMA PARTE, SEM O id (QUE NÃO MUDA O QUE APARECE NA TELA)
+function partContent(part: Part): string {
+  return JSON.stringify([
+    part.type,
+    part.type == "verse" ? part.info.chords : part.info.text,
+  ]);
+}
+
+// MESMA MÚSICA, CARACTERE POR CARACTERE: IMPORTAR UM ARQUIVO COM ELA REUSA A
+// CIFRA QUE JÁ ESTÁ NO ACERVO EM VEZ DE CRIAR UMA CÓPIA. QUALQUER DIFERENÇA
+// (EX: EDITADA DEPOIS DE EXPORTAR) CONTA COMO OUTRA MÚSICA: NADA SE PERDE
+export function sameSong(a: CipherFields, b: CipherFields): boolean {
+  return (
+    a.title.trim() == b.title.trim() &&
+    a.artist.trim() == b.artist.trim() &&
+    a.instrument == b.instrument &&
+    a.tone.trim() == b.tone.trim() &&
+    a.tuning.length == b.tuning.length &&
+    a.tuning.every((note, index) => note == b.tuning[index]) &&
+    a.parts.length == b.parts.length &&
+    a.parts.every(
+      (part, index) => partContent(part) == partContent(b.parts[index])
+    )
+  );
+}
+
 // CHAVE DO i18n DO AVISO DE ERRO AO LER UM ARQUIVO
 export function songFileMessage(error: unknown): string {
   return error instanceof SongFileError

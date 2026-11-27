@@ -2,7 +2,12 @@ import { defineStore } from "pinia";
 
 import { api, ApiError } from "@/core/api";
 import { downloadText } from "@/core/files";
-import { songFile, songFileName, type SongFileContent } from "@/core/song-file";
+import {
+  sameSong,
+  songFile,
+  songFileName,
+  type SongFileContent,
+} from "@/core/song-file";
 import type {
   Cipher,
   CipherFields,
@@ -352,9 +357,47 @@ export const useLibraryStore = defineStore("library", {
       );
     },
 
-    // CADA MÚSICA DOS ARQUIVOS VIRA UMA CIFRA NOVA, NA ORDEM DO ARQUIVO; ARQUIVO
-    // DE PLAYLIST RECRIA A PLAYLIST COM ELAS. SE A API FALHAR NO MEIO, AS QUE
-    // JÁ ENTRARAM FICAM
+    // id DA CIFRA DO ACERVO COM EXATAMENTE O MESMO CONTEÚDO DE song, OU null.
+    // A LISTA NÃO TRAZ AS PARTES: SÓ BUSCA AS CANDIDATAS (MESMO TÍTULO,
+    // ARTISTA, INSTRUMENTO E TOM). known GUARDA AS JÁ BUSCADAS
+    async findSameCipher(
+      song: CipherFields,
+      known: Map<string, CipherFields>
+    ): Promise<string | null> {
+      const candidates = this.ciphers.filter(
+        (cipher) =>
+          cipher.title.trim() == song.title.trim() &&
+          cipher.artist.trim() == song.artist.trim() &&
+          cipher.instrument == song.instrument &&
+          cipher.tone.trim() == song.tone.trim()
+      );
+
+      for (const candidate of candidates) {
+        let fields = known.get(candidate.id);
+
+        if (!fields) {
+          const cipher = await api.getCipher(candidate.id).catch((error) => {
+            // EXCLUÍDA NO MEIO DO CAMINHO: NÃO É CANDIDATA
+            if (error instanceof ApiError && error.status == 404) return null;
+            throw error;
+          });
+
+          if (!cipher) continue;
+
+          fields = fieldsOf(cipher);
+          known.set(candidate.id, fields);
+        }
+
+        if (sameSong(fields, song)) return candidate.id;
+      }
+
+      return null;
+    },
+
+    // AS MÚSICAS DOS ARQUIVOS ENTRAM NO ACERVO NA ORDEM DO ARQUIVO; ARQUIVO DE
+    // PLAYLIST RECRIA A PLAYLIST COM ELAS. MÚSICA IDÊNTICA A UMA DO ACERVO NÃO
+    // É DUPLICADA: A PLAYLIST USA A QUE JÁ EXISTE. SE A API FALHAR NO MEIO, AS
+    // QUE JÁ ENTRARAM FICAM
     async importSongs(contents: SongFileContent[]) {
       if (this.transferring) return;
 
@@ -362,14 +405,26 @@ export const useLibraryStore = defineStore("library", {
 
       try {
         const playlists: string[] = [];
+        const known = new Map<string, CipherFields>();
+        let reused = 0;
 
         for (const content of contents) {
           const ids: string[] = [];
 
           for (const song of content.songs) {
+            const same = await this.findSameCipher(song, known);
+
+            if (same) {
+              reused++;
+              ids.push(same);
+              continue;
+            }
+
             const cipher = await api.createCipher(song);
 
             this.ciphers = [summary(cipher), ...this.ciphers];
+            // OUTRO ARQUIVO COM A MESMA MÚSICA REUSA A QUE ACABOU DE ENTRAR
+            known.set(cipher.id, fieldsOf(cipher));
             ids.push(cipher.id);
           }
 
@@ -389,19 +444,20 @@ export const useLibraryStore = defineStore("library", {
           0
         );
 
+        const suffix = reused ? "Reused" : "";
+
         if (playlists.length == 1) {
           useUiStore().showFlash(
-            "components.songFile.importedPlaylist",
+            `components.songFile.importedPlaylist${suffix}`,
             false,
-            {
-              name: playlists[0],
-              count,
-            }
+            { name: playlists[0], count, reused }
           );
         } else {
-          useUiStore().showFlash("components.songFile.imported", false, {
-            count,
-          });
+          useUiStore().showFlash(
+            `components.songFile.imported${suffix}`,
+            false,
+            { count: count - reused, reused }
+          );
         }
       } catch (error) {
         reportApiError(error);

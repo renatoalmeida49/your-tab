@@ -358,6 +358,114 @@ test.describe("arquivo de músicas no acervo", () => {
     ]);
   });
 
+  test("a aba Playlists também importa o arquivo da playlist", async ({
+    page,
+    api,
+  }) => {
+    await openLibrary(page);
+    await page.locator(".library__tab-playlists").click();
+
+    await chooseFile(
+      page,
+      () => page.locator(".library__import-playlist").click(),
+      JSON.stringify({ ...JSON.parse(fileOf(SONG, OTHER)), playlist: "Luau" })
+    );
+
+    await expect(page.locator(".library__playlist")).toContainText("Luau");
+    await expect(page.locator(".library__song-title")).toHaveText([
+      "Segredos",
+      "Proud Mary",
+    ]);
+    // O BOTÃO FICA NO FORMULÁRIO DE CRIAR PLAYLIST: NÃO PODE ENVIÁ-LO
+    expect(api.playlists).toHaveLength(1);
+  });
+
+  test("música idêntica a uma do acervo não é duplicada", async ({
+    page,
+    api,
+  }) => {
+    const existing = api.addCipher(SONG);
+    await openLibrary(page);
+    await expect(page.locator(".library__cipher")).toHaveCount(1);
+
+    // OS ids DAS PARTES NÃO CONTAM: SÓ O CONTEÚDO
+    const sameContent = {
+      ...SONG,
+      parts: SONG.parts.map((part, index) => ({ ...part, id: `n${index}` })),
+    };
+
+    await chooseFile(
+      page,
+      () => page.locator(".library__import").click(),
+      JSON.stringify({
+        ...JSON.parse(fileOf(sameContent, OTHER)),
+        playlist: "Luau",
+      })
+    );
+
+    await expect(page.locator(".toast")).toContainText(
+      "Playlist Luau importada com 2 músicas (1 já estavam no acervo)"
+    );
+    expect(api.ciphers.map((cipher) => cipher.title).sort()).toEqual([
+      "Proud Mary",
+      "Segredos",
+    ]);
+    expect(api.playlists[0].cipherIds).toContain(existing.id);
+    await expect(page.locator(".library__cipher")).toHaveCount(2);
+  });
+
+  test("a mesma música com conteúdo diferente entra como cifra nova", async ({
+    page,
+    api,
+  }) => {
+    api.addCipher(SONG);
+    await openLibrary(page);
+
+    const edited = {
+      ...SONG,
+      parts: [
+        SONG.parts[0],
+        { ...SONG.parts[1], info: { text: "Outra letra" } },
+      ],
+    };
+
+    await chooseFile(
+      page,
+      () => page.locator(".library__import").click(),
+      fileOf(edited)
+    );
+
+    await expect(page.locator(".toast")).toContainText(
+      "Músicas importadas para o acervo: 1"
+    );
+    expect(api.ciphers).toHaveLength(2);
+  });
+
+  test("importar de novo o mesmo arquivo não duplica nada", async ({
+    page,
+    api,
+  }) => {
+    await openLibrary(page);
+
+    for (let round = 0; round < 2; round++) {
+      await chooseFile(
+        page,
+        () => page.locator(".library__import").click(),
+        fileOf(SONG, OTHER)
+      );
+      // O AVISO DA PRIMEIRA AINDA PODE ESTAR SUMINDO QUANDO O SEGUNDO APARECE
+      await expect(
+        page.locator(".toast", {
+          hasText: round
+            ? "Já estavam lá: 2"
+            : "Músicas importadas para o acervo: 2",
+        })
+      ).toBeVisible();
+    }
+
+    expect(api.ciphers).toHaveLength(2);
+  });
+
   test("importar arquivo inválido não cria nada", async ({ page, api }) => {
     await openLibrary(page);
 
