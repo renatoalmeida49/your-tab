@@ -9,8 +9,11 @@
     aria-modal="true"
     :aria-label="$t('components.stage.title')"
     :style="{ '--stage-size': `${fontSize}px` }"
-    @wheel="stopScroll"
-    @touchstart="stopScroll"
+    @wheel.passive="holdScroll"
+    @touchstart.passive="startTouch"
+    @touchend="endTouch"
+    @touchcancel="endTouch"
+    @scroll.passive="watchScroll"
   >
     <header class="stage__header">
       <h1>{{ title || $t("components.stage.untitled") }}</h1>
@@ -151,6 +154,8 @@ const MAX_SIZE = 40;
 const MAX_SPEED = 10;
 // PIXELS POR SEGUNDO EM CADA NÍVEL DE VELOCIDADE
 const PIXELS_PER_LEVEL = 10;
+// QUANTO ESPERAR DEPOIS DA ÚLTIMA ROLAGEM MANUAL PARA RETOMAR A AUTOMÁTICA
+const RESUME_DELAY = 300;
 
 // MÚSICA EM TELA CHEIA PARA TOCAR: SÓ LEITURA, LETRA GRANDE, TEMA ESCURO E
 // ROLAGEM AUTOMÁTICA
@@ -178,6 +183,12 @@ export default defineComponent({
       lastTime: 0,
       // FRAÇÃO DE PIXEL ACUMULADA ENTRE OS QUADROS
       carry: 0,
+      // ROLAGEM MANUAL EM ANDAMENTO: A AUTOMÁTICA ESPERA ATÉ holdUntil
+      touching: false,
+      holdUntil: 0,
+      // ÚLTIMA POSIÇÃO ESCRITA PELA ROLAGEM AUTOMÁTICA, PARA DISTINGUIR A
+      // NOSSA ROLAGEM DA DO USUÁRIO (BARRA DE ROLAGEM, TECLADO, INÉRCIA)
+      autoTop: 0,
     };
   },
 
@@ -233,9 +244,14 @@ export default defineComponent({
     },
 
     play() {
+      const stage = this.$refs.stage as HTMLElement | undefined;
+
       this.scrolling = true;
       this.lastTime = performance.now();
       this.carry = 0;
+      this.holdUntil = 0;
+      this.autoTop = stage?.scrollTop ?? 0;
+      cancelAnimationFrame(this.frame);
       this.frame = requestAnimationFrame(this.step);
     },
 
@@ -244,15 +260,42 @@ export default defineComponent({
       cancelAnimationFrame(this.frame);
     },
 
-    // ROLAR NA MÃO PAUSA A ROLAGEM AUTOMÁTICA
-    stopScroll() {
-      if (this.scrolling) this.pause();
+    // ROLAR NA MÃO NÃO DESLIGA A ROLAGEM AUTOMÁTICA: ELA SÓ ESPERA O USUÁRIO
+    // TERMINAR E CONTINUA DE ONDE ELE PAROU. ESCREVER scrollTop DURANTE A
+    // ROLAGEM MANUAL BRIGARIA COM O DEDO E CORTARIA A INÉRCIA E O SCROLL SUAVE
+    holdScroll() {
+      this.holdUntil = performance.now() + RESUME_DELAY;
+    },
+
+    startTouch() {
+      this.touching = true;
+    },
+
+    endTouch() {
+      this.touching = false;
+      this.holdScroll();
+    },
+
+    watchScroll() {
+      const stage = this.$refs.stage as HTMLElement | undefined;
+
+      if (!stage) return;
+
+      if (Math.abs(stage.scrollTop - this.autoTop) > 2) this.holdScroll();
+      this.autoTop = stage.scrollTop;
     },
 
     step(time: number) {
       const stage = this.$refs.stage as HTMLElement | undefined;
 
       if (!stage || !this.scrolling) return;
+
+      if (this.touching || time < this.holdUntil) {
+        this.lastTime = time;
+        this.carry = 0;
+        this.frame = requestAnimationFrame(this.step);
+        return;
+      }
 
       this.carry +=
         ((time - this.lastTime) / 1000) * this.speed * PIXELS_PER_LEVEL;
@@ -261,6 +304,7 @@ export default defineComponent({
       const pixels = Math.floor(this.carry);
       this.carry -= pixels;
       stage.scrollTop += pixels;
+      this.autoTop = stage.scrollTop;
 
       const atEnd =
         stage.scrollTop + stage.clientHeight >= stage.scrollHeight - 1;
@@ -378,6 +422,22 @@ export default defineComponent({
     .the-button {
       border-radius: var(--radius-full);
     }
+
+    // CELULAR: BOTÕES MENORES PARA A BARRA CABER INTEIRA EM 375px
+    @media (max-width: 480px) {
+      gap: var(--space-1);
+
+      .the-button--md {
+        height: 30px;
+      }
+    }
+
+    // TELAS MUITO ESTREITAS (320px): QUEBRA EM DUAS LINHAS EM VEZ DE ESTOURAR
+    @media (max-width: 360px) {
+      flex-wrap: wrap;
+      justify-content: center;
+      border-radius: var(--radius-lg);
+    }
   }
 
   &__group {
@@ -386,6 +446,11 @@ export default defineComponent({
     gap: 2px;
     padding-left: var(--space-2);
     border-left: 1px solid var(--color-border);
+
+    @media (max-width: 480px) {
+      gap: 0;
+      padding-left: var(--space-1);
+    }
   }
 
   &__value {

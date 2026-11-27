@@ -311,8 +311,30 @@ export default defineComponent({
 
   &__actions {
     display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
     align-items: center;
     gap: var(--space-1);
+    max-width: 100%;
+
+    // CELULAR: OS ÍCONES GANHAM UMA LINHA PRÓPRIA E ENCOLHEM UM POUCO PARA
+    // CABER EM 375px. SE A BARRA ESTOURAR A TELA, A PÁGINA TODA FICA MAIS
+    // LARGA QUE O VIEWPORT E OS ELEMENTOS FIXOS (MODO PALCO) SAEM DA TELA
+    @media (max-width: 480px) {
+      width: 100%;
+      justify-content: space-between;
+      gap: 0;
+
+      .the-button--md {
+        height: 32px;
+      }
+
+      .language-menu__trigger,
+      .account-menu__login {
+        padding: 0;
+        aspect-ratio: 1;
+      }
+    }
   }
 
   // NO CELULAR CABEM SÓ OS ÍCONES ESSENCIAIS (A PALETA É DE TECLADO)
