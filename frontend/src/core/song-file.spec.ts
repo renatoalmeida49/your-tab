@@ -3,6 +3,7 @@ import type { CipherFields } from "@/types/library";
 import {
   parseSongFile,
   parseSongFileContent,
+  sameSong,
   songFile,
   songFileName,
   SongFileError,
@@ -135,5 +136,47 @@ describe("songFileName", () => {
       "tab.json"
     );
     expect(songFileName([song, song], NOW)).toBe("tab-builder-2026-10-22.json");
+  });
+});
+
+describe("sameSong", () => {
+  it("mesmo conteúdo é a mesma música, mesmo com ids de parte diferentes", () => {
+    const copy: CipherFields = {
+      ...song,
+      tone: " G ",
+      parts: song.parts.map((part, index) => ({ ...part, id: `x${index}` })),
+    };
+
+    expect(sameSong(song, copy)).toBe(true);
+  });
+
+  it("qualquer diferença no conteúdo é outra música", () => {
+    const changes: Partial<CipherFields>[] = [
+      { title: "Segredos 2" },
+      { artist: "Barão Vermelho" },
+      { instrument: "bass" },
+      { tone: "A" },
+      { tuning: ["e", "B", "G", "D", "A", "D"] },
+      { tuning: ["G", "D", "A", "E"] },
+      { parts: song.parts.slice(0, 2) },
+      {
+        parts: [
+          { id: "1", type: "verse", info: { chords: "G      C" } },
+          ...song.parts.slice(1),
+        ],
+      },
+      // MESMO TEXTO, OUTRO TIPO DE PARTE
+      {
+        parts: [
+          song.parts[0],
+          { id: "2", type: "tab", info: { text: "Eu procuro um amor" } },
+          song.parts[2],
+        ],
+      },
+    ];
+
+    for (const change of changes) {
+      expect(sameSong(song, { ...song, ...change })).toBe(false);
+    }
   });
 });

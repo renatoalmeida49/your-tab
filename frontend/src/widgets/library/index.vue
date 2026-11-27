@@ -268,6 +268,20 @@
               <Plus :size="16" />
               {{ $t("components.library.createPlaylist") }}
             </TheButton>
+            <!-- O MESMO IMPORTADOR DA ABA CIFRAS: AQUI É ONDE SE PROCURA -->
+            <TheButton
+              size="sm"
+              variant="secondary"
+              class="library__import-playlist"
+              :disabled="transferring"
+              :title="$t('components.songFile.importPlaylistHint')"
+              @click="importFiles"
+            >
+              <Upload :size="16" />
+              <span class="library__import-label">
+                {{ $t("components.songFile.importPlaylist") }}
+              </span>
+            </TheButton>
           </form>
 
           <p v-if="!playlists.length" class="library__status">
@@ -964,8 +978,9 @@ export default defineComponent({
     gap: var(--space-1);
   }
 
-  // CELULAR: "TOCAR" SÓ COM O ÍCONE (TEM title)
-  &__play-label {
+  // CELULAR: "TOCAR" E "IMPORTAR PLAYLIST" SÓ COM O ÍCONE (TÊM title)
+  &__play-label,
+  &__import-label {
     @media (max-width: 480px) {
       display: none;
     }

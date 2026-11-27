@@ -170,9 +170,17 @@ export const locale: MessageSchema = {
       openedFirst:
         "The file has {count} songs: the first one was opened. To bring them all, use “Import” in the library",
       import: "Import",
-      importHint: "Adds the songs from .json files to the library",
+      importHint:
+        "Adds the songs from .json files to the library. A playlist file recreates the playlist; songs already in the library are not duplicated",
       imported: "Songs imported into the library: {count}",
+      importedReused:
+        "New songs in the library: {count}. Already there: {reused}",
       importedPlaylist: "Playlist {name} imported with {count} songs",
+      importedPlaylistReused:
+        "Playlist {name} imported with {count} songs ({reused} were already in the library)",
+      importPlaylist: "Import playlist",
+      importPlaylistHint:
+        "Recreates a playlist downloaded from Tab Builder (.json). Songs already in the library are not duplicated",
       exportAll: "Export all",
       exportAllHint: "Downloads every song in the library as a .json file",
       exportSelected: "Export ({n})",
